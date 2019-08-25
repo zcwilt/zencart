@@ -15,6 +15,7 @@ if (!defined('DIR_WS_IMAGES')) define('DIR_WS_IMAGES', 'images/');
 if (!defined('DIR_WS_INCLUDES')) define('DIR_WS_INCLUDES', 'includes/');
 if (!defined('DIR_WS_FUNCTIONS')) define('DIR_WS_FUNCTIONS', DIR_WS_INCLUDES . 'functions/');
 if (!defined('DIR_WS_CLASSES')) define('DIR_WS_CLASSES', DIR_WS_INCLUDES . 'classes/');
+if (!defined('DIR_WS_ADMIN_CLASSES')) define('DIR_WS_ADMIN_CLASSES', DIR_WS_INCLUDES . 'classes/admin/');
 if (!defined('DIR_WS_MODULES')) define('DIR_WS_MODULES', DIR_WS_INCLUDES . 'modules/');
 if (!defined('DIR_WS_LANGUAGES')) define('DIR_WS_LANGUAGES', DIR_WS_INCLUDES . 'languages/');
 if (!defined('DIR_WS_DOWNLOAD_PUBLIC')) define('DIR_WS_DOWNLOAD_PUBLIC', DIR_WS_CATALOG . 'pub/');

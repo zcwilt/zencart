@@ -161,4 +161,10 @@ class splitPageResultsNew{
       return sprintf($text_output, $from_num, $to_num, $this->number_of_rows);
     }
   }
+
+    public function getSqlQuery()
+    {
+        return $this->sql_query;
+    }
+
 }

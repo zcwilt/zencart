@@ -1425,6 +1425,7 @@ CREATE TABLE plugin_control (
   author varchar(40) NOT NULL,
   version varchar(10),
   zc_versions text NOT NULL,
+  infs tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (unique_key)
 ) ENGINE=MyISAM;
 
@@ -1440,6 +1441,7 @@ CREATE TABLE plugin_control_versions (
   version varchar(10),
   author varchar(40) NOT NULL,
   zc_versions text NOT NULL,
+  infs tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (unique_key, version)
 ) ENGINE=MyISAM;
 
@@ -2226,6 +2228,7 @@ VALUES ('configMyStore', 'BOX_CONFIGURATION_MY_STORE', 'FILENAME_CONFIGURATION',
        ('productsToCategories', 'BOX_CATALOG_PRODUCTS_TO_CATEGORIES', 'FILENAME_PRODUCTS_TO_CATEGORIES', '', 'catalog', 'Y', 17),
        ('payment', 'BOX_MODULES_PAYMENT', 'FILENAME_MODULES', 'set=payment', 'modules', 'Y', 1),
        ('shipping', 'BOX_MODULES_SHIPPING', 'FILENAME_MODULES', 'set=shipping', 'modules', 'Y', 2),
+       ('plugins', 'BOX_MODULES_PLUGINS', 'FILENAME_PLUGIN_MANAGER', '', 'modules', 'Y', 4),
        ('orderTotal', 'BOX_MODULES_ORDER_TOTAL', 'FILENAME_MODULES', 'set=ordertotal', 'modules', 'Y', 3),
        ('customers', 'BOX_CUSTOMERS_CUSTOMERS', 'FILENAME_CUSTOMERS', '', 'customers', 'Y', 1),
        ('orders', 'BOX_CUSTOMERS_ORDERS', 'FILENAME_ORDERS', '', 'customers', 'Y', 2),
@@ -3374,6 +3377,18 @@ INSERT INTO query_builder ( query_id , query_category , query_name , query_descr
 INSERT INTO get_terms_to_filter VALUES ('manufacturers_id', 'TABLE_MANUFACTURERS', 'manufacturers_name');
 INSERT INTO get_terms_to_filter VALUES ('music_genre_id', 'TABLE_MUSIC_GENRE', 'music_genre_name');
 INSERT INTO get_terms_to_filter VALUES ('record_company_id', 'TABLE_RECORD_COMPANY', 'record_company_name');
+
+#
+# Dumping data for table plugin groups
+#
+
+INSERT INTO plugin_groups VALUES ('admin');
+INSERT INTO plugin_groups VALUES ('marketing');
+INSERT INTO plugin_groups VALUES ('pricing');
+
+INSERT INTO plugin_groups_description VALUES ('admin', 1, 'Admin Tools');
+INSERT INTO plugin_groups_description VALUES ('marketing', 1, 'Marketing Tools');
+INSERT INTO plugin_groups_description VALUES ('pricing', 1, 'Pricing Tools');
 
 #
 # Dumping data for table project_version
