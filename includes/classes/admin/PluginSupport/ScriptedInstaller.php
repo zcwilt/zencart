@@ -4,8 +4,9 @@ namespace Zencart\PluginSupport;
 
 class ScriptedInstaller
 {
-    public function __construct()
+    public function __construct($dbConn)
     {
+        $this->dbConn = $dbConn;
         $this->errors = [];
     }
 
@@ -16,6 +17,11 @@ class ScriptedInstaller
     }
 
     protected function executeInstall()
+    {
+        return true;
+    }
+
+    protected function executeInstallSql($sql)
     {
         return true;
     }

@@ -7,10 +7,10 @@ class Installer
 
     protected $errors = [];
 
-    public function __construct($patchInstaller, $migrationInstaller)
+    public function __construct($patchInstaller, $scriptedInstallerFactory)
     {
         $this->patchInstaller = $patchInstaller;
-        $this->migrationInstaller = $migrationInstaller;
+        $this->scriptedInstallerFactory = $scriptedInstallerFactory;
     }
 
     public function executeInstallers($pluginDir)
@@ -21,7 +21,7 @@ class Installer
         if ($this->hasErrors()) {
             return;
         }
-        $this->executeMigrationInstaller($pluginDir);
+        $this->executeScriptedInstaller($pluginDir);
 //        die('heree');
     }
 
@@ -38,17 +38,14 @@ class Installer
         $this->patchInstaller->executePatchSql($paramLines);
     }
 
-    protected function executeMigrationInstaller($pluginDir)
+    protected function executeScriptedInstaller($pluginDir)
     {
-        if (!file_exists($pluginDir . '/Installer/sqlinstall/PluginMigrationInstall.php')) {
+        if (!file_exists($pluginDir . '/Installer/sqlinstall/ScriptedInstaller.php')) {
             return;
         }
-        require_once $pluginDir . '/Installer/sqlinstall/PluginMigrationInstall.php';
-        $migrationInstaller = new \ScriptedInstaller;
-        $result = $migrationInstaller->execute();
-        if ($this->hasErrors()) {
-            return;
-        }
+        $scriptedInstaller = $this->scriptedInstallerFactory->make($pluginDir, $dbConn);
+        $result = $scriptedInstaller->execute();
+        return $result;
     }
 
     public function hasErrors()

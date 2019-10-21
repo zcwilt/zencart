@@ -8,7 +8,7 @@
  */
 
 use Zencart\PluginSupport\SqlPatchInstaller;
-use Zencart\PluginSupport\ScriptedInstall;
+use Zencart\PluginSupport\ScriptedInstallerFactory;
 use Zencart\PluginSupport\InstallerFactory;
 use Zencart\PluginSupport\Installer;
 use Zencart\PluginManager\PluginManager;
@@ -19,9 +19,9 @@ require('includes/application_top.php');
 
 $pluginManager->inspectAndUpdate();
 
-$pluginSqlInstaller = new Installer(new SqlPatchInstaller($db), new ScriptedInstaller($db));
+$pluginInstaller = new Installer(new SqlPatchInstaller($db), new ScriptedInstallerFactory($db));
 
-$installerFactory = new InstallerFactory($db, $pluginSqlInstaller);
+$installerFactory = new InstallerFactory($db, $pluginInstaller);
 
 
 $tableDefinition = [

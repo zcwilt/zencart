@@ -1,8 +1,8 @@
 <?php
 
-use Zencart\PluginSupport\ScriptedInstaller as PluginMigrationInstallBase;
+use Zencart\PluginSupport\ScriptedInstaller as ScriptedInstallBase;
 
-class ScriptedInstaller extends PluginMigrationInstallBase
+class ScriptedInstaller extends ScriptedInstallBase
 {
     protected function executeInstall()
     {
@@ -19,6 +19,7 @@ class ScriptedInstaller extends PluginMigrationInstallBase
         $result = $this->executeInstallSql($sql);
         if (!$result) {
             $this->processError();
+            return false;
         }
 
         return true;
