@@ -7,7 +7,8 @@ class ScriptedInstaller
     public function __construct($dbConn)
     {
         $this->dbConn = $dbConn;
-        $this->errors = [];
+        $this->logErrors = [];
+        $this->messageErrors = [];
     }
 
     public function execute()
@@ -23,6 +24,12 @@ class ScriptedInstaller
 
     protected function executeInstallSql($sql)
     {
+        $this->dbConn->dieOnErrors = false;
+        $this->dbConn->Execute($sql);
+        if ($this->dbConn->error_number !== 0) {
+            $this->logErrors[] = $this->dbConn->error_text;
+        }
+        $this->dbConn->dieOnErrors = true;
         return true;
     }
 

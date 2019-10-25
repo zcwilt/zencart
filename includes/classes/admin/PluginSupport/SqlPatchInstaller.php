@@ -57,16 +57,16 @@ class SqlPatchInstaller
 
     public function executePatchSql($paramLines)
     {
+        $this->dbConn->dieOnErrors = false;
         foreach ($paramLines as $line) {
             $sql = implode($line, ' ') . ';';
-            $this->dbConn->dieOnErrors = false;
             $this->dbConn->execute($sql);
             if ($this->dbConn->error_number !== 0) {
                 $this->errors[] = $this->dbConn->error_text;
                 break;
             }
          }
-
+        $this->dbConn->dieOnErrors = true;
     }
 
 
