@@ -28,13 +28,20 @@ class ScriptedInstaller
         $this->dbConn->Execute($sql);
         if ($this->dbConn->error_number !== 0) {
             $this->logErrors[] = $this->dbConn->error_text;
+            $this->messageErrors['SQLFAILURE'] = PLUGIN_INSTALL_SQL_FAILURE;
         }
         $this->dbConn->dieOnErrors = true;
-        return true;
     }
 
-    protected function processError()
+    public function getErrors()
     {
-
+        return $this->logErrors;
     }
+
+    public function hasErrors()
+    {
+        return (count($this->logErrors) > 0);
+    }
+
+
 }

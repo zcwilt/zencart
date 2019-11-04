@@ -29,11 +29,11 @@ class InstallerFactory
             throw new PluginInstallerException('NO VERSION MANIFEST');
         }
         if (!file_exists($versionDir . 'installer/' . 'Installer.php')) {
-            $installer = new BasePluginInstaller($this->dbConn, $this->configInstaller, $this->sqlInstaller);
+            $installer = new BasePluginInstaller($this->dbConn, $this->sqlInstaller);
             return $installer;
         }
         require_once($versionDir . 'Installer');
-        $installer = new Installer($this->dbConn, $this->configInstaller, $this->sqlInstaller);
+        $installer = new Installer($this->dbConn, $this->sqlInstaller);
         return $installer;
     }
 }

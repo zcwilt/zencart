@@ -6,7 +6,7 @@ class ScriptedInstaller extends ScriptedInstallBase
 {
     protected function executeInstall()
     {
-        $sql = "CRREATE TABLE IF NOT EXISTS reward_master (
+        $sql = "CcREATE TABLE IF NOT EXISTS reward_master (
                                rewards_products_id INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                scope INT( 1 ) NOT NULL DEFAULT '0',
                                scope_id INT( 11 ) NOT NULL DEFAULT '0',
@@ -16,13 +16,8 @@ class ScriptedInstaller extends ScriptedInstallBase
                                redeem_points DOUBLE( 15, 4 ) NULL,
                                UNIQUE unique_id ( scope , scope_id ));";
 
-        $result = $this->executeInstallSql($sql);
-        if (!$result) {
-            $this->processError();
-            return false;
-        }
-
-        return true;
+        $installed = $this->executeInstallSql($sql);
+        return $installed;
     }
 
 

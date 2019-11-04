@@ -21,8 +21,8 @@ class Installer
         if ($this->hasErrors()) {
             return;
         }
-        $this->executeScriptedInstaller($pluginDir);
-//        die('heree');
+        $scriptedInstaller = $this->executeScriptedInstaller($pluginDir);
+        $this->errors = $scriptedInstaller->getErrors();
     }
 
     protected function executePatchInstaller($pluginDir)
@@ -41,11 +41,11 @@ class Installer
     protected function executeScriptedInstaller($pluginDir)
     {
         if (!file_exists($pluginDir . '/Installer/sqlinstall/ScriptedInstaller.php')) {
-            return;
+             return;
         }
-        $scriptedInstaller = $this->scriptedInstallerFactory->make($pluginDir, $dbConn);
-        $result = $scriptedInstaller->execute();
-        return $result;
+        $scriptedInstaller = $this->scriptedInstallerFactory->make($pluginDir);
+        $scriptedInstaller->execute();
+        return $scriptedInstaller;
     }
 
     public function hasErrors()

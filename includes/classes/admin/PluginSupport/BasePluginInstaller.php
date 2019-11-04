@@ -7,10 +7,9 @@ class BasePluginInstaller
 
     protected $pluginDir;
 
-    public function __construct($dbConn, $configInstaller, $sqlInstaller)
+    public function __construct($dbConn, $sqlInstaller)
     {
         $this->dbConn = $dbConn;
-        $this->configInstaller = $configInstaller;
         $this->sqlInstaller = $sqlInstaller;
     }
 
@@ -23,8 +22,7 @@ class BasePluginInstaller
             $this->processSqlErrors();
             return false;
         }
-        //print_r($this->sqlInstaller->getErrors());die();
-        $this->setPluginVersionStatus($pluginKey, $version, 1);
+        //$this->setPluginVersionStatus($pluginKey, $version, 1);
         return true;
     }
 
