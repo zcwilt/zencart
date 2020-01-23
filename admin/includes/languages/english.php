@@ -424,6 +424,7 @@ define('TEXT_DISPLAY_NUMBER_OF_FEATURED', 'Displaying <b>%d</b> to <b>%d</b> (of
 define('TEXT_DISPLAY_NUMBER_OF_LANGUAGES', 'Displaying <b>%d</b> to <b>%d</b> (of <b>%d</b> languages)');
 define('TEXT_DISPLAY_NUMBER_OF_MANUFACTURERS', 'Displaying <b>%d</b> to <b>%d</b> (of <b>%d</b> manufacturers)');
 define('TEXT_DISPLAY_NUMBER_OF_NEWSLETTERS', 'Displaying <b>%d</b> to <b>%d</b> (of <b>%d</b> newsletters)');
+define('TEXT_DISPLAY_NUMBER_OF_OPTIONS', 'Displaying <b>%d</b> to <b>%d</b> (of <b>%d</b> options)');
 define('TEXT_DISPLAY_NUMBER_OF_ORDERS', 'Displaying <b>%d</b> to <b>%d</b> (of <b>%d</b> orders)');
 define('TEXT_DISPLAY_NUMBER_OF_ORDERS_STATUS', 'Displaying <b>%d</b> to <b>%d</b> (of <b>%d</b> orders status)');
 define('TEXT_DISPLAY_NUMBER_OF_PRICING_GROUPS', 'Displaying <b>%d</b> to <b>%d</b> (of <b>%d</b> pricing groups)');
@@ -671,7 +672,7 @@ define('ENTRY_EMAIL_OPTOUT_DISPLAY','Opted Out of Newsletters');
 define('ENTRY_NOTHING_TO_SEND','You haven\'t entered any content for your message');
 define('EMAIL_SEND_FAILED','ERROR: Failed sending email to: "%s" <%s> with subject: "%s"');
 define('EMAIL_SALUTATION', 'Dear');
-  
+
   define('EDITOR_NONE', 'Plain Text');
   define('TEXT_EDITOR_INFO', 'Text Editor');
   define('ERROR_EDITORS_FOLDER_NOT_FOUND', 'You have an HTML editor selected in \'My Store\' but the \'/editors/\' folder cannot be located. Please disable your selection or move your editor files into the \''.DIR_WS_CATALOG.'editors/\' folder');
@@ -759,8 +760,10 @@ define('EMAIL_SALUTATION', 'Dear');
 
   define('WARNING_WELCOME_DISCOUNT_COUPON_EXPIRES_IN', 'WARNING! Welcome Email Discount Coupon expires in %s days');
 
-define('WARNING_ADMIN_FOLDERNAME_VULNERABLE', 'CAUTION: <a href="http://tutorials.zen-cart.com/index.php?article=33" target="_blank">Your /admin/ foldername should be renamed to something less common</a>, to prevent unauthorized access.');
-define('WARNING_EMAIL_SYSTEM_DISABLED', 'WARNING: The email subsystem is turned off. No emails will be sent until it is re-enabled in Admin->Configuration->Email Options.');
+define('WARNING_ADMIN_FOLDERNAME_VULNERABLE', 'CAUTION: <a href="https://tutorials.zen-cart.com/index.php?article=33" target="_blank">Your /admin/ foldername should be renamed to something less common</a>, to prevent unauthorized access.');
+define('WARNING_EMAIL_SYSTEM_DISABLED', 'WARNING: The email subsystem is disabled. No emails will be sent until it is re-enabled in Admin->Configuration->Email Options.');
+define('WARNING_EMAIL_SYSTEM_DEVELOPER_OVERRIDE', 'WARNING: The sending of emails has been disabled as developer switch "DEVELOPER_OVERRIDE_EMAIL_STATUS" is set to "false".');
+define('WARNING_EMAIL_SYSTEM_DEVELOPER_EMAIL', 'WARNING: ALL emails will be sent to %s (as defined in "DEVELOPER_OVERRIDE_EMAIL_ADDRESS").');
 define('TEXT_CURRENT_VER_IS', 'You are presently using: ');
 define('ERROR_NO_DATA_TO_SAVE', 'ERROR: The data you submitted was found to be empty. YOUR CHANGES HAVE *NOT* BEEN SAVED. You may have a problem with your browser or your internet connection.');
 define('TEXT_HIDDEN', 'Hidden');

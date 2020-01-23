@@ -14,7 +14,7 @@ class InitSystem
 
     protected $context;
     protected $loaderPrefix;
-    protected $fileSytem;
+    protected $fileSystem;
     protected $pluginManager;
 
     public function __construct($context, $loaderPrefix, $fileSystem, $pluginManager, $installedPlugins)
@@ -100,9 +100,8 @@ class InitSystem
         $objectName = $entry['objectName'];
         $className = $entry['className'];
         $this->debugList[] = 'processing class instantiate - class = ' . $className . ' object name = ' . $objectName;
-        $classSession = (isset($entry['classSession']) && $entry['classSession'] === true) ? true : false;
-        $checkInstantiated = (isset($entry['checkInstantiated']) && $entry['checkInstantiated'] === true) ? true :
-            false;
+        $classSession = (isset($entry['classSession']) && $entry['classSession'] === true);
+        $checkInstantiated = (isset($entry['checkInstantiated']) && $entry['checkInstantiated'] === true);
         if (!$classSession) {
             $this->debugList[] = 'instantiating normal class - ' . $className . ' as ' . $objectName;
             $this->actionList[] = ['type' => 'class', 'object' => $objectName, 'class' => $className];
@@ -113,7 +112,7 @@ class InitSystem
         return;
     }
 
-    protected function processObjectMethod($entry)
+    protected function processAutoTypeObjectMethod($entry)
     {
         $objectName = $entry['objectName'];
         $methodName = $entry['methodName'];

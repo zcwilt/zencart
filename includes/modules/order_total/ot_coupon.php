@@ -137,13 +137,15 @@ class ot_coupon {
    */
   function credit_selection() {
     global $discount_coupon, $request_type;
-    if (!isset($discount_coupon->fields['coupon_code'])) {
-      $discount_coupon->fields['coupon_code'] = '';
+
+    $coupon_code = '';
+    if (isset($discount_coupon->fields['coupon_code'])) {
+      $coupon_code = $discount_coupon->fields['coupon_code'];
     }
     // note the placement of the redeem code can be moved within the array on the instructions or the title
     $selection = array('id' => $this->code,
                        'module' => $this->title,
-                       'redeem_instructions' => MODULE_ORDER_TOTAL_COUPON_REDEEM_INSTRUCTIONS . ($discount_coupon->fields['coupon_code'] != '' ? MODULE_ORDER_TOTAL_COUPON_REMOVE_INSTRUCTIONS : '') . ($discount_coupon->fields['coupon_code'] != '' ? '<p>' . MODULE_ORDER_TOTAL_COUPON_TEXT_CURRENT_CODE . '<a href="javascript:couponpopupWindow(\'' . zen_href_link(FILENAME_POPUP_COUPON_HELP, 'cID=' . $_SESSION['cc_id'], $request_type) . '\')">' . $discount_coupon->fields['coupon_code'] . '</a></p><br />' : ''),
+                       'redeem_instructions' => MODULE_ORDER_TOTAL_COUPON_REDEEM_INSTRUCTIONS . ($coupon_code != '' ? MODULE_ORDER_TOTAL_COUPON_REMOVE_INSTRUCTIONS : '') . ($coupon_code != '' ? '<p>' . MODULE_ORDER_TOTAL_COUPON_TEXT_CURRENT_CODE . '<a href="javascript:couponpopupWindow(\'' . zen_href_link(FILENAME_POPUP_COUPON_HELP, 'cID=' . $_SESSION['cc_id'], $request_type) . '\')">' . $coupon_code . '</a></p><br />' : ''),
                        'fields' => array(array('title' => MODULE_ORDER_TOTAL_COUPON_TEXT_ENTER_CODE,
                                                'field' => zen_draw_input_field('dc_redeem_code', '', 'id="disc-' . $this->code . '" onkeyup="submitFunction(0,0)"'),
                                                'tag' => 'disc-'.$this->code
@@ -210,7 +212,7 @@ class ot_coupon {
           $this->clear_posts();
           zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL',true, false));
         }
-	
+
         $GLOBALS['zco_notifier']->notify(
             'NOTIFY_OT_COUPON_COUPON_INFO', 
             array(
@@ -218,7 +220,7 @@ class ot_coupon {
                 'code' => $dc_check
             )
         );
-	
+
         //$order_total = $this->get_order_total($coupon_result->fields['coupon_id']);
 
         // display all error messages at once
@@ -594,6 +596,20 @@ class ot_coupon {
           }
         }
       }
+
+      // -----
+      // Let an observer know that the coupon-related calculations have finished, providing read-only
+      // copies of (a) the base coupon information, (b) the results from 'get_order_total' and this
+      // method's return values.
+      //
+      $GLOBALS['zco_notifier']->notify(
+        'NOTIFY_OT_COUPON_CALCS_FINISHED', 
+        array(
+            'coupon' => $coupon, 
+            'order_totals' => $orderTotalDetails,
+            'od_amount' => $od_amount,
+        )
+      );
     }
 //    print_r($order->info);
 //    print_r($orderTotalDetails);echo "<br><br>";

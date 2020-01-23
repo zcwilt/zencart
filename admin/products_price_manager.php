@@ -88,7 +88,7 @@ if ($action == 'add_discount_qty_id') {
                                 WHERE products_id = " . (int)$products_filter . "
                                 ORDER BY discount_id DESC LIMIT 1");
   $add_cnt = 1;
-  $add_id = $add_id_query->fields['discount_id'];
+  $add_id = ($add_id_query->EOF) ? 0 : (int)$add_id_query->fields['discount_id'];
   while ($add_cnt <= DISCOUNT_QTY_ADD) {
     $db->Execute("INSERT INTO " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " (discount_id, products_id)
                   VALUES (" . ($add_id + $add_cnt) . ", " . (int)$products_filter . ")");
@@ -965,9 +965,11 @@ if (zen_not_null($action)) {
                 'discount_price' => $discount_qty['discount_price']);
             }
             ?>
+
+          <div class="well" style="color: #31708f;background-color: #d9edf7;border-color: #bce8f1;;padding: 10px 10px 0 0;">
             <div class="col-sm-12"><?php echo TEXT_DISCOUNT_TYPE_INFO; ?></div>
             <div class="form-group">
-                <?php echo zen_draw_label(TEXT_PRODUCTS_MIXED_DISCOUNT_QUANTITY, 'products_mixed_discount_quantity', 'class="control-label col-sm-3"'); ?>
+              <?php echo zen_draw_label(TEXT_PRODUCTS_MIXED_DISCOUNT_QUANTITY, 'products_mixed_discount_quantity', 'class="control-label col-sm-3"'); ?>
               <div class="col-sm-9 col-md-6">
                 <div class="radio-inline">
                   <label><?php echo zen_draw_radio_field('products_mixed_discount_quantity', '1', $pInfo->products_mixed_discount_quantity == 1, '', $jsreadonly) . TEXT_YES; ?></label>
@@ -989,6 +991,7 @@ if (zen_not_null($action)) {
                   <?php echo zen_draw_pull_down_menu('products_discount_type_from', $discount_type_from_array, $pInfo->products_discount_type_from, 'class="form-control"'. $readonly); ?>
               </div>
             </div>
+           </div>
             <div class="table-responsive">
               <table class="table table-bordered">
                 <thead>
