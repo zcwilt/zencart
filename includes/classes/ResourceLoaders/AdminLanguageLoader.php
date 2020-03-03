@@ -9,9 +9,9 @@
 
 namespace Zencart\LanguageLoader;
 
-use Zencart\FileSystem;
+use Zencart\FileSystem\FileSystem;
 
-class LanguageLoader
+class AdminLanguageLoader
 {
 
     public function __construct($pluginList, $currentPage)

@@ -7,7 +7,8 @@
  * @version $Id: DrByte 2019 May 26 Modified in v1.5.6b $
  */
 
-use Zencart\LanguageLoader\LanguageLoader as LanguageLoader;
+use Zencart\LanguageLoader\AdminLanguageLoader as LanguageLoader;
+use Zencart\LanguageLoader\LanguageLoaderFactory;
 
 if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
@@ -44,5 +45,6 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 // include the language translations
 $languagePage = ($PHP_SELF == 'home.php') ? 'index.php' : $PHP_SELF;
-$languageLoader = new LanguageLoader($installedPlugins, $languagePage);
+//$languageLoader = new LanguageLoader($installedPlugins, $languagePage);
+$langauageLoader = LanguageLoaderFactory::make('admin');
 $languageLoader->loadlanguageDefines();
