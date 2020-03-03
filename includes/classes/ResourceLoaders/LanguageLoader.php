@@ -9,6 +9,8 @@
 
 namespace Zencart\LanguageLoader;
 
+use Zencart\FileSystem;
+
 class LanguageLoader
 {
 
@@ -43,7 +45,8 @@ class LanguageLoader
 
     protected function loadLanguageExtraDefinitions()
     {
-        $this->loadFilesFromDirectory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/extra_definitions', '~^[^\._].*\.php$~i');
+        $fs = FileSystem::getInstance();
+        $fs->loadFilesFromDirectory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/extra_definitions', '~^[^\._].*\.php$~i');
         foreach ($this->pluginList as $plugin) {
             $pluginDir = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'];
             $extrasDir = $pluginDir . '/admin/includes/languages/' . $_SESSION['language'] . '/extra_definitions';
@@ -57,17 +60,4 @@ class LanguageLoader
         require_once(DIR_WS_LANGUAGES . $_SESSION['language'] . '.php');
     }
 
-
-////////// move below to filesystemclass ////////////////////
-
-    public function loadFilesFromDirectory($rootDir, $fileRegx)
-    {
-        if (!$dir = @dir($rootDir)) return;
-        while ($file = $dir->read()) {
-            if (preg_match($fileRegx, $file) > 0) {
-                require_once($rootDir . '/' . $file);
-            }
-        }
-        $dir->close();
-    }
 }
