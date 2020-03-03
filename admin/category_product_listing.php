@@ -531,8 +531,8 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
                   <strong><?php echo HEADING_TITLE_GOTO; ?></strong>
                 </div>
               <?php } ?>
-              <?php echo '</form>'; ?>
             </div>
+            <?php echo '</form>'; ?>
           </div>
         </div>
       <?php } ?>
@@ -555,7 +555,6 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
           }
 
           $categories_count = 0;
-          $rows = 0;
           if (isset($_GET['search'])) {
             $search = zen_db_prepare_input($_GET['search']);
 
@@ -603,8 +602,6 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
             <?php
             foreach ($categories as $category) {
               $categories_count++;
-              $rows++;
-
 // Get parent_id for subcategories if search
               if (isset($_GET['search'])) {
                 $cPath = $category['parent_id'];
@@ -780,8 +777,6 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
 
             foreach ($products as $product) {
               $products_count++;
-              $rows++;
-
 // Get categories_id for product if search
               if (isset($_GET['search'])) {
                 $cPath = $product['categories_id'];
@@ -841,7 +836,7 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
                         </a>
                       <?php } ?>
                       <?php if (zen_has_product_attributes($product['products_id'], 'false')) { ?>
-                        <a href="<?php echo zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING, 'cPath=' . $cPath . '&pID=' . $product['products_id'] . '&action=attribute_features' . (isset($_GET['page']) ? '&page=' . $_GET['page'] : '')); ?>" class="btn btn-sm btn-default btn-attributes-on" role="button"><strong>A</strong></i></a>
+                        <a href="<?php echo zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING, 'cPath=' . $cPath . '&pID=' . $product['products_id'] . '&action=attribute_features' . (isset($_GET['page']) ? '&page=' . $_GET['page'] : '')); ?>" class="btn btn-sm btn-default btn-attributes-on" role="button"><strong>A</strong></a>
                       <?php } else { ?>
                         <a href="<?php echo zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, 'products_filter=' . $product['products_id'] . '&current_category_id=' . $current_category_id); ?>" class="btn btn-sm btn-default btn-attributes-off" role="button"><strong>A</strong></a>
                       <?php } ?>

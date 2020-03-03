@@ -504,7 +504,7 @@ if (zen_not_null($action)) {
       // reset products_price_sorter for searches etc.
       zen_update_products_price_sorter($_POST['products_id']);
 
-      zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, ($currentPage != 0 ? 'page=' . $currentPage . '&' : '') . 'current_category_id=' . $_POST['current_category_id']));
+      zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, ($currentPage != 0 ? 'page=' . $currentPage . '&' : '') . 'current_category_id=' . $_POST['current_category_id'] . '&products_filter=' . $products_id));
       break;
     case 'delete_attribute':
       if (isset($_POST['delete_attribute_id'])) {
@@ -522,7 +522,7 @@ if (zen_not_null($action)) {
         // reset products_price_sorter for searches etc.
         zen_update_products_price_sorter($products_filter);
 
-        zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, ($currentPage != 0 ? 'page=' . $currentPage . '&' : '') . 'current_category_id=' . $_POST['current_category_id']));
+        zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, ($currentPage != 0 ? 'page=' . $currentPage . '&' : '') . 'current_category_id=' . $_POST['current_category_id'] . '&products_filter=' . $products_filter));
       }
       break;
 // delete all attributes
@@ -1130,7 +1130,6 @@ function zen_js_option_values_list($selectedName, $fieldName)
                                              FROM " . TABLE_PRODUCTS . "
                                              WHERE products_id = " . (int)$products_filter . "
                                              LIMIT 1");
-              $rows = 0;
 //  echo '$products_filter: ' . $products_filter . ' tax id: ' . $product_check->fields['products_tax_class_id'] . '<br>';
               foreach ($attributes_values as $attributes_value) {
                 $current_attributes_products_id = $attributes_value['products_id'];
@@ -1148,8 +1147,6 @@ function zen_js_option_values_list($selectedName, $fieldName)
                   $value_type = translate_type_to_name($sql_result->fields['products_options_type']);
                 }
                 $values_name = (!empty($attributes_value['options_values_id']) ? zen_values_name($attributes_value['options_values_id']) : $value_type);
-                $rows++;
-
 // delete all option name values
                 if ($current_options_name != $options_name) {
                   $current_options_name = $options_name;
