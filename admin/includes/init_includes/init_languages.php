@@ -46,5 +46,5 @@ if (!defined('IS_ADMIN_FLAG')) {
 // include the language translations
 $current_page = ($PHP_SELF == 'home.php') ? 'index.php' : $PHP_SELF;
 //$languageLoader = new LanguageLoader($installedPlugins, $current_page);
-$langauageLoader = LanguageLoaderFactory::make('admin');
+$languageLoader = LanguageLoaderFactory::make('admin', $installedPlugins, $current_page);
 $languageLoader->loadlanguageDefines();
