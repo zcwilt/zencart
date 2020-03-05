@@ -13,13 +13,6 @@ use Zencart\FileSystem\FileSystem;
 
 class CatalogLanguageLoader extends BaseLanguageLoader implements LanguageLoaderInterface
 {
-    public function __construct($pluginList, $currentPage)
-    {
-//        $this->pluginList = $pluginList;
-        $this->pluginList = []; // @todo temp
-        $this->currentPage = $currentPage;
-    }
-
     public function loadLanguageDefines()
     {
         $this->loadLanguageForView();
