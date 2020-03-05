@@ -11,15 +11,13 @@ namespace Zencart\LanguageLoader;
 
 use Zencart\FileSystem\FileSystem;
 
-class CatalogLanguageLoader extends BaseLanguageLoader implements LanguageLoaderInterface
+class CatalogLanguageLoader extends BaseLanguageLoader
 {
     public function loadLanguageDefines()
     {
-        $this->loadLanguageForView();
-        $this->loadLanguageExtraDefinitions();
-        $this->loadBaseLanguageFile();
+//        $this->loadLanguageForView();
+//        $this->loadLanguageExtraDefinitions();
+//        $this->loadBaseLanguageFile();
     }
-
-
 
 }
