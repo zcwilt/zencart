@@ -11,7 +11,7 @@ namespace Zencart\LanguageLoader;
 
 use Zencart\FileSystem\FileSystem;
 
-class AdminLanguageLoader
+class AdminLanguageLoader extends BaseLanguageLoader implements LanguageLoaderInterface
 {
 
     public function __construct($pluginList, $currentPage)
