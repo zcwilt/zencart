@@ -393,6 +393,7 @@ define('ICON_CROSS', 'False');
 define('ICON_CURRENT_FOLDER', 'Current Folder');
 define('ICON_DELETE', 'Delete');
 define('ICON_EDIT', 'Edit');
+define('ICON_EDIT_METATAGS', 'Edit Meta Tags');
 define('ICON_ERROR', 'Error');
 define('ICON_FILE', 'File');
 define('ICON_FILE_DOWNLOAD', 'Download');
@@ -691,8 +692,9 @@ define('EMAIL_SALUTATION', 'Dear');
   define('TEXT_PRODUCTS_IMAGE_MANUAL', '<br /><strong>Or, select an existing image file from server, filename:</strong>');
   define('TEXT_IMAGES_OVERWRITE', '<br /><strong>Overwrite Existing Image on Server?</strong>');
   define('TEXT_IMAGE_OVERWRITE_WARNING','WARNING: FILENAME was updated but not overwritten ');
-  define('TEXT_IMAGES_DELETE', '<strong>Delete Image?</strong> NOTE: Removes Image from Product, Image is NOT removed from server:');
+  define('TEXT_IMAGES_DELETE', '<strong>Remove Image?</strong> Note: Removes image from product (image is NOT deleted/removed from server):');
   define('TEXT_IMAGE_CURRENT', 'Image Name: ');
+  define('TEXT_IMAGE_NONEXISTENT', 'IMAGE FILE IS MISSING');
 
   define('ERROR_DEFINE_OPTION_NAMES', 'Warning: No Option Names have been defined');
   define('ERROR_DEFINE_OPTION_VALUES', 'Warning: No Option Values have been defined');
@@ -771,7 +773,7 @@ define('TEXT_NOEMAIL', 'No Email');
 
 define('BOX_HEADING_PRODUCT_TYPES', 'Product Types');
 
-define('ERROR_DATABASE_MAINTENANCE_NEEDED', '<a href="http://www.zen-cart.com/content.php?334-ERROR-0071-There-appears-to-be-a-problem-with-the-database-Maintenance-is-required" target="_blank">ERROR 0071: There appears to be a problem with the database. Maintenance is required.</a>');
+define('ERROR_DATABASE_MAINTENANCE_NEEDED', '<a href="https://docs.zen-cart.com/user/troubleshooting/error_71_maintenance_required/" target="_blank">ERROR 0071 There appears to be a problem with the database. Maintenance is required.</a>');
 
 // moved from currencies file:
 define('TEXT_INFO_CURRENCY_UPDATED', 'The exchange rate for %s (%s) was updated successfully to %s via %s.');
