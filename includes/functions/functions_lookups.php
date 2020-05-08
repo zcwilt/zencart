@@ -253,12 +253,14 @@
       // don't include READONLY attributes to determin if attributes must be selected to add to cart
       $attributes_query = "select pa.products_attributes_id
                            from " . TABLE_PRODUCTS_ATTRIBUTES . " pa left join " . TABLE_PRODUCTS_OPTIONS . " po on pa.options_id = po.products_options_id
-                           where pa.products_id = '" . (int)$products_id . "' and po.products_options_type != '" . PRODUCTS_OPTIONS_TYPE_READONLY . "' limit 1";
+                           where pa.products_id = '" . (int)$products_id . "' 
+                           and pa.is_hidden = 0 
+                           and po.products_options_type != '" . PRODUCTS_OPTIONS_TYPE_READONLY . "' limit 1";
     } else {
       // regardless of READONLY attributes no add to cart buttons
       $attributes_query = "select pa.products_attributes_id
                            from " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-                           where pa.products_id = '" . (int)$products_id . "' limit 1";
+                           where pa.products_id = '" . (int)$products_id . "' and pa.is_hidden = 0 limit 1";
     }
 
     $attributes = $db->Execute($attributes_query);
@@ -297,6 +299,7 @@
               from " . TABLE_PRODUCTS_ATTRIBUTES . " pa
               left join " . TABLE_PRODUCTS_OPTIONS . " po on pa.options_id = po.products_options_id
               where pa.products_id = " . (int)$products_id . "
+              and pa.is_hidden = 0
               and po.language_id = " . (int)$_SESSION['languages_id'] . "
               group by products_options_id, options_type";
 
@@ -1084,4 +1087,60 @@ function zen_get_orders_status_name($orders_status_id, $language_id = '')
           LIMIT 1"
     );
     return ($orders_status->EOF) ? '' : $orders_status->fields['orders_status_name'];
+}
+
+
+//faceted search stuff
+
+function zen_fs_has_searchable_attributes($productIds)
+{
+    global $db;
+    $sql = "SELECT * FROM " . TABLE_PRODUCTS_ATTRIBUTES . " AS pa 
+            WHERE pa.products_id IN (:productIds:) AND is_searchable = 1";
+    $sql = $db->bindVars($sql, ':productIds:', $productIds, 'inConstructInteger');
+    $result = $db->execute($sql, false, true, 600);
+    if (count($result)) return true;
+    return false;
+}
+
+function zen_fs_get_searchable_attributes($productIds)
+{
+    global $db;
+    $sql = "SELECT * FROM " . TABLE_PRODUCTS_ATTRIBUTES . " AS pa 
+            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS . " AS popt ON pa.options_id = popt.products_options_id 
+            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " AS povtov ON popt.products_options_id = povtov.products_options_id 
+            WHERE pa.products_id IN (:productId:) AND is_searchable = 1";
+    $sql = $db->bindVars($sql, ':productId:', $productIds, 'inConstructInteger');
+    $result = $db->execute($sql, false, true, 600);
+    return $result;
+}
+
+function zen_normalize_searchable_attributes($queryResults)
+{
+    $searchables = [];
+    foreach ($queryResults as $entry) {
+        $searchables[$entry['options_id']]['name'] = $entry['products_options_name'];
+    }
+    return $searchables;
+}
+
+function zen_fs_prepare_listing_sql($listingSql)
+{
+    $splitPoint = strpos($listingSql, ' FROM ' . TABLE_PRODUCTS);
+    if ($splitPoint == 0) return '';
+    $newSql = substr($listingSql, $splitPoint);
+    $newSql = "SELECT p.products_id " . $newSql;
+    return $newSql;
+}
+
+function zen_fs_create_productid_list($sql)
+{
+    global $db;
+    $idList = [];
+    $result = $db->execute($sql);
+    foreach ($result as $entry) {
+        $idList[] = $entry['products_id'];
+    }
+    $idList = implode(',', $idList);
+    return $idList;
 }

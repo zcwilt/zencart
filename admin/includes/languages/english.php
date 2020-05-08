@@ -140,6 +140,7 @@ define('BOX_CATALOG_PRODUCTS_PRICE_MANAGER', 'Products Price Manager');
 define('BOX_CATALOG_PRODUCT', 'Product');
 define('BOX_CATALOG_PRODUCTS_TO_CATEGORIES', 'Products to Categories');
 define('BOX_CATALOG_CATEGORY', 'Category');
+define('BOX_CATALOG_FACETED_SEARCH', 'Faceted Search');
 
 // customers box text
 define('BOX_HEADING_CUSTOMERS', 'Customers');

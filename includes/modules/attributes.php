@@ -22,7 +22,8 @@ $show_attributes_qty_prices_description = false;
 $sql = "SELECT count(*) as total
         FROM " . TABLE_PRODUCTS_OPTIONS . " popt
         LEFT JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " patrib ON (popt.products_options_id = patrib.options_id)
-        WHERE patrib.products_id = :products_id
+        WHERE patrib.products_id = :products_id 
+        AND patrib.is_hidden = 0
         AND popt.language_id = :language_id
         LIMIT 1";
 $sql = $db->bindVars($sql, ':products_id', $_GET['products_id'], 'integer');
@@ -59,6 +60,7 @@ $sql = "SELECT DISTINCT popt.products_options_id, popt.products_options_name, po
         FROM " . TABLE_PRODUCTS_OPTIONS . " popt
         LEFT JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " patrib ON (patrib.options_id = popt.products_options_id) 
         WHERE patrib.products_id= :products_id
+        AND patrib.is_hidden = 0 
         AND popt.language_id = :language_id " .
         $options_order_by;
 $sql = $db->bindVars($sql, ':products_id', $_GET['products_id'], 'integer');
@@ -98,6 +100,7 @@ while (!$products_options_names->EOF) {
             LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov ON (pa.options_values_id = pov.products_options_values_id)
             WHERE pa.products_id = :products_id
             AND   pa.options_id = :options_id
+            AND pa.is_hidden = 0 
             AND   pov.language_id = :language_id " .
             $order_by;
     $sql = $db->bindVars($sql, ':products_id', $_GET['products_id'], 'integer');

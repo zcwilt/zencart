@@ -187,6 +187,26 @@ if (zen_not_null($action)) {
       zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, zen_get_all_get_params($exclude_array)));
       break;
 
+    case 'set_flag_is_hidden':
+        $db->Execute("UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . "
+                SET is_hidden = " . ($_GET['flag'] == '0' ? '1' : '0') . "
+                WHERE products_id = " . (int)$_GET['products_filter'] . "
+                AND products_attributes_id = " . (int)$_GET['attributes_id']);
+
+        $exclude_array = ['action'];
+        zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, zen_get_all_get_params($exclude_array)));
+        break;
+
+    case 'set_flag_is_searchable':
+        $db->Execute("UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . "
+            SET is_searchable = " . ($_GET['flag'] == '0' ? '1' : '0') . "
+            WHERE products_id = " . (int)$_GET['products_filter'] . "
+            AND products_attributes_id = " . (int)$_GET['attributes_id']);
+
+        $exclude_array = ['action'];
+        zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, zen_get_all_get_params($exclude_array)));
+        break;
+
 //// EOF OF FLAGS
 /////////////////////////////////////////
 
@@ -275,6 +295,8 @@ if (zen_not_null($action)) {
           $attributes_price_letters = (float)$_POST['attributes_price_letters'];
           $attributes_price_letters_free = (int)$_POST['attributes_price_letters_free'];
           $attributes_required = (int)$_POST['attributes_required'];
+          $is_hidden = (int)$_POST['is_hidden'];
+          $is_searchable = (int)$_POST['is_searchable'];
 
 // add - update as record exists
 // attributes images
@@ -301,7 +323,7 @@ if (zen_not_null($action)) {
           }
           $attributes_image_name = zen_limit_image_filename($attributes_image_name, TABLE_PRODUCTS_ATTRIBUTES, 'attributes_image');
 
-          $db->Execute("INSERT INTO " . TABLE_PRODUCTS_ATTRIBUTES . " (products_id, options_id, options_values_id, options_values_price, price_prefix, products_options_sort_order, product_attribute_is_free, products_attributes_weight, products_attributes_weight_prefix, attributes_display_only, attributes_default, attributes_discounted, attributes_image, attributes_price_base_included, attributes_price_onetime, attributes_price_factor, attributes_price_factor_offset, attributes_price_factor_onetime, attributes_price_factor_onetime_offset, attributes_qty_prices, attributes_qty_prices_onetime, attributes_price_words, attributes_price_words_free, attributes_price_letters, attributes_price_letters_free, attributes_required)
+          $db->Execute("INSERT INTO " . TABLE_PRODUCTS_ATTRIBUTES . " (products_id, options_id, options_values_id, options_values_price, price_prefix, products_options_sort_order, product_attribute_is_free, products_attributes_weight, products_attributes_weight_prefix, attributes_display_only, attributes_default, attributes_discounted, attributes_image, attributes_price_base_included, attributes_price_onetime, attributes_price_factor, attributes_price_factor_offset, attributes_price_factor_onetime, attributes_price_factor_onetime_offset, attributes_qty_prices, attributes_qty_prices_onetime, attributes_price_words, attributes_price_words_free, attributes_price_letters, attributes_price_letters_free, attributes_required, is_hidden, is_searchable)
                         VALUES (" . (int)$products_id . ",
                                 " . (int)$options_id . ",
                                 " . (int)$values_id . ",
@@ -327,7 +349,10 @@ if (zen_not_null($action)) {
                                 " . (int)$attributes_price_words_free . ",
                                 " . (float)$attributes_price_letters . ",
                                 " . (int)$attributes_price_letters_free . ",
-                                " . (int)$attributes_required . ")");
+                                " . (int)$attributes_required . ",
+                                " . (int)$is_hidden . ",
+                                " . (int)$is_searchable . "
+                                )");
 
           $products_attributes_id = $db->Insert_ID();
 
@@ -415,6 +440,8 @@ if (zen_not_null($action)) {
           $attributes_price_letters = (float)$_POST['attributes_price_letters'];
           $attributes_price_letters_free = (int)$_POST['attributes_price_letters_free'];
           $attributes_required = (int)$_POST['attributes_required'];
+          $ais_hidden = (int)$_POST['is_hidden'];
+          $is_searchable = (int)$_POST['is_searchable'];
 
           $attribute_id = (int)$_POST['attribute_id'];
 
@@ -474,7 +501,9 @@ if (zen_not_null($action)) {
                             attributes_price_words_free = " . (int)$attributes_price_words_free . ",
                             attributes_price_letters = " . (float)$attributes_price_letters . ",
                             attributes_price_letters_free = " . (int)$attributes_price_letters_free . ",
-                            attributes_required = " . (int)$attributes_required . "
+                            attributes_required = " . (int)$attributes_required . ",
+                            is_hidden = " . (int)$is_hidden . "
+                            is_searchable = " . (int)$is_searchable . "
                         WHERE products_attributes_id = " . (int)$attribute_id);
 
           if (DOWNLOAD_ENABLED == 'true') {
@@ -717,9 +746,14 @@ function zen_js_option_values_list($selectedName, $fieldName)
       .is-discounted-attr-txt {color: #f0f;}
       .base-included-attr-txt {color: #d200f0;}
       .required-attr-txt {color: #ff0606;}
+      .hidden-attr-txt {color: #000000;}
+      .hidden-attr {background-color: #ffffff;}
+      .searchable-attr-txt {color: #00aa00;}
+      .searchable-attr {background-color: #00aa00;}
       .opacity-25 {opacity: 0.25;}
       .red-txt {color: #f00;}
       .black-txt {color: #000;}
+      .white-txt {color: #fff;}
     </style>
     <script>
       function popupWindow(url) {
@@ -975,6 +1009,8 @@ function zen_js_option_values_list($selectedName, $fieldName)
                   <td class="text-center"><?php echo LEGEND_ATTRIBUTE_IS_DISCOUNTED; ?></td>
                   <td class="text-center"><?php echo LEGEND_ATTRIBUTE_PRICE_BASE_INCLUDED; ?></td>
                   <td class="text-center"><?php echo LEGEND_ATTRIBUTES_REQUIRED; ?></td>
+                  <td class="text-center"><?php echo LEGEND_IS_HIDDEN; ?></td>
+                  <td class="text-center"><?php echo LEGEND_IS_SEARCHABLE; ?></td>
                   <td class="text-center"><?php echo LEGEND_ATTRIBUTES_IMAGES ?></td>
                   <td class="text-center"><?php echo LEGEND_ATTRIBUTES_DOWNLOAD ?></td>
                 </tr>
@@ -1039,6 +1075,26 @@ function zen_js_option_values_list($selectedName, $fieldName)
                       <i class="fa fa-check fa-stack-1x" aria-hidden="true"></i>
                     </span>
                   </td>
+                <td class="text-center">
+                <span class="fa-stack">
+                  <i class="fa fa-square fa-stack-2x hidden-attr-txt opacity-25" aria-hidden="true"></i>
+                  <i class="fa fa-times fa-stack-1x white-txt" aria-hidden="true"></i>
+                </span>
+                    <span class="fa-stack">
+                  <i class="fa fa-square fa-stack-2x hidden-attr-txt" aria-hidden="true"></i>
+                  <i class="fa fa-check fa-stack-1x white-txt" aria-hidden="true"></i>
+                </span>
+                </td>
+                <td class="text-center">
+                <span class="fa-stack">
+                  <i class="fa fa-square fa-stack-2x searchable-attr-txt opacity-25" aria-hidden="true"></i>
+                  <i class="fa fa-times fa-stack-1x" aria-hidden="true"></i>
+                </span>
+                 <span class="fa-stack">
+                  <i class="fa fa-square fa-stack-2x searchable-attr-txt" aria-hidden="true"></i>
+                  <i class="fa fa-check fa-stack-1x" aria-hidden="true"></i>
+                </span>
+                 </td>
                   <td class="text-center">
                     <span class="fa-stack">
                       <i class="fa fa-circle fa-stack-1x" aria-hidden="true" style="color: #fc0;"></i>
@@ -1345,6 +1401,8 @@ function zen_js_option_values_list($selectedName, $fieldName)
                               <th class="is-discounted-attr"><?php echo TEXT_ATTRIBUTE_IS_DISCOUNTED; ?></th>
                               <th class="base-included-attr"><?php echo TEXT_ATTRIBUTE_PRICE_BASE_INCLUDED; ?></th>
                               <th class="required-attr"><?php echo TEXT_ATTRIBUTES_REQUIRED; ?></th>
+                              <th class="hidden-attr"><?php echo TEXT_IS_HIDDEN; ?></th>
+                              <th class="searchable-attr"><?php echo TEXT_IS_SEARCHABLE; ?></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1397,6 +1455,22 @@ function zen_js_option_values_list($selectedName, $fieldName)
                                   <label><?php echo zen_draw_radio_field('attributes_required', '1', ($attributes_value['attributes_required'] == 1)) . TABLE_HEADING_YES; ?></label>
                                 </div>
                               </td>
+                                <td class="hidden-attr">
+                                    <div class="radio">
+                                        <label><?php echo zen_draw_radio_field('is_hidden', '0', ($attributes_value['is_hidden'] == 0)) . TABLE_HEADING_NO; ?></label>
+                                    </div>
+                                    <div class="radio">
+                                        <label><?php echo zen_draw_radio_field('is_hidden', '1', ($attributes_value['is_hidden'] == 1)) . TABLE_HEADING_YES; ?></label>
+                                    </div>
+                                </td>
+                                <td class="searchable-attr">
+                                    <div class="radio">
+                                        <label><?php echo zen_draw_radio_field('is_searchable', '0', ($attributes_value['is_searchable'] == 0)) . TABLE_HEADING_NO; ?></label>
+                                    </div>
+                                    <div class="radio">
+                                        <label><?php echo zen_draw_radio_field('is_searchable', '1', ($attributes_value['is_searchable'] == 1)) . TABLE_HEADING_YES; ?></label>
+                                    </div>
+                                </td>
                             </tr>
                           </tbody>
                         </table>
@@ -1622,6 +1696,28 @@ function zen_js_option_values_list($selectedName, $fieldName)
                             <?php } ?>
                           </span>
                         </a>
+                          <a href="<?php echo zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, 'action=set_flag_is_hidden' . '&attributes_id=' . $attributes_value['products_attributes_id'] . '&' . ($currentPage != 0 ? 'page=' . $currentPage . '&' : '') . 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id . '&flag=' . $attributes_value['is_hidden']); ?>" onClick="divertClick(this.href);return false;" title="<?php echo LEGEND_IS_HIDDEN; ?>">
+                          <span class="fa-stack">
+                            <?php if ($attributes_value['is_hidden'] == '0') { ?>
+                                <i class="fa fa-square fa-stack-2x hidden-attr-txt opacity-25" aria-hidden="true"></i>
+                                <i class="fa fa-times fa-stack-1x white-txt" aria-hidden="true"></i>
+                            <?php } else { ?>
+                                <i class="fa fa-square fa-stack-2x hidden-attr-txt" aria-hidden="true"></i>
+                                <i class="fa fa-check fa-stack-1x white-txt" aria-hidden="true"></i>
+                            <?php } ?>
+                          </span>
+                          </a>
+                          <a href="<?php echo zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, 'action=set_flag_is_searchable' . '&attributes_id=' . $attributes_value['products_attributes_id'] . '&' . ($currentPage != 0 ? 'page=' . $currentPage . '&' : '') . 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id . '&flag=' . $attributes_value['is_searchable']); ?>" onClick="divertClick(this.href);return false;" title="<?php echo LEGEND_IS_SEARCHABLE; ?>">
+                          <span class="fa-stack">
+                            <?php if ($attributes_value['is_searchable'] == '0') { ?>
+                                <i class="fa fa-square fa-stack-2x searchable-attr-txt opacity-25" aria-hidden="true"></i>
+                                <i class="fa fa-times fa-stack-1x" aria-hidden="true"></i>
+                            <?php } else { ?>
+                                <i class="fa fa-square fa-stack-2x searchable-attr-txt" aria-hidden="true"></i>
+                                <i class="fa fa-check fa-stack-1x" aria-hidden="true"></i>
+                            <?php } ?>
+                          </span>
+                          </a>
                       </td>
                     <?php } else { ?>
                       <td>&nbsp;</td>
@@ -1771,6 +1867,8 @@ function zen_js_option_values_list($selectedName, $fieldName)
                       $radio_attributes_discounted = zen_get_show_product_switch($products_filter, 'ATTRIBUTES_DISCOUNTED', 'DEFAULT_', '');
                       $radio_attributes_price_base_included = zen_get_show_product_switch($products_filter, 'ATTRIBUTES_PRICE_BASE_INCLUDED', 'DEFAULT_', '');
                       $radio_attributes_required = zen_get_show_product_switch($products_filter, 'ATTRIBUTES_REQUIRED', 'DEFAULT_', '');
+                      $radio_is_hidden = zen_get_show_product_switch($products_filter, 'IS_HIDDEN', 'DEFAULT_', '');
+                      $radio_is_searchable = zen_get_show_product_switch($products_filter, 'IS_SEARCHABLE', 'DEFAULT_', '');
 
                       $default_price_prefix = zen_get_show_product_switch($products_filter, 'PRICE_PREFIX', 'DEFAULT_', '');
                       $default_products_attributes_weight_prefix = zen_get_show_product_switch($products_filter, 'PRODUCTS_ATTRIBUTES_WEIGHT_PREFIX', 'DEFAULT_', '');
@@ -1898,6 +1996,8 @@ function zen_js_option_values_list($selectedName, $fieldName)
                             <th class="is-discounted-attr"><?php echo TEXT_ATTRIBUTE_IS_DISCOUNTED; ?></th>
                             <th class="base-included-attr"><?php echo TEXT_ATTRIBUTE_PRICE_BASE_INCLUDED; ?></th>
                             <th class="required-attr"><?php echo TEXT_ATTRIBUTES_REQUIRED; ?></th>
+                            <th class="hidden-attr"><?php echo TEXT_IS_HIDDEN; ?></th>
+                            <th class="searchable-attr"><?php echo TEXT_IS_SEARCHABLE; ?></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1950,6 +2050,22 @@ function zen_js_option_values_list($selectedName, $fieldName)
                                 <label><?php echo zen_draw_radio_field('attributes_required', '1', ($radio_attributes_required == 1)) . TABLE_HEADING_YES; ?></label>
                               </div>
                             </td>
+                              <td class="hidden-attr">
+                                  <div class="radio">
+                                      <label><?php echo zen_draw_radio_field('is_hidden', '0', ($radio_is_hidden == 0)) . TABLE_HEADING_NO; ?></label>
+                                  </div>
+                                  <div class="radio">
+                                      <label><?php echo zen_draw_radio_field('is_hidden', '1', ($radio_is_hidden == 1)) . TABLE_HEADING_YES; ?></label>
+                                  </div>
+                              </td>
+                              <td class="searchable-attr">
+                                  <div class="radio">
+                                      <label><?php echo zen_draw_radio_field('is_searchable', '0', ($radio_is_searchable == 0)) . TABLE_HEADING_NO; ?></label>
+                                  </div>
+                                  <div class="radio">
+                                      <label><?php echo zen_draw_radio_field('is_searchable', '1', ($radio_is_searchable == 1)) . TABLE_HEADING_YES; ?></label>
+                                  </div>
+                              </td>
                           </tr>
                         </tbody>
                       </table>

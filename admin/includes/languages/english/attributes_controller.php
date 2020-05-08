@@ -88,6 +88,8 @@ define('TABLE_TEXT_MAX_COUNT_SHORT', 'Max:');
   define('TEXT_ATTRIBUTE_IS_DISCOUNTED', 'Apply Discounts Used<br />by Product Special/Sale:');
   define('TEXT_ATTRIBUTE_PRICE_BASE_INCLUDED','Include in Base Price<br />When Priced by Attributes');
   define('TEXT_ATTRIBUTES_REQUIRED','Attribute Required<br />for Text<br />or File:');
+  define('TEXT_IS_HIDDEN','Attribute is hidden<br> from product display');
+  define('TEXT_IS_SEARCHABLE','Attribute can <br> be used in faceted search');
 
   define('LEGEND_BOX','Legend:');
   define('LEGEND_KEYS','OFF/ON');
@@ -97,6 +99,8 @@ define('TABLE_TEXT_MAX_COUNT_SHORT', 'Max:');
   define('LEGEND_ATTRIBUTE_IS_DISCOUNTED', 'Discounted');
   define('LEGEND_ATTRIBUTE_PRICE_BASE_INCLUDED','Base Price');
   define('LEGEND_ATTRIBUTES_REQUIRED','Required');
+  define('LEGEND_IS_HIDDEN','Hidden');
+  define('LEGEND_IS_SEARCHABLE','Searchable');
   define('LEGEND_ATTRIBUTES_IMAGES','Images');
   define('LEGEND_ATTRIBUTES_DOWNLOAD','Valid/Invalid<br />filename');
 
