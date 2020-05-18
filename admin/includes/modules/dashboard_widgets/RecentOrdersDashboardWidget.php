@@ -38,17 +38,22 @@ $currencies = new currencies();
             $amt .= ' (' . $order['order_total'] . ')';
           }
 
-          $sql = "SELECT op.products_quantity AS qty, op.products_name AS name, op.products_model AS model, opa.products_options AS product_option, opa.products_options_values AS product_value
-                  FROM " . TABLE_ORDERS_PRODUCTS . " op
-                  LEFT OUTER JOIN " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . " opa ON op.orders_products_id=opa.orders_products_id
+          $sql = "SELECT op.orders_products_id, op.products_quantity AS qty, op.products_name AS name, op.products_model AS model
+                  FROM " . TABLE_ORDERS_PRODUCTS . " op 
                   WHERE op.orders_id = " . (int)$order['orders_id'];
 
           $orderProducts = $db->Execute($sql, false, true, 1800);
           $product_details = '';
           foreach($orderProducts as $product) {
               $product_details .= $product['qty'] . ' x ' . $product['name'] . ' (' . $product['model'] . ')' . "\n";
-              if (!empty($product['product_option'])) {
-                  $product_details .= '&nbsp;&nbsp;- ' . $product['product_option'] . ': ' . zen_output_string_protected($product['product_value']) . "\n";
+              $sql = "SELECT products_options, products_options_values 
+                      FROM " .  TABLE_ORDERS_PRODUCTS_ATTRIBUTES . " 
+                      WHERE orders_products_id = " . (int)$product['orders_products_id'] . " ORDER BY orders_products_attributes_id ASC";
+              $productAttributes = $db->Execute($sql, false, true, 1800);
+              foreach ($productAttributes as $attr) {
+                  if (!empty($attr['products_options'])) { 
+                      $product_details .= '&nbsp;&nbsp;- ' . $attr['products_options'] . ': ' . zen_output_string_protected($attr['products_options_values']) . "\n";
+                   }
               }
               $product_details .= '<hr>'; // add HR
           }
@@ -62,7 +67,11 @@ $currencies = new currencies();
                 <?php echo $order['orders_id'] . ' - ' . substr($order['customers_name'], 0, 20); ?>
             </a>
           </td>
-          <td class="text-left">
+          <td class="text-right" title="<?php echo zen_output_string($product_details, array('"' => '&quot;', "'" => '&#39;', '<br />' => '', '<hr>' => "----\n")); ?>">
+            <?php echo $amt; ?>
+          </td>
+          <td class="text-right"><?php echo zen_date_short($order['date_purchased']); ?></td>
+          <td class="text-center">
               <a tabindex="0" class="btn btn-xs btn-link orderProductsPopover" role="button" data-toggle="popover"
                  data-trigger="focus"
                  data-placement="left"
@@ -72,8 +81,6 @@ $currencies = new currencies();
                   <?php echo TEXT_PRODUCT_POPUP_BUTTON; ?>
               </a>
           </td>
-          <td class="text-right"><?php echo $amt; ?></td>
-          <td class="text-right"><?php echo zen_date_short($order['date_purchased']); ?></td>
         </tr>
       <?php } ?>
     </table>
