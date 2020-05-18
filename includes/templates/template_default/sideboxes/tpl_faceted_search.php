@@ -8,4 +8,15 @@
 $content = '';
 
 $content .= '<div id="' . str_replace('_', '-', $box_id . 'Content') . '" class="sideBoxContent centeredContent">';
+//$content .= '<pre>' . print_r($processedAttributes, true) . '</pre>';
+$content .= '<ul>';
+foreach ($processedAttributes as $fsAttrKey => $fsAttrValue) {
+    $content .= '<li>' . $fsAttrKey . '-' . $fsAttrValue['name'] . '</li>';
+    $content .= '<ul>';
+    foreach ($fsAttrValue['values'] as $optValKey => $optValValue) {
+        $content .= '<li>' . $optValKey . '-' . $optValValue['name'] . '</li>';
+    }
+    $content .= '</ul>';
+}
+$content .= '</ul>';
 $content .= '</div>';

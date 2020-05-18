@@ -13,7 +13,7 @@ if ($concatSql == '') return;
 $productIds = zen_fs_create_productid_list($concatSql);
 if (!zen_fs_has_searchable_attributes($productIds)) return;
 $rawAttributes = zen_fs_get_searchable_attributes($productIds);
-print_r($rawAttributes);
+$processedAttributes = zen_fs_normalize_searchable_attributes($rawAttributes);
 
 require($template->get_template_dir('tpl_faceted_search.php',DIR_WS_TEMPLATE, $current_page_base,'sideboxes'). '/tpl_faceted_search.php');
 $title = '<label>' . BOX_HEADING_SEARCH . '</label>';

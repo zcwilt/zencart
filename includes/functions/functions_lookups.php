@@ -1108,18 +1108,29 @@ function zen_fs_get_searchable_attributes($productIds)
     global $db;
     $sql = "SELECT * FROM " . TABLE_PRODUCTS_ATTRIBUTES . " AS pa 
             LEFT JOIN " . TABLE_PRODUCTS_OPTIONS . " AS popt ON pa.options_id = popt.products_options_id 
-            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " AS povtov ON popt.products_options_id = povtov.products_options_id 
-            WHERE pa.products_id IN (:productId:) AND is_searchable = 1";
+            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " AS pov ON pov.products_options_values_id = pa.options_values_id
+            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_TYPES . " AS pot ON pot.products_options_types_id = popt.products_options_type
+            WHERE pa.products_id IN (:productId:) AND is_searchable = 1 AND popt.language_id = :languageId: AND pov.language_id = :languageId:";
     $sql = $db->bindVars($sql, ':productId:', $productIds, 'inConstructInteger');
+    $sql = $db->bindVars($sql, ':languageId:', $_SESSION['languages_id'], 'integer');
     $result = $db->execute($sql, false, true, 600);
     return $result;
 }
 
-function zen_normalize_searchable_attributes($queryResults)
+function zen_fs_normalize_searchable_attributes($queryResults)
 {
     $searchables = [];
     foreach ($queryResults as $entry) {
         $searchables[$entry['options_id']]['name'] = $entry['products_options_name'];
+        $searchables[$entry['options_id']]['type'] = $entry['products_options_types_name'];
+        if (!isset($searchables[$entry['options_id']]['values'])) {
+            $searchables[$entry['options_id']]['values'] = [];
+        }
+        if (!isset($searchables[$entry['options_id']]['values'][$entry['products_options_values_id']])) {
+            $searchables[$entry['options_id']]['values'][$entry['products_options_values_id']] = [];
+        }
+        $searchables[$entry['options_id']]['values'][$entry['products_options_values_id']]['name'] = $entry['products_options_values_name'];
+        //$searchables[$entry['options_id']]['values'] = $entry;
     }
     return $searchables;
 }
