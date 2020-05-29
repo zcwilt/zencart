@@ -191,8 +191,8 @@
   }
 
 ////
-// Parse search string into indivual objects
-  function zen_parse_search_string($search_str = '', &$objects) {
+// Parse search string into individual objects
+  function zen_parse_search_string($search_str = '', &$objects = array()) {
     $search_str = trim(strtolower($search_str));
 
 // Break up $search_str on whitespace; quoted string will be reconstructed later
@@ -1423,21 +1423,6 @@ function zen_set_field_length($tbl, $fld, $max = 70)
     $sql = $db->bindVars($sql, ':rcId:', $recordCompanyId, 'integer');
     $sql = $db->bindVars($sql, ':languageId:', $languageId, 'integer');
     $db->execute($sql);
-  }
-
-  /**
-   * function issetorArray
-   *
-   * returns an array[key] or default value if key does not exist
-   *
-   * @param array $array
-   * @param $key
-   * @param null $default
-   * @return mixed
-   */
-  function issetorArray(array $array, $key, $default = null)
-  {
-    return isset($array[$key]) ? $array[$key] : $default;
   }
 
   /////////////////////////////////////////////

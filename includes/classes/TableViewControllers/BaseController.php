@@ -1,8 +1,14 @@
 <?php
+/**
+ * @copyright Copyright 2003-2020 Zen Cart Development Team
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id: $
+ */
 
 namespace Zencart\TableViewControllers;
 
 use Zencart\Traits\EventManager;
+use Zencart\Paginator\Paginator;
 
 class BaseController implements TableViewController
 {
@@ -34,6 +40,7 @@ class BaseController implements TableViewController
     public function processRequest()
     {
         $this->action = $this->getAction();
+        $this->page = (isset($_GET['page'])) ? $_GET['page'] : 1;
         $this->queryParts = $this->buildListQuery();
         $this->queryBuilder->processQuery($this->queryParts);
         $listingSql = $this->queryBuilder->getQuery()['mainSql'];
@@ -70,7 +77,7 @@ class BaseController implements TableViewController
     public function getSelectedRowLink($tableData)
     {
         $fn = $_GET['cmd'];
-        $params = 'page=' . (isset($_GET['page']) ? $_GET['page'] : '1');
+        $params = 'page=' . $this->page;
         $params .= "&" . $this->getColKeyGetParamName() . "=" . $tableData['row'][$this->tableDefinition['colKey']];
         if ($this->getDefaultRowAction() != '') {
             $params .= "&action=" . $this->getDefaultRowAction();
@@ -82,7 +89,7 @@ class BaseController implements TableViewController
     public function getNotSelectedRowLink($tableData)
     {
         $fn = $_GET['cmd'];
-        $params = 'page=' . (isset($_GET['page']) ? $_GET['page'] : '1');
+        $params = 'page=' . $this->page;
         $params .= "&" . $this->getColKeyGetParamName() . "=" . $tableData['row'][$this->tableDefinition['colKey']];
         return zen_href_link($fn, $params);
 
@@ -189,9 +196,14 @@ class BaseController implements TableViewController
         return $action;
     }
 
+    public function getPage()
+    {
+        return $this->page;
+    }
+
     protected function getSplitPageListingSql($listingSql)
     {
-        $splitSql = new \splitPageResultsNew($listingSql, 10);
+        $splitSql = new Paginator($listingSql, 10);
         return $splitSql;
     }
 
@@ -230,6 +242,15 @@ class BaseController implements TableViewController
         return $this->splitPage;
     }
 
+    public function outputMessageList($errorList, $errorType)
+    {
+        if (!count($errorList)) {
+            return;
+        }
+        foreach ($errorList as $error) {
+            $this->messageStack->add_session($error, $errorType);
+        }
+    }
     protected function setTableDefinitionDefaults()
     {
         $this->notify('TABLE_CONTROLLER_SET_TABLE_DESC_DEFAULTS');
@@ -244,13 +265,11 @@ class BaseController implements TableViewController
         return $result;
     }
 
-    protected function processDefaultAction()
+    protected function arrayReplace($listResult, $colName, $columnInfo)
     {
-        $this->tableDefinition['header'][] = array(
-            'text' => ''
-        );
-        $this->tableDefinition['content'][] = [
-            'text' => ''
-        ];
+        $params = $columnInfo['derivedItem']['params'];
+        $listValue = $listResult[$colName];
+        $result = $params[$listValue];
+        return $result;
     }
 }

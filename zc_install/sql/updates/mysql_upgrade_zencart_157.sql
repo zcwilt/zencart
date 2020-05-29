@@ -220,6 +220,21 @@ UPDATE configuration SET val_function = '{"error":"TEXT_EMAIL_ADDRESS_VALIDATE",
 UPDATE configuration SET val_function = '{"error":"TEXT_EMAIL_ADDRESS_VALIDATE","id":"FILTER_CALLBACK","options":{"options":["configurationValidation","sanitizeEmail"]}}' WHERE configuration_key ='SEND_EXTRA_LOW_STOCK_EMAILS_TO';
 
 
+#
+# Table structure for table 'count_product_views'
+#
+CREATE TABLE IF NOT EXISTS count_product_views (
+  product_id int(11) NOT NULL default 0,
+  language_id int(11) NOT NULL default 1,
+  date_viewed date NOT NULL,
+  views int(11) default NULL,
+  PRIMARY KEY (product_id, language_id, date_viewed),
+  KEY idx_pid_lang_date_zen (language_id, product_id, date_viewed),
+  KEY idx_date_pid_lang_zen (date_viewed, product_id, language_id)
+) ENGINE=MyISAM;
+
+
+
 ALTER TABLE admin_activity_log MODIFY attention MEDIUMTEXT;
 
 # ZC 156 changed these fields in the install but not in the upgrade
@@ -258,6 +273,7 @@ CREATE TABLE plugin_control (
   author varchar(40) NOT NULL,
   version varchar(10),
   zc_versions text NOT NULL,
+  infs tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (unique_key)
 ) ENGINE=MyISAM;
 
@@ -273,6 +289,7 @@ CREATE TABLE plugin_control_versions (
   version varchar(10),
   author varchar(40) NOT NULL,
   zc_versions text NOT NULL,
+  infs tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (unique_key, version)
 ) ENGINE=MyISAM;
 
@@ -302,6 +319,7 @@ CREATE TABLE plugin_groups_description (
   PRIMARY KEY  (plugin_group_unique_key,language_id)
 ) ENGINE=MyISAM;
 
+INSERT INTO admin_pages (page_key, language_key, main_page, page_params, menu_key, display_on_menu, sort_order) VALUES  ('plugins', 'BOX_MODULES_PLUGINS', 'FILENAME_PLUGIN_MANAGER', '', 'modules', 'Y', 4);
 
 
 ######
@@ -320,7 +338,7 @@ SELECT project_version_key, project_version_major, project_version_minor, projec
 FROM project_version;
 
 ## Now set to new version
-UPDATE project_version SET project_version_major='1', project_version_minor='5.7-alpha', project_version_patch1='', project_version_patch1_source='', project_version_patch2='', project_version_patch2_source='', project_version_comment='Version Update 1.5.6->1.5.7-alpha', project_version_date_applied=now() WHERE project_version_key = 'Zen-Cart Main';
-UPDATE project_version SET project_version_major='1', project_version_minor='5.7-alpha', project_version_patch1='', project_version_patch1_source='', project_version_patch2='', project_version_patch2_source='', project_version_comment='Version Update 1.5.6->1.5.7-alpha', project_version_date_applied=now() WHERE project_version_key = 'Zen-Cart Database';
+UPDATE project_version SET project_version_major='1', project_version_minor='5.7-beta', project_version_patch1='', project_version_patch1_source='', project_version_patch2='', project_version_patch2_source='', project_version_comment='Version Update 1.5.6->1.5.7-beta', project_version_date_applied=now() WHERE project_version_key = 'Zen-Cart Main';
+UPDATE project_version SET project_version_major='1', project_version_minor='5.7-beta', project_version_patch1='', project_version_patch1_source='', project_version_patch2='', project_version_patch2_source='', project_version_comment='Version Update 1.5.6->1.5.7-beta', project_version_date_applied=now() WHERE project_version_key = 'Zen-Cart Database';
 
 ##### END OF UPGRADE SCRIPT

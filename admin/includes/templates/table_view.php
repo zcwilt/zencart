@@ -1,5 +1,11 @@
 <div class="container-fluid">
     <h1><?php echo HEADING_TITLE; ?></h1>
+    <div class="row noprint">
+        <div class="form-inline">
+            <div class="form-group col-xs-4 col-sm-3 col-md-3 col-lg-3">
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 configurationColumnLeft">
@@ -60,7 +66,8 @@
                     <?php echo $tableController->getSplitPage()->display_count(TEXT_DISPLAY_NUMBER_OF_COUNTRIES); ?>
                     </td>
                     <td class="text-right">
-                    <?php echo $tableController->getSplitPage()->display_links(MAX_DISPLAY_SEARCH_RESULTS, $_GET['page']); ?>
+                    <?php echo $tableController->getSplitPage()->display_links(MAX_DISPLAY_SEARCH_RESULTS,
+                                                                               $tableController->getPage()); ?>
                     </td>
                 </tr>
             </table>

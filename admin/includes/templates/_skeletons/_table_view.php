@@ -7,47 +7,21 @@
  * @version $Id:
  */
 
-use Zencart\PluginSupport\SqlPatchInstaller;
-use Zencart\PluginSupport\ScriptedInstaller;
-use Zencart\PluginSupport\PluginConfigInstaller;
-use Zencart\PluginSupport\InstallerFactory;
-use Zencart\PluginSupport\Installer;
-use Zencart\PluginManager\PluginManager;
 use Zencart\QueryBuilder\QueryBuilder;
 use Zencart\TableViewControllers\PluginManagerController;
 
 require('includes/application_top.php');
 
-$pluginSqlInstaller = new Installer(new SqlPatchInstaller($db), new ScriptedInstaller($db));
-
-$installerFactory = new InstallerFactory($db, $pluginSqlInstaller, new PluginConfigInstaller());
-
-
 $tableDefinition = [];
 
 $tableController = (new PluginManagerController(
-    $db, $messageStack, new QueryBuilder($db), $tableDefinition, $installerFactory))->processRequest();
-
+    $db, $messageStack, new QueryBuilder($db), $tableDefinition))->processRequest();
 
 ?>
 <!doctype html>
 <html <?php echo HTML_PARAMS; ?>>
 <head>
-    <meta charset="<?php echo CHARSET; ?>">
-    <title><?php echo TITLE; ?></title>
-    <link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
-    <link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
-    <script src="includes/menu.js"></script>
-    <script src="includes/general.js"></script>
-    <script>
-        function init() {
-            cssjsmenu('navbar');
-            if (document.getElementById) {
-                var kill = document.getElementById('hoverJS');
-                kill.disabled = true;
-            }
-        }
-    </script>
+    <?php require DIR_WS_INCLUDES . 'admin_html_head.php'; ?>
 </head>
 <body onload="init()">
 <!-- header //-->

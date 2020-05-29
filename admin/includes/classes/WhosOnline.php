@@ -313,51 +313,59 @@ class WhosOnline extends base
             return null;
         }
 
-        $products = [];
-        $total = [];
-
-        $start_field = [];
-        $session_data_field = [];
-
-        $session_fields = [
-            'id' => 'customer_id|s',
-            'currency' => 'currency|s',
-            'country' => 'customer_country_id|s',
-            'zone' => 'customer_zone_id|s',
-            'cart' => 'cart|O',
+        $extracted_data = [];
+        $fields_to_extract = [
+            'language' => 'language_name',
+            'languages_id' => 'language_id',
+            'languages_code' => 'language_code',
+            'customers_ip_address' => 'customer_ip',
+            'customers_host_address' => 'customer_hostname',
+            'customers_email_address' => 'customers_email_address',
+            'customer_default_address_id' => 'address_default_id',
+            'billto' => 'address_billing_id',
+            'sendto' => 'address_delivery_id',
+            'customer_country_id' => 'customer_country_id',
+            'customer_zone_id' => 'customer_zone_id',
+            'shipping_weight' => 'shipping_weight',
+            'shipping' => 'shipping',
+            'payment' => 'payment',
+            'cot_gv' => 'cot_gv',
+            'cart_errors' => 'cart_errors',
+            'comments' => 'checkout_comments',
         ];
 
-        foreach ($session_fields as $key => $value) {
-            $start_field[$key] = strpos($session_data, $value);
+        $adminSession = session_encode();
+        $backupSessionArray = $_SESSION;
 
-            // If the session type is not found then don't try to initiate it.
-            if (false === $start_field[$key]) {
-                continue;
+        if (session_decode($session_data) !== false) {
+            $cart = $_SESSION['cart'];
+            $currency = $_SESSION['currency'];
+
+            if (is_object($cart) && isset($currency)) {
+                $extracted_data['products'] = $cart->get_products();
+                $extracted_data['total'] = $GLOBALS['currencies']->format($cart->show_total(), true, $currency);
+                $extracted_data['cartObject'] = $cart;
+                $extracted_data['currency_code'] = $currency;
+                $extracted_data['cartID'] = $_SESSION['cartID'];
             }
 
-            $session_data_field[$key] = substr($session_data, $start_field[$key], (strpos($session_data, ';', $start_field[$key]) - $start_field[$key] + 1));
-
-            if ('cart' === $key) {
-                $end_cart = (int)strpos($session_data, 'check_valid|s');
-                $session_data_field[$key] = substr($session_data, $start_field[$key], ($end_cart - $start_field[$key]));
-
-//                  $end_cart = (int)strpos($session_data, '|', $start_field[$key] + strlen($value));
-//                  $end_cart = (int)strrpos(substr($session_data, 0, $end_cart), ';}');
-//                  $session_data_field[$key] = substr($session_data, $start_field[$key], ($end_cart - $start_field[$key] + 2));
+            foreach($fields_to_extract as $field => $as) {
+                if (isset($_SESSION[$field])) {
+                    $extracted_data[$as] = $_SESSION[$field];
+                }
             }
-
-            $backup = $_SESSION;
-            if (false === session_decode($session_data_field[$key])) {
-                $_SESSION = $backup;
-            }
-            unset($backup);
         }
 
-        if (isset($_SESSION['cart']) && is_object($_SESSION['cart'])) {
-            $products = $_SESSION['cart']->get_products();
-            $total = $GLOBALS['currencies']->format($_SESSION['cart']->show_total(), true, $_SESSION['currency']);
+        // protect against tampering
+        $_SESSION = $backupSessionArray;
+        foreach($_SESSION as $key) {
+            if (!isset($backupSessionArray[$key])) {
+                unset($_SESSION[$key]);
+            }
         }
+        session_decode($adminSession);
+        unset($adminSession, $backupSessionArray);
 
-        return ['total' => $total, 'products' => $products];
+        return $extracted_data;
     }
 }

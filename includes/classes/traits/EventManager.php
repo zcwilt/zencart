@@ -1,8 +1,11 @@
 <?php
+/**
+ * @copyright Copyright 2003-2019 Zen Cart Development Team
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id:  $
+ */
 
-
-namespace zencart\Traits;
-
+namespace Zencart\Traits;
 
 trait EventManager
 {
@@ -48,7 +51,7 @@ trait EventManager
             }
         }
         global $this_is_home_page, $PHP_SELF;
-        $main_page = (isset($this_is_home_page) && $this_is_home_page) ? 'index-home' : (IS_ADMIN_FLAG) ? basename($PHP_SELF) : (isset($_GET['main_page'])) ? $_GET['main_page'] : '';
+        $main_page = (isset($this_is_home_page) && $this_is_home_page) ? 'index-home' : ((IS_ADMIN_FLAG) ? basename($PHP_SELF) : (isset($_GET['main_page']) ? $_GET['main_page'] : ''));
         $output = '';
         if (count($paramArray)) {
             $output = ', ';

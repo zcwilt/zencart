@@ -383,6 +383,23 @@ CREATE TABLE counter_history (
 # --------------------------------------------------------
 
 #
+# Table structure for table 'count_product_views'
+#
+
+DROP TABLE IF EXISTS count_product_views;
+CREATE TABLE count_product_views (
+  product_id int(11) NOT NULL default 0,
+  language_id int(11) NOT NULL default 1,
+  date_viewed date NOT NULL,
+  views int(11) default NULL,
+  PRIMARY KEY (product_id, language_id, date_viewed),
+  KEY idx_pid_lang_date_zen (language_id, product_id, date_viewed),
+  KEY idx_date_pid_lang_zen (date_viewed, product_id, language_id)
+) ENGINE=MyISAM;
+
+# --------------------------------------------------------
+
+#
 # Table structure for table 'countries'
 #
 
@@ -1428,6 +1445,7 @@ CREATE TABLE plugin_control (
   author varchar(40) NOT NULL,
   version varchar(10),
   zc_versions text NOT NULL,
+  infs tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (unique_key)
 ) ENGINE=MyISAM;
 
@@ -1443,6 +1461,7 @@ CREATE TABLE plugin_control_versions (
   version varchar(10),
   author varchar(40) NOT NULL,
   zc_versions text NOT NULL,
+  infs tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (unique_key, version)
 ) ENGINE=MyISAM;
 
@@ -2231,6 +2250,7 @@ VALUES ('configMyStore', 'BOX_CONFIGURATION_MY_STORE', 'FILENAME_CONFIGURATION',
        ('productsToCategories', 'BOX_CATALOG_PRODUCTS_TO_CATEGORIES', 'FILENAME_PRODUCTS_TO_CATEGORIES', '', 'catalog', 'Y', 17),
        ('payment', 'BOX_MODULES_PAYMENT', 'FILENAME_MODULES', 'set=payment', 'modules', 'Y', 1),
        ('shipping', 'BOX_MODULES_SHIPPING', 'FILENAME_MODULES', 'set=shipping', 'modules', 'Y', 2),
+       ('plugins', 'BOX_MODULES_PLUGINS', 'FILENAME_PLUGIN_MANAGER', '', 'modules', 'Y', 4),
        ('orderTotal', 'BOX_MODULES_ORDER_TOTAL', 'FILENAME_MODULES', 'set=ordertotal', 'modules', 'Y', 3),
        ('customers', 'BOX_CUSTOMERS_CUSTOMERS', 'FILENAME_CUSTOMERS', '', 'customers', 'Y', 1),
        ('orders', 'BOX_CUSTOMERS_ORDERS', 'FILENAME_ORDERS', '', 'customers', 'Y', 2),
@@ -3384,9 +3404,9 @@ INSERT INTO get_terms_to_filter VALUES ('record_company_id', 'TABLE_RECORD_COMPA
 # Dumping data for table project_version
 #
 
-INSERT INTO project_version (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch1, project_version_patch1_source, project_version_patch2, project_version_patch2_source, project_version_comment, project_version_date_applied) VALUES (1, 'Zen-Cart Main', '1', '5.7-alpha', '', '', '', '', 'New Installation-v157-alpha', now());
-INSERT INTO project_version (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch1, project_version_patch1_source, project_version_patch2, project_version_patch2_source, project_version_comment, project_version_date_applied) VALUES (2, 'Zen-Cart Database', '1', '5.7-alpha', '', '', '', '', 'New Installation-v157-alpha', now());
-INSERT INTO project_version_history (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch, project_version_comment, project_version_date_applied) VALUES (1, 'Zen-Cart Main', '1', '5.7-alpha', '', 'New Installation-v157-alpha', now());
-INSERT INTO project_version_history (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch, project_version_comment, project_version_date_applied) VALUES (2, 'Zen-Cart Database', '1', '5.7-alpha', '', 'New Installation-v157-alpha', now());
+INSERT INTO project_version (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch1, project_version_patch1_source, project_version_patch2, project_version_patch2_source, project_version_comment, project_version_date_applied) VALUES (1, 'Zen-Cart Main', '1', '5.7-beta', '', '', '', '', 'New Installation-v157-beta', now());
+INSERT INTO project_version (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch1, project_version_patch1_source, project_version_patch2, project_version_patch2_source, project_version_comment, project_version_date_applied) VALUES (2, 'Zen-Cart Database', '1', '5.7-beta', '', '', '', '', 'New Installation-v157-beta', now());
+INSERT INTO project_version_history (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch, project_version_comment, project_version_date_applied) VALUES (1, 'Zen-Cart Main', '1', '5.7-beta', '', 'New Installation-v157-beta', now());
+INSERT INTO project_version_history (project_version_id, project_version_key, project_version_major, project_version_minor, project_version_patch, project_version_comment, project_version_date_applied) VALUES (2, 'Zen-Cart Database', '1', '5.7-beta', '', 'New Installation-v157-beta', now());
 
 ##### End of SQL setup for Zen Cart.

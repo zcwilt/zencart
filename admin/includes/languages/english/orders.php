@@ -36,7 +36,6 @@ define('TABLE_HEADING_PRICE_INCLUDING_TAX', 'Price (incl)');
 define('TABLE_HEADING_TOTAL_EXCLUDING_TAX', 'Total (excl)');
 define('TABLE_HEADING_TOTAL_INCLUDING_TAX', 'Total (incl)');
 define('TABLE_HEADING_PRICE', 'Price');
-define('TABLE_HEADING_TOTAL', 'Total');
 define('TABLE_HEADING_UPDATED_BY', 'Updated By');
 
 define('TABLE_HEADING_CUSTOMER_NOTIFIED', 'Customer Notified');
@@ -72,7 +71,7 @@ define('TEXT_ALL_ORDERS', 'All Orders');
 define('EMAIL_SEPARATOR', '------------------------------------------------------');
 define('EMAIL_TEXT_SUBJECT', 'Order Update');
 define('EMAIL_TEXT_ORDER_NUMBER', 'Order Number:');
-define('EMAIL_TEXT_INVOICE_URL', 'Detailed Invoice:');
+define('EMAIL_TEXT_INVOICE_URL', 'Order Details:');
 define('EMAIL_TEXT_DATE_ORDERED', 'Date Ordered:');
 define('EMAIL_TEXT_COMMENTS_UPDATE', '<em>The comments for your order are: </em>');
 define('EMAIL_TEXT_STATUS_UPDATED', 'Your order has been updated to the following status:' . "\n");
@@ -83,7 +82,7 @@ define('ERROR_ORDER_DOES_NOT_EXIST', 'Error: Order does not exist.');
 define('SUCCESS_ORDER_UPDATED', 'Success: Order has been successfully updated.');
 define('WARNING_ORDER_NOT_UPDATED', 'Warning: Nothing to change. The order was not updated.');
 
-define('ENTRY_ORDER_ID','Invoice No. ');
+define('ENTRY_ORDER_ID','Order No. ');
 define('TEXT_INFO_ATTRIBUTE_FREE', '&nbsp;-&nbsp;<span class="alert">FREE</span>');
 
 define('TEXT_DOWNLOAD','Download'); 

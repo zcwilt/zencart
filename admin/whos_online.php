@@ -226,7 +226,17 @@ $listingURL = FILENAME_WHOS_ONLINE . '.php?' . zen_get_all_get_params(['q', 't',
                     }
                     ?>
                 </td>
-                <td class="dataTableContentWhois dataTableButtonCell" align="left" valign="top"><a href="http://whois.domaintools.com/<?php echo $item['ip_address']; ?>" rel="noreferrer noopener" target="_blank"><?php echo '<u>' . $item['ip_address'] . '</u>'; ?></a></td>
+                <td class="dataTableContentWhois dataTableButtonCell" align="left" valign="top">
+                    <?php
+                    $whois_url = 'https://whois.domaintools.com/' . $item['ip_address'];
+                    $additional_ipaddress_links = '';
+                    $zco_notifier->notify('ADMIN_WHOSONLINE_IP_LINKS', $item, $additional_ipaddress_links, $whois_url);
+                    ?>
+                    <a href="<?php echo $whois_url; ?>" rel="noreferrer noopener" target="_blank">
+                        <?php echo '<i class="fa fa-search"></i> <u>' . $item['ip_address'] . '</u>'; ?>
+                    </a>
+                    <?php echo $additional_ipaddress_links; ?>
+                </td>
                 <td>&nbsp;</td>
                 <td class="dataTableContentWhois" align="center" valign="top"><?php echo date('H:i:s', $item['time_entry']); ?></td>
                 <td class="dataTableContentWhois" align="center" valign="top"><?php echo date('H:i:s', $item['time_last_click']); ?></td>
@@ -307,17 +317,49 @@ $listingURL = FILENAME_WHOS_ONLINE . '.php?' . zen_get_all_get_params(['q', 't',
             $cart = isset($whos_online[$selectedSession]['cart']) ? $whos_online[$selectedSession]['cart'] : null;
 
             if ($cart !== null) {
-                $contents[] = ['text' => $item['full_name'] . ' - ' . $item['ip_address'] . '<br>' . $selectedSession];
+                $contents[] = ['text' => $whos_online[$selectedSession]['full_name'] . ' - ' . $cart['customer_ip'] . ' (' . $cart['language_code']  . ')<br>' . $selectedSession];
+
                 foreach ($cart['products'] as $product) {
                   $contents[] = ['text' => $product['quantity'] . ' x ' . '<a href="' . zen_href_link(FILENAME_PRODUCT, 'cPath=' . zen_get_product_path($product['id']) . '&pID=' . $product['id']) . '">' . $product['name'] . '</a>'];
                 }
 
                 if (!empty($cart['products'])) {
                   $contents[] = ['text' => zen_draw_separator('pixel_black.gif', '100%', '1')];
-                  $contents[] = ['align' => 'right', 'text' => TEXT_SHOPPING_CART_SUBTOTAL . ' ' . $cart['total']];
+                  $contents[] = ['align' => 'right', 'text' => TEXT_SHOPPING_CART_SUBTOTAL . ' ' . $cart['total'] . ' ' . $cart['currency_code']];
                 } else {
                   $contents[] = ['text' => TEXT_EMPTY_CART];
                 }
+                /* Other $cart[] entries which may be available depending on customer stage:
+                 * ['total'] => 92.74
+                 * ['total_before_discounts'] => 92.74
+                 * ['weight'] => 10
+                 * ['cartID'] => 123456
+                 * ['content_type'] => physical | virtual
+                 * ['free_shipping_item'] => 0 | 1
+                 * ['free_shipping_weight'] => 0 | 1
+                 * ['free_shipping_price'] => 0 | 1
+                 * ['download_count'] => integer
+                 *
+                 * Other $whos_online[$selectedSession][] entries which may or may not be available:
+                 * ['currency_code'] 'USD'
+                 * ['language_name'] 'english'
+                 * ['language_id'] integer
+                 * ['language_code'] 'en'
+                 * ['customer_ip'] - ip address
+                 * ['customer_hostname'] - hostname of ip address
+                 * ['customers_email_address']
+                 * ['address_default_id'] customer's default address_book ID
+                 * ['address_billing_id'] selected address_book ID for billing
+                 * ['address_delivery_id'] selected address_book ID for shipping
+                 * ['customer_country_id'] countries table country_id of default address_book ID
+                 * ['customer_zone_id'] zones table zone_id of default address_book ID
+                 * ['shipping_weight'] cart weight
+                 * ['shipping'] array of shipping module/code details
+                 * ['payment'] string name of payment module selected
+                 * ['cot_gv'] coupon/gv code being redeemed
+                 * ['cart_errors'] array of error messages in cart
+                 * ['checkout_comments'] order comments entered during checkout pages
+                 */
             }
           }
 

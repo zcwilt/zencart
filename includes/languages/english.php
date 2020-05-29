@@ -13,7 +13,7 @@
 //define('CUSTOM_KEYWORDS', 'ecommerce, open source, shop, online shopping');
 // END: moved to meta_tags.php
 
-  define('FOOTER_TEXT_BODY', 'Copyright &copy; ' . date('Y') . ' <a href="' . zen_href_link(FILENAME_DEFAULT) . '" rel="noopener" target="_blank">' . STORE_NAME . '</a>. Powered by <a href="https://www.zen-cart.com" rel="noopener" target="_blank">Zen Cart</a>');
+  define('FOOTER_TEXT_BODY', 'Copyright &copy; ' . date('Y') . ' <a href="' . zen_href_link(FILENAME_DEFAULT) . '">' . STORE_NAME . '</a>. Powered by <a href="https://www.zen-cart.com" rel="noopener noreferrer" target="_blank">Zen Cart</a>');
 
 // look in your $PATH_LOCALE/locale directory for available locales..
   $locales = ['en_US', 'en_US.utf8', 'en', 'English_United States.1252'];
@@ -242,6 +242,18 @@
   define('PREVNEXT_TITLE_NEXT_SET_OF_NO_PAGE', 'Next Set of %d Pages');
   define('PREVNEXT_BUTTON_PREV', '[&laquo;&nbsp;Prev]');
   define('PREVNEXT_BUTTON_NEXT', '[Next&nbsp;&raquo;]');
+
+define('ARIA_PAGINATION_ROLE_LABEL_GENERAL','Pagination');
+define('ARIA_PAGINATION_ROLE_LABEL_FOR','%s Pagination'); // eg: "Search results Pagination"
+define('ARIA_PAGINATION_PREVIOUS_PAGE','Go to Previous Page');
+define('ARIA_PAGINATION_NEXT_PAGE','Go to Next Page');
+define('ARIA_PAGINATION_CURRENT_PAGE','Current Page');
+define('ARIA_PAGINATION_CURRENTLY_ON',', now on page %s');
+define('ARIA_PAGINATION_GOTO','Go to ');
+define('ARIA_PAGINATION_PAGE_NUM','Page %s');
+define('ARIA_PAGINATION_ELLIPSIS_PREVIOUS','Get previous group of pages');
+define('ARIA_PAGINATION_ELLIPSIS_NEXT','Get next group of pages');
+define('ARIA_PAGINATION_','');
 
   define('TEXT_BASE_PRICE','Starting at: ');
 

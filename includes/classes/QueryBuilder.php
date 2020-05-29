@@ -43,7 +43,6 @@ class QueryBuilder extends \base
         if (count($listingQuery) > 0) {
             $this->initParts($listingQuery);
         }
-        $this->debug = false;
     }
     public function initParts(array $listingQuery)
     {
@@ -181,15 +180,16 @@ class QueryBuilder extends \base
         $this->notify('NOTIFY_QUERYBUILDER_PROCESSJOINFKEYFIELD_START');
         $fkeyFieldLeft = $this->parts ['mainTableName'] . '.' . $this->parts ['countField'];
         $fkeyFieldRight = $joinTable ['table'] . '.' . $this->parts ['countField'];
-        if (!isset($joinTable ['fkeyFieldLeft']) && !isset($joinTable ['fkeyFieldRight'])) {
+        if (!isset($joinTable ['fkeyFieldLeft'])) {
             $this->query ['joins'] .= " ON " . $fkeyFieldLeft . " = " . $fkeyFieldRight . " ";
             return;
+
         }
-//        $fkeyFieldLeft = $this->parts ['mainTableName'] . '.' . $joinTable ['fkeyFieldLeft'];
-//        if (isset($joinTable ['fkeyTable'])) {
-//            $fkeyFieldLeft =  constant($joinTable ['fkeyTable']) . '.' . $joinTable ['fkeyFieldLeft'];
-//        }
-        //$fkeyFieldRight = $joinTable ['table'] . '.' . $joinTable ['fkeyFieldLeft'];
+        $fkeyFieldLeft = $this->parts ['mainTableName'] . '.' . $joinTable ['fkeyFieldLeft'];
+        if (isset($joinTable ['fkeyTable'])) {
+            $fkeyFieldLeft =  constant($joinTable ['fkeyTable']) . '.' . $joinTable ['fkeyFieldLeft'];
+        }
+        $fkeyFieldRight = $joinTable ['table'] . '.' . $joinTable ['fkeyFieldLeft'];
         if (isset($joinTable ['fkeyFieldRight'])) {
             $fkeyFieldRight = $joinTable ['table'] . '.' . $joinTable ['fkeyFieldRight'];
         }

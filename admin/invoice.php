@@ -45,9 +45,7 @@ if ($order->billing['street_address'] != $order->delivery['street_address']) {
     <title><?php echo TITLE; ?></title>
     <link rel="stylesheet" href="includes/stylesheet.css">
     <script>
-      function couponpopupWindow(url) {
-          window.open(url, 'popupWindow', 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=450,height=280,screenX=150,screenY=150,top=150,left=150')
-      }
+      function couponpopupWindow(url) { /* just a stub for coupon output that might fire it */ }
     </script>
   </head>
   <body>
@@ -130,7 +128,7 @@ if ($order->billing['street_address'] != $order->delivery['street_address']) {
 <?php if ($show_including_tax)  { ?>
             <th class="dataTableHeadingContent text-right"><?php echo TABLE_HEADING_PRICE_INCLUDING_TAX; ?></th>
 <?php } ?>
-            <th class="dataTableHeadingContent text-right"><?php ($show_including_tax) ? TABLE_HEADING_TOTAL_EXCLUDING_TAX : TABLE_HEADING_TOTAL; ?></th>
+            <th class="dataTableHeadingContent text-right"><?php echo ($show_including_tax) ? TABLE_HEADING_TOTAL_EXCLUDING_TAX : TABLE_HEADING_TOTAL; ?></th>
 <?php if ($show_including_tax)  { ?>
             <th class="dataTableHeadingContent text-right"><?php echo TABLE_HEADING_TOTAL_INCLUDING_TAX; ?></th>
 <?php } ?>
