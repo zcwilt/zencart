@@ -9,9 +9,7 @@
 
 namespace Zencart\FileSystem;
 
-use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
-
-class FileSystem extends IlluminateFilesystem
+class FileSystem
 {
     public function loadFilesFromDirectory($rootDir, $fileRegx = '~^[^\._].*\.php$~i')
     {
@@ -133,14 +131,5 @@ class FileSystem extends IlluminateFilesystem
             return false;
         }
         return true;
-    }
-
-    public function getExtraPathForTemplateOverrrideOrOriginal($templateDir, $rootPath, $language, $file, $extraPath = '')
-    {
-        if (!$this->hasTemplateLanguageOverride($templateDir, $rootPath, $language, $file, $extraPath)) {
-            return $extraPath;
-        }
-        $extraPath = $extraPath . '/' . $templateDir;
-        return $extraPath;
     }
 }
