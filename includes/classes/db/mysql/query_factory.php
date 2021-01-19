@@ -434,6 +434,39 @@ class queryFactory extends base
         return $this->total_query_time;
     }
 
+    public function insertOnDuplicateKeySql($table, $insertValues, $updateValues)
+    {
+        $insertSql = $this->processInsertArrayToSql($insertValues);
+        $updateSql = $this->processUpdateArrayToSql($updateValues);
+        $sql = "INSERT INTO " .  $table . ' ' . $insertSql . ' ON DUPLICATE KEY UPDATE ' . $updateSql;
+        return $sql;
+    }
+
+    public function processUpdateArrayToSql($tableData)
+    {
+        $sql = '';
+        foreach ($tableData as $value) {
+            $sql = $value['fieldName'];
+            $bindVarValue = $this->getBindVarValue($value['value'], $value['type']);
+            $sql .= ' = ' . $bindVarValue . ', ';
+        }
+        $sql = rtrim($sql, ', ');
+        return $sql;
+    }
+
+    public function processInsertArrayToSql($tableData)
+    {
+        $fieldList = $valueList = '(';
+        foreach ($tableData as $value) {
+            $fieldList .= $value['fieldName'] . ", ";
+            $bindVarValue = $this->getBindVarValue($value['value'], $value['type']);
+            $valueList .= $bindVarValue . ", ";
+        }
+        $fieldList = rtrim($fieldList, ', ') . ')';
+        $valueList = rtrim($valueList, ', ') . ')';
+        $insertString = $fieldList . ' VALUES ' . $valueList;
+        return $insertString;
+    }
     /**
      * Performs an INSERT or UPDATE based on a supplied array of field data
      *

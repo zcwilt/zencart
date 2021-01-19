@@ -11,12 +11,10 @@ namespace Zencart\PluginManager;
 class PluginManager
 {
 
-    public function __construct($pluginControl, $pluginControlVersion)
+    public function __construct($db)
     {
-        $this->pluginControl = $pluginControl;
-        $this->pluginControlVersion = $pluginControlVersion;
+        $this->db = $db;
     }
-
     public function inspectAndUpdate()
     {
         $pluginsFromFilesystem = $this->getPluginsFromFileSystem();
@@ -25,7 +23,8 @@ class PluginManager
 
     public function getInstalledPlugins()
     {
-        $results = $this->pluginControl->where(['status' => 1])->get();
+        $sql = "SELECT * FROM " . TABLE_PLUGIN_CONTROL . " WHERE status = 1";
+        $results = $this->db->execute($sql);
         $pluginList = [];
         foreach ($results as $result) {
             $pluginList[$result['unique_key']] = $result;
@@ -134,7 +133,9 @@ class PluginManager
 
     protected function getPluginVersions($uniqueKey)
     {
-        $result = $this->pluginControlVersion->where(['unique_key' => $uniqueKey])->get();
+        $sql = "SELECT * FROM " . TABLE_PLUGIN_CONTROL_VERSIONS . " WHERE unique_key = :uniqueKey:";
+        $sql = $this->db->bindVars($sql, ':uniqueKey:', $uniqueKey, 'string');
+        $result = $this->db->execute($sql);
         return $result;
     }
 
@@ -175,7 +176,8 @@ class PluginManager
     public function getPluginsFromDb()
     {
         $pluginList = [];
-        $results = $this->pluginControl->all();
+        $sql = "SELECT * FROM " . TABLE_PLUGIN_CONTROL;
+        $results = $this->db->execute($sql);
         foreach ($results as $result) {
             $pluginList[$result['unique_key']] = $result;
         }
@@ -189,8 +191,11 @@ class PluginManager
 
     protected function updatePluginControl($pluginsFromFilesystem)
     {
-        $this->pluginControl->query()->update(['infs' => 0]);
-        $this->pluginControlVersion->query()->update(['infs' => 0]);
+        $sql = "UPDATE " . TABLE_PLUGIN_CONTROL ." SET infs = 0";
+        $this->db->execute($sql);
+        $sql = "UPDATE " . TABLE_PLUGIN_CONTROL_VERSIONS ." SET infs = 0";
+        $this->db->execute($sql);
+
         $insertValues = [];
         $versionInsertValues = [];
         foreach ($pluginsFromFilesystem as $uniqueKey => $plugin) {
@@ -198,33 +203,33 @@ class PluginManager
             $versionInsertValues = $this->processUpdatePluginControlVersions($uniqueKey, $pluginsFromFilesystem, $versionInsertValues);
             $insertValues[] =
                 [
-                    'unique_key'    => $uniqueKey,
-                    'name'          => $plugin[$pluginVersion]['pluginName'],
-                    'description'   => $plugin[$pluginVersion]['pluginDescription'],
-                    'type'          => '',
-                    'status'        => 0,
-                    'author'        => $plugin[$pluginVersion]['pluginAuthor'],
-                    'version'       => '',
-                    'zc_versions'   => '',
-                    'infs'          => 1,
-                    'zc_contrib_id' => $plugin[$pluginVersion]['pluginId']
+                    ['fieldName' => 'unique_key', 'value' => $uniqueKey, 'type' => 'string'],
+                    ['fieldName' => 'name', 'value' => $plugin[$pluginVersion]['pluginName'], 'type' => 'string'],
+                    ['fieldName' => 'description', 'value' => $plugin[$pluginVersion]['pluginDescription'], 'type' => 'string'],
+                    ['fieldName' => 'type', 'value' => '', 'type' => 'string'],
+                    ['fieldName' => 'status', 'value' => 0, 'type' => 'integer'],
+                    ['fieldName' => 'author', 'value' => $plugin[$pluginVersion]['pluginAuthor'], 'type' => 'string'],
+                    ['fieldName' => 'version', 'value' => '', 'type' => 'string'],
+                    ['fieldName' => 'zc_versions', 'value' => '', 'type' => 'string'],
+                    ['fieldName' => 'infs', 'value' => 1, 'type' => 'integer'],
+                    ['fieldName' => 'zc_contrib_id', 'value' => $plugin[$pluginVersion]['pluginId'], 'type' => 'integer']
                 ];
-
         }
-        $this->pluginControl->insertOnDuplicateKey(
-            $insertValues,
-            [
-                'infs' => 1
-            ]
-        );
-        $this->pluginControlVersion->insertOnDuplicateKey(
-            $versionInsertValues,
-            [
-                'infs' => 1
-            ]
-        );
-        $this->pluginControl->where(['infs' => 0])->delete();
-        $this->pluginControlVersion->where(['infs' => 0])->delete();
+        $updateValues = [['fieldName' => 'infs', 'value' => 1, 'type' => 'integer']];
+
+        foreach ($insertValues as $insertValue) {
+            $sql = $this->db->insertOnDuplicateKeySql(TABLE_PLUGIN_CONTROL, $insertValue, $updateValues);
+            $this->db->execute($sql);
+        }
+
+        foreach ($versionInsertValues as $versionInsertValue) {
+            $sql = $this->db->insertOnDuplicateKeySql(TABLE_PLUGIN_CONTROL_VERSIONS, $versionInsertValue, $updateValues);
+            $this->db->execute($sql);
+        }
+        $sql = "DELETE FROM " . TABLE_PLUGIN_CONTROL . " WHERE infs = 0";
+        $this->db->execute($sql);
+        $sql = "DELETE FROM " . TABLE_PLUGIN_CONTROL_VERSIONS . " WHERE infs = 0";
+        $this->db->execute($sql);
     }
 
     protected function processUpdatePluginControlVersions($uniqueKey, $pluginsFromFilesystem, $versionInsertValues)
@@ -235,11 +240,11 @@ class PluginManager
                 continue;
             }
             $versionInsertValues[] = [
-                'unique_key' => $uniqueKey,
-                'author' => $versionInfo['pluginAuthor'],
-                'version' => $version,
-                'zc_versions' => json_encode($versionInfo['zcVersions']),
-                'infs' => 1
+                ['fieldName' => 'unique_key', 'value' => $uniqueKey, 'type' => 'string'],
+                ['fieldName' => 'author', 'value' => $versionInfo['pluginAuthor'], 'type' => 'string'],
+                ['fieldName' => 'version', 'value' => $version, 'type' => 'string'],
+                ['fieldName' => 'zc_versions', 'value' => json_encode($versionInfo['zcVersions']), 'type' => 'string'],
+                ['fieldName' => 'infs', 'value' => 1, 'type' => 'integer']
             ];
         }
         return $versionInsertValues;
@@ -282,8 +287,4 @@ class PluginManager
         return count($this->getPluginVersionsToClean($uniqueKey, $version));
     }
 
-    public function getPluginControl()
-    {
-        return $this->pluginControl;
-    }
 }

@@ -27,9 +27,14 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 
 $observersMain = (new FileSystem)->listFilesFromDirectory(DIR_WS_CLASSES . 'observers/', '~(^auto\..*\.php$)~');
-$observersMain = collect($observersMain)->map(function ($item, $key) {
+$observersMain = array_map(function ($item) {
     return DIR_WS_CLASSES . 'observers/' . $item;
-})->toArray();
+}, $observersMain);
+
+//$observersMain = collect($observersMain)->map(function ($item, $key) {
+//    return DIR_WS_CLASSES . 'observers/' . $item;
+//})->toArray();
+
 $context = (new FileSystem)->isAdminDir(__DIR__) ? 'admin' : 'catalog';
 $observersPlugins = [];
 foreach ($installedPlugins as $plugin) {

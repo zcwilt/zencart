@@ -298,5 +298,3 @@ $group = array(
 $sanitizer->addComplexSanitization($group);
 
 $sanitizer->runSanitizers();
-
-$sanitizedRequest = Request::capture();
