@@ -5,7 +5,7 @@
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: lat9 2019 Dec 15 Modified in v1.5.7 $
+ * @version $Id: DrByte 2020 Jul 11 Modified in v1.5.7a $
  */
 if (!defined('TEXT_RESELECT_SHIPPING')) define('TEXT_RESELECT_SHIPPING', 'You have changed the items in your cart since shipping was last calculated, and costs may have changed. Please verify/re-select your shipping method.');
 
@@ -152,9 +152,9 @@ Processing...
   }
 
   ipn_debug_email('Breakpoint: 2 - Validated transaction components');
-  if (empty($_POST['exchange_rate']))  $_POST['exchange_rate'] = 1;
-  if (empty($_POST['num_cart_items'])) $_POST['num_cart_items'] = 1;
-  if (empty($_POST['settle_amount']))  $_POST['settle_amount'] = 0;
+  if ($_POST['exchange_rate'] == '')  $_POST['exchange_rate'] = 1;
+  if ($_POST['num_cart_items'] == '') $_POST['num_cart_items'] = 1;
+  if ($_POST['settle_amount'] == '')  $_POST['settle_amount'] = 0;
 
   /**
    * is this a sandbox transaction?
@@ -179,10 +179,10 @@ Processing...
   $txn_type    = $lookupData['txn_type'];
   $parentLookup = $txn_type;
 
-  ipn_debug_email('Breakpoint: 4 - ' . 'Details:  txn_type=' . $txn_type . '    ordersID = '. $ordersID . '  IPN_id=' . $paypalipnID . "\n\n" . '   Relevant data from POST:' . "\n     " . 'txn_type = ' . $txn_type . "\n     " . 'parent_txn_id = ' . (empty($_POST['parent_txn_id']) ? 'None' : $_POST['parent_txn_id']) . "\n     " . 'txn_id = ' . $_POST['txn_id']);
+  ipn_debug_email('Breakpoint: 4 - ' . 'Details:  txn_type=' . $txn_type . '    ordersID = '. $ordersID . '  IPN_id=' . $paypalipnID . "\n\n" . '   Relevant data from POST:' . "\n     " . 'txn_type = ' . $txn_type . "\n     " . 'parent_txn_id = ' . ($_POST['parent_txn_id'] =='' ? 'None' : $_POST['parent_txn_id']) . "\n     " . 'txn_id = ' . $_POST['txn_id']);
 
   // ignore auth_status == 'Expired'
-  if (isset($_POST['auth_status']) && $_POST['auth_status'] === 'Expired' && isset($_POST['txn_type']) && $_POST['txn_type'] === 'web_accept') {
+  if ($_POST['auth_status'] === 'Expired' && $_POST['txn_type'] === 'web_accept') {
     ipn_debug_email('NOTICE :: IPN Processing Aborted -- we do not need to do anything with an "Expired" auth notification.');
     die();
   }
@@ -283,7 +283,7 @@ Processing...
       /**
        * delete IPN session from PayPal table -- housekeeping
        */
-      $db->Execute("delete from " . TABLE_PAYPAL_SESSION . " where session_id = '" . zen_db_input(str_replace($zenSessionId . '=', '', $_POST['custom'])) . "'");
+      $db->Execute("delete from " . TABLE_PAYPAL_SESSION . " where session_id = '" . zen_db_input(str_replace('zenid=', '', $_POST['custom'])) . "'");
       /**
        * require shipping class
        */
@@ -436,7 +436,7 @@ Processing...
         case 'voided':
         case ($_POST['payment_status'] == 'Refunded' || $_POST['payment_status'] == 'Reversed' || $_POST['payment_status'] == 'Voided'):
           //payment_status=Refunded or payment_status=Voided
-          $new_status = MODULE_PAYMENT_PAYPALWPP_REFUNDED_STATUS_ID;
+          $new_status = defined('MODULE_PAYMENT_PAYPALWPP_REFUNDED_STATUS_ID') ? MODULE_PAYMENT_PAYPALWPP_REFUNDED_STATUS_ID : 1;
           if (defined('MODULE_PAYMENT_PAYPAL_REFUND_ORDER_STATUS_ID') && (int)MODULE_PAYMENT_PAYPAL_REFUND_ORDER_STATUS_ID > 0 && !$isECtransaction) $new_status = MODULE_PAYMENT_PAYPAL_REFUND_ORDER_STATUS_ID;
           break;
         case 'echeck-denied':
