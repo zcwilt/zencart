@@ -12,7 +12,7 @@ class DatabaseTest extends zcUnitTestCase
 {
     use DatabaseConcerns;
 
-    public $databaseFixtures = ['adminEmpty' => ['admin'], 'configurationGroup' => ['configuration_group']];
+    public $databaseFixtures = ['adminEmpty' => ['admin']];
 
     public function testExample()
     {
@@ -20,14 +20,5 @@ class DatabaseTest extends zcUnitTestCase
         $this->assertTrue(!count($f));
         $f = $this->db->Execute('SELECT * FROM ' . TABLE_ADMIN);
         $this->assertTrue(!$f->count());
-    }
-
-    public function testZenGetConfigurationGroupValue()
-    {
-        require(DIR_FS_ADMIN . 'includes/functions/general.php');
-        $result = zen_get_configuration_group_value(1);
-        $this->assertEquals('test-group-title', $result);
-        $result = zen_get_configuration_group_value(9);
-        $this->assertEquals(9, $result);
     }
 }
