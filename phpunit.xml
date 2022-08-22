@@ -16,8 +16,8 @@
         <testsuite name="Unit">
           <directory suffix="Test.php">./not_for_release/testFramework/Unit/</directory>
         </testsuite>
-        <testsuite name="Browser">
-            <directory suffix="Test.php">./not_for_release/testFramework/Browser/</directory>
+        <testsuite name="Feature">
+            <directory suffix="Test.php">./not_for_release/testFramework/Feature/</directory>
         </testsuite>
     </testsuites>
     <php>

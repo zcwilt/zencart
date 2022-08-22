@@ -20,7 +20,7 @@ if (!defined('DEBUG_AUTOLOAD')) define('DEBUG_AUTOLOAD', false);
  * boolean used to see if we are in the admin script, obviously set to false here.
  * DO NOT REMOVE THE define BELOW. WILL BREAK ADMIN
  */
-define('IS_ADMIN_FLAG', true);
+if (!defined('IS_ADMIN_FLAG')) define('IS_ADMIN_FLAG', true);
 /**
  * integer saves the time at which the script started.
  */
