@@ -71,6 +71,7 @@ if ($zenSessionId !== 'zenid') {
  * boolean used to see if we are in the admin script, obviously set to false here.
  */
 define('IS_ADMIN_FLAG', false);
+
 /**
  * integer saves the time at which the script started.
  */
@@ -113,10 +114,11 @@ if (DEBUG_AUTOLOAD || (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTI
 }
 
 @date_default_timezone_set(date_default_timezone_get());
+require('includes/application_testing.php');
 /**
  * check for and include load application parameters
  */
-if (file_exists('includes/configure.php')) {
+if (file_exists('includes/configure.php') && !defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
   /**
    * load the main configure file.
    */

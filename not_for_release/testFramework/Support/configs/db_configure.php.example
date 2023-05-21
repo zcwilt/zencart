@@ -1,0 +1,14 @@
+<?php
+
+// @todo consider using define reader from zc_install so we dont need this duplication
+
+return [
+
+    'DB_TYPE' => '',
+    'DB_PREFIX' => '',
+    'DB_CHARSET' => '',
+    'DB_SERVER'  => '',
+    'DB_SERVER_USERNAME'  => '',
+    'DB_SERVER_PASSWORD'  => '',
+    'DB_DATABASE'  => '',
+];

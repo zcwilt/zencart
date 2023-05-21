@@ -78,10 +78,12 @@ if (file_exists('includes/local/configure.php')) {
     include('includes/local/configure.php');
 }
 
+require('includes/application_testing.php');
+
 /**
  * check for and load application configuration parameters
  */
-if (file_exists('includes/configure.php')) {
+if (file_exists('includes/configure.php') && !defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
     /**
      * load the main configure file.
      */
