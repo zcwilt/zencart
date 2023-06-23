@@ -36,7 +36,9 @@
         "symfony/browser-kit": "^6.0",
         "symfony/css-selector": "^6.0",
         "symfony/maker-bundle": "^1.49",
-        "symfony/phpunit-bridge": "^6.3"
+        "symfony/phpunit-bridge": "^6.3",
+        "symfony/http-client": "^6.0",
+        "symfony/mime": "^6.0"
     },
     "autoload": {
         "classmap": ["includes/classes", "includes/modules"]
@@ -60,19 +62,12 @@
     "config": {
         "bin-dir": "vendor/bin",
         "sort-packages": true,
-        "optimize-autoloader": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": false
-        }
+        "optimize-autoloader": true
     },
     "scripts": {
         "feature-tests": "phpunit --verbose --process-isolation --testsuite Feature --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
         "unit-tests": "phpunit --verbose  --process-isolation --testsuite Unit --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "require": {
-        "symfony/http-client": "^6.0",
-        "symfony/mime": "^6.0"
-    }
+    "prefer-stable": true
 }
