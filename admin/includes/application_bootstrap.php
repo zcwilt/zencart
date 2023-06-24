@@ -78,16 +78,17 @@ if (file_exists('includes/local/configure.php')) {
     include('includes/local/configure.php');
 }
 
-require('includes/application_testing.php');
-
+require('../includes/application_testing.php');
 /**
  * check for and load application configuration parameters
  */
-if (file_exists('includes/configure.php') && !defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
-    /**
-     * load the main configure file.
-     */
-    include('includes/configure.php');
+if (!defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
+    if (file_exists('includes/configure.php')) {
+        /**
+         * load the main configure file.
+         */
+        include('includes/configure.php');
+    }
 }
 
 if (!defined('DIR_FS_CATALOG') || !is_dir(DIR_FS_CATALOG.'/includes/classes') || !defined('DB_TYPE') || DB_TYPE == '') {

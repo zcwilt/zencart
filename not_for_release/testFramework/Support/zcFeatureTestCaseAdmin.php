@@ -16,8 +16,7 @@ abstract class zcFeatureTestCaseAdmin extends zcFeatureTestCase
 {
     use DatabaseConcerns, GeneralConcerns;
 
-    const CONTEXT = 'admin';
-
+    protected $context = 'admin';
     /**
      * @return void
      *

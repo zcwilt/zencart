@@ -1,4 +1,5 @@
 configure.php
+configure.php.save
 local/configure*.php
 /vendor
 

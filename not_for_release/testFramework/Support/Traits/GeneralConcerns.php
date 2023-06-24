@@ -16,11 +16,14 @@ trait GeneralConcerns
     public function loadConfigureFile($context)
     {
         $user = $this->detectUser();
+        echo 'This user = ' . $user . PHP_EOL;
         $basePath = $configFile = TESTCWD . 'Support/configs/';
         $configFile =  $basePath . $user . '.' . $context . '.configure.php';
         if (!file_exists($configFile)) {
             die('could not find config file ' .$configFile);
         }
+        echo $configFile . PHP_EOL;
+
         require($configFile);
     }
 

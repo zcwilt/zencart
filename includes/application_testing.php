@@ -10,10 +10,15 @@
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
+if  (isset($_SERVER['HTTP_USER_AGENT']) && $_SERVER['HTTP_USER_AGENT'] === 'Symfony BrowserKit') {
+    define('ZENCART_TESTFRAMEWORK_RUNNING', true);
+}
+
 if (!defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
     return;
 }
-$user = $_SERVER['USER'] ?? $_SERVER['MY_USER'];
-$config = './not_for_release/testFramework/Support/configs/' . $user . '.store.configure.php';
+$user = $_SERVER['USER'] ?? $_SERVER['MY_USER'] ?? 'runner';
+$prefix = (IS_ADMIN_FLAG == true) ? '..' : '.';
+$config = $prefix . '/not_for_release/testFramework/Support/configs/' . $user . '.store.configure.php';
 require($config);
 

@@ -23,7 +23,7 @@ class StoreTest extends zcFeatureTestCaseStore
 
     public function testSimpleStore()
     {
-        $this->browser->request('GET', HTTP_SERVER);
+        $request = $this->browser->request('GET', HTTP_SERVER);
         $response = $this->browser->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $this->browser->request('GET', HTTP_SERVER  .'/index.php?main_page=products_all');

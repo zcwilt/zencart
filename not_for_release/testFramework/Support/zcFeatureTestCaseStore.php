@@ -15,8 +15,7 @@ use Tests\Support\Traits\GeneralConcerns;
 abstract class zcFeatureTestCaseStore extends zcFeatureTestCase
 {
     use DatabaseConcerns, GeneralConcerns;
-
-    const CONTEXT = 'store';
+    protected $context = 'store';
     /**
      * @return void
      *

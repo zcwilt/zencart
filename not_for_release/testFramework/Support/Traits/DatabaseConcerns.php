@@ -27,12 +27,14 @@ trait DatabaseConcerns
 
     public function runMigrations()
     {
+        echo 'Running Migrations' . PHP_EOL;
         $runner = new MigrationsRunner(ROOTCWD . 'not_for_release/testFramework/Support/database/migrations/');
         $runner->run();
     }
 
     public function runInitialSeeders()
     {
+        echo 'Running Seeders' . PHP_EOL;
         $runner = new SeederRunner();
         $runner->run();
     }

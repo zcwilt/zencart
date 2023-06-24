@@ -1,4 +1,4 @@
-name: Zen Cart Tests
+name: Zen Cart Unit Tests
 
 on: [push, pull_request]
 

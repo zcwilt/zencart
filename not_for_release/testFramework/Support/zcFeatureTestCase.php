@@ -19,7 +19,6 @@ abstract class zcFeatureTestCase extends WebTestCase
 {
     use DatabaseConcerns, GeneralConcerns;
 
-    const CONTEXT = 'store';
 
     /**
      * @param TestResult|null $result
@@ -52,7 +51,7 @@ abstract class zcFeatureTestCase extends WebTestCase
             define('ROOTCWD', realpath(__DIR__ . '/../../../') . '/');
         }
 
-        $this->loadConfigureFile(self::CONTEXT);
+        $this->loadConfigureFile($this->context);
         $this->loadMigrationAndSeeders();
         $this->createHttpBrowser();
     }

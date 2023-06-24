@@ -21,7 +21,7 @@ class MigrationsRunner
             $fileName = $migration;
             require($fileName);
             $className = 'Migrations\\Create' . ucfirst(Str::camel(str_replace(['.php', 'migration'], '', basename($migration)))) . 'Table';
-            $class =  new ($className);
+            $class =  new $className;
             $class->down();
             $class->up();
         }
