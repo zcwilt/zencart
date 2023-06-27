@@ -25,6 +25,7 @@
         "php": "^7.4|^8.0|^8.1",
         "ext-curl": "*",
         "ext-json": "*",
+        "dbrekelmans/bdi": "^1.0",
         "guzzlehttp/guzzle": "^7.7",
         "illuminate/console": "^8.83",
         "illuminate/database": "^8.83",
@@ -35,10 +36,12 @@
         "sempro/phpunit-pretty-print": "^1.4",
         "symfony/browser-kit": "^6.0",
         "symfony/css-selector": "^6.0",
-        "symfony/maker-bundle": "^1.49",
-        "symfony/phpunit-bridge": "^6.3",
         "symfony/http-client": "^6.0",
-        "symfony/mime": "^6.0"
+        "symfony/maker-bundle": "^1.49",
+        "symfony/mime": "^6.0",
+        "symfony/panther": "^2.1",
+        "symfony/phpunit-bridge": "^6.3",
+        "symfony/test-pack": "^1.1"
     },
     "autoload": {
         "classmap": ["includes/classes", "includes/modules"]
@@ -65,7 +68,7 @@
         "optimize-autoloader": true
     },
     "scripts": {
-        "feature-tests": "phpunit --verbose --process-isolation --testsuite Feature --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
+        "feature-tests": "phpunit --verbose --testsuite Feature --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
         "unit-tests": "phpunit --verbose  --process-isolation --testsuite Unit --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'"
     },
     "minimum-stability": "dev",

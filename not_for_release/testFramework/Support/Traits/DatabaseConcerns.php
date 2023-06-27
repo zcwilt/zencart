@@ -8,7 +8,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 trait DatabaseConcerns
 {
-    public function databaseSetup(): void
+    public static function databaseSetup(): void
     {
         $capsule = new Capsule;
         $capsule->addConnection([
@@ -25,14 +25,14 @@ trait DatabaseConcerns
         $capsule->bootEloquent();
     }
 
-    public function runMigrations()
+    public static function runMigrations()
     {
         echo 'Running Migrations' . PHP_EOL;
         $runner = new MigrationsRunner(ROOTCWD . 'not_for_release/testFramework/Support/database/migrations/');
         $runner->run();
     }
 
-    public function runInitialSeeders()
+    public static function runInitialSeeders()
     {
         echo 'Running Seeders' . PHP_EOL;
         $runner = new SeederRunner();

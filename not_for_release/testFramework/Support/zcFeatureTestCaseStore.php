@@ -21,9 +21,13 @@ abstract class zcFeatureTestCaseStore extends zcFeatureTestCase
      *
      * set some defines where necessary
      */
-    public function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
+        self::loadConfigureFile('store');
+        self::loadMigrationAndSeeders();
+        //$this->createHttpBrowser();
+
     }
 
     public function tearDown(): void

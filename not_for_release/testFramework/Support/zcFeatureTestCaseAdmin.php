@@ -22,9 +22,12 @@ abstract class zcFeatureTestCaseAdmin extends zcFeatureTestCase
      *
      * set some defines where necessary
      */
-    public function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
+        self::loadConfigureFile('admin');
+        self::loadMigrationAndSeeders();
+
     }
 
     public function tearDown(): void

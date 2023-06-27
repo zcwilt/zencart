@@ -2,20 +2,24 @@
 
 namespace Tests\Support\Traits;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpClient\HttpClient;
 
 trait GeneralConcerns
 {
-    public function detectUser()
+    public static function detectUser()
     {
         $user = $_SERVER['USER'] ?? $_SERVER['MY_USER'];
         return $user;
     }
 
-    public function loadConfigureFile($context)
+    public static function loadConfigureFile($context)
     {
-        $user = $this->detectUser();
+        if (defined('HTTP_SERVER')) {
+            return;
+        }
+        $user = self::detectUser();
         echo 'This user = ' . $user . PHP_EOL;
         $basePath = $configFile = TESTCWD . 'Support/configs/';
         $configFile =  $basePath . $user . '.' . $context . '.configure.php';
@@ -28,11 +32,18 @@ trait GeneralConcerns
     }
 
 
-    public function loadMigrationAndSeeders()
+    public static function loadMigrationAndSeeders()
     {
-        $this->databaseSetup(); //setup Capsule
-        $this->runMigrations();
-        $this->runInitialSeeders();
+        self::databaseSetup(); //setup Capsule
+        echo 'FIRST RUN = '. self::$firstrun . PHP_EOL;
+        if (self::$firstrun) {
+            echo 'FIRST RUN IS TRUE'. PHP_EOL;
+            return;
+        }
+        self::$firstrun = true;
+        echo 'FIRST RUN = '. self::$firstrun . PHP_EOL;
+        self::runMigrations();
+        self::runInitialSeeders();
     }
 
     public function createHttpBrowser()
@@ -48,6 +59,11 @@ trait GeneralConcerns
     protected function buildStoreLink($page)
     {
         $URI = HTTP_SERVER . '/index.php?main_page='.$page;
+        return $URI;
+    }
+    protected function buildAdminLink($page)
+    {
+        $URI = HTTP_SERVER . '/admin/index.php?cmd='.$page;
         return $URI;
     }
 

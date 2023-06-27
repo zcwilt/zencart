@@ -19,6 +19,14 @@ if (!defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
 }
 $user = $_SERVER['USER'] ?? $_SERVER['MY_USER'] ?? 'runner';
 $prefix = (IS_ADMIN_FLAG == true) ? '..' : '.';
-$config = $prefix . '/not_for_release/testFramework/Support/configs/' . $user . '.store.configure.php';
+$context = (IS_ADMIN_FLAG == true) ? 'admin' : 'store';
+$config = $prefix . '/not_for_release/testFramework/Support/configs/' . $user . '.' . $context . '.configure.php';
+if (!file_exists($config)) {
+  die($config . ' does not exist');
+}
+//var_dump($_SERVER);
 require($config);
+//echo 'config loaded' . PHP_EOL;
+//echo 'DIR_FS_CATALOG = '. DIR_FS_CATALOG . PHP_EOL;
+
 

@@ -42,5 +42,4 @@ class StoreTest extends zcFeatureTestCaseStore
         }
 
     }
-
 }

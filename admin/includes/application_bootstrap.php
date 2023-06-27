@@ -11,7 +11,7 @@ use App\Models\PluginControlVersion;
 use Zencart\FileSystem\FileSystem;
 use Zencart\PluginManager\PluginManager;
 use Zencart\PageLoader\PageLoader;
-
+define('STRICT_ERROR_REPORTING', true);
 /**
  * boolean if true the autoloader scripts will be parsed and their output shown. For debugging purposes only.
  */
@@ -92,6 +92,10 @@ if (!defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
 }
 
 if (!defined('DIR_FS_CATALOG') || !is_dir(DIR_FS_CATALOG.'/includes/classes') || !defined('DB_TYPE') || DB_TYPE == '') {
+    echo 'FOO IN GOING TO SETUP1' . PHP_EOL;
+    echo 'DIR_FS_CATALOG = ' .DIR_FS_CATALOG . PHP_EOL;
+    echo 'DB_TYPE = ' .DB_TYPE . PHP_EOL;
+    echo 'IS DIR ' . is_dir(DIR_FS_CATALOG.'/includes/classes') . PHP_EOL;
     if (file_exists('../includes/templates/template_default/templates/tpl_zc_install_suggested_default.php')) {
         require('../includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
         exit;
