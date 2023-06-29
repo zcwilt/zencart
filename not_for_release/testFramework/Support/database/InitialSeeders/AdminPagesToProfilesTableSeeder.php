@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class AdminPagesToProfilesTableSeeder extends Seeder
 {
@@ -19,87 +19,87 @@ class AdminPagesToProfilesTableSeeder extends Seeder
 
         Capsule::table('admin_pages_to_profiles')->truncate();
 
-        Capsule::table('admin_pages_to_profiles')->insert(array (
+        Capsule::table('admin_pages_to_profiles')->insert(array(
             0 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'currencies',
-            ),
+                array(
+                    'page_key' => 'currencies',
+                    'profile_id' => 2,
+                ),
             1 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'customers',
-            ),
+                array(
+                    'page_key' => 'customers',
+                    'profile_id' => 2,
+                ),
             2 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'gvMail',
-            ),
+                array(
+                    'page_key' => 'gvMail',
+                    'profile_id' => 2,
+                ),
             3 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'gvQueue',
-            ),
+                array(
+                    'page_key' => 'gvQueue',
+                    'profile_id' => 2,
+                ),
             4 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'gvSent',
-            ),
+                array(
+                    'page_key' => 'gvSent',
+                    'profile_id' => 2,
+                ),
             5 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'invoice',
-            ),
+                array(
+                    'page_key' => 'invoice',
+                    'profile_id' => 2,
+                ),
             6 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'mail',
-            ),
+                array(
+                    'page_key' => 'mail',
+                    'profile_id' => 2,
+                ),
             7 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'orders',
-            ),
+                array(
+                    'page_key' => 'orders',
+                    'profile_id' => 2,
+                ),
             8 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'packingslip',
-            ),
+                array(
+                    'page_key' => 'packingslip',
+                    'profile_id' => 2,
+                ),
             9 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'paypal',
-            ),
+                array(
+                    'page_key' => 'paypal',
+                    'profile_id' => 2,
+                ),
             10 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'reportCustomers',
-            ),
+                array(
+                    'page_key' => 'reportCustomers',
+                    'profile_id' => 2,
+                ),
             11 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'reportLowStock',
-            ),
+                array(
+                    'page_key' => 'reportLowStock',
+                    'profile_id' => 2,
+                ),
             12 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'reportProductsSold',
-            ),
+                array(
+                    'page_key' => 'reportProductsSold',
+                    'profile_id' => 2,
+                ),
             13 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'reportProductsViewed',
-            ),
+                array(
+                    'page_key' => 'reportProductsViewed',
+                    'profile_id' => 2,
+                ),
             14 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'reportReferrals',
-            ),
+                array(
+                    'page_key' => 'reportReferrals',
+                    'profile_id' => 2,
+                ),
             15 =>
-            array (
-                'profile_id' => 2,
-                'page_key' => 'whosOnline',
-            ),
+                array(
+                    'page_key' => 'whosOnline',
+                    'profile_id' => 2,
+                ),
         ));
 
 

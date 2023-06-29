@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class MediaTypesTableSeeder extends Seeder
 {
@@ -19,13 +19,13 @@ class MediaTypesTableSeeder extends Seeder
 
         Capsule::table('media_types')->truncate();
 
-        Capsule::table('media_types')->insert(array (
+        Capsule::table('media_types')->insert(array(
             0 =>
-            array (
-                'type_id' => 1,
-                'type_name' => 'MP3',
-                'type_ext' => '.mp3',
-            ),
+                array(
+                    'type_ext' => '.mp3',
+                    'type_id' => 1,
+                    'type_name' => 'MP3',
+                ),
         ));
 
 

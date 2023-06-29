@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class GetTermsToFilterTableSeeder extends Seeder
 {
@@ -19,25 +19,25 @@ class GetTermsToFilterTableSeeder extends Seeder
 
         Capsule::table('get_terms_to_filter')->truncate();
 
-        Capsule::table('get_terms_to_filter')->insert(array (
+        Capsule::table('get_terms_to_filter')->insert(array(
             0 =>
-            array (
-                'get_term_name' => 'manufacturers_id',
-                'get_term_table' => 'TABLE_MANUFACTURERS',
-                'get_term_name_field' => 'manufacturers_name',
-            ),
+                array(
+                    'get_term_name' => 'manufacturers_id',
+                    'get_term_name_field' => 'manufacturers_name',
+                    'get_term_table' => 'TABLE_MANUFACTURERS',
+                ),
             1 =>
-            array (
-                'get_term_name' => 'music_genre_id',
-                'get_term_table' => 'TABLE_MUSIC_GENRE',
-                'get_term_name_field' => 'music_genre_name',
-            ),
+                array(
+                    'get_term_name' => 'music_genre_id',
+                    'get_term_name_field' => 'music_genre_name',
+                    'get_term_table' => 'TABLE_MUSIC_GENRE',
+                ),
             2 =>
-            array (
-                'get_term_name' => 'record_company_id',
-                'get_term_table' => 'TABLE_RECORD_COMPANY',
-                'get_term_name_field' => 'record_company_name',
-            ),
+                array(
+                    'get_term_name' => 'record_company_id',
+                    'get_term_name_field' => 'record_company_name',
+                    'get_term_table' => 'TABLE_RECORD_COMPANY',
+                ),
         ));
 
 

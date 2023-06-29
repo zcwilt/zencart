@@ -35,13 +35,10 @@ trait GeneralConcerns
     public static function loadMigrationAndSeeders()
     {
         self::databaseSetup(); //setup Capsule
-        echo 'FIRST RUN = '. self::$firstrun . PHP_EOL;
         if (self::$firstrun) {
-            echo 'FIRST RUN IS TRUE'. PHP_EOL;
             return;
         }
         self::$firstrun = true;
-        echo 'FIRST RUN = '. self::$firstrun . PHP_EOL;
         self::runMigrations();
         self::runInitialSeeders();
     }

@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class CurrenciesTableSeeder extends Seeder
 {
@@ -19,72 +19,72 @@ class CurrenciesTableSeeder extends Seeder
 
         Capsule::table('currencies')->truncate();
 
-        Capsule::table('currencies')->insert(array (
+        Capsule::table('currencies')->insert(array(
             0 =>
-            array (
-                'currencies_id' => 1,
-                'title' => 'US Dollar',
-                'code' => 'USD',
-                'symbol_left' => '$',
-                'symbol_right' => '',
-                'decimal_point' => '.',
-                'thousands_point' => ',',
-                'decimal_places' => '2',
-                'value' => '1.000000',
-                'last_updated' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'code' => 'USD',
+                    'currencies_id' => 1,
+                    'decimal_places' => '2',
+                    'decimal_point' => '.',
+                    'last_updated' => '2023-06-29 12:14:04',
+                    'symbol_left' => '$',
+                    'symbol_right' => '',
+                    'thousands_point' => ',',
+                    'title' => 'US Dollar',
+                    'value' => '1.000000',
+                ),
             1 =>
-            array (
-                'currencies_id' => 2,
-                'title' => 'Euro',
-                'code' => 'EUR',
-                'symbol_left' => '&euro;',
-                'symbol_right' => '',
-                'decimal_point' => '.',
-                'thousands_point' => ',',
-                'decimal_places' => '2',
-                'value' => '0.773000',
-                'last_updated' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'code' => 'EUR',
+                    'currencies_id' => 2,
+                    'decimal_places' => '2',
+                    'decimal_point' => '.',
+                    'last_updated' => '2023-06-29 12:14:04',
+                    'symbol_left' => '&euro;',
+                    'symbol_right' => '',
+                    'thousands_point' => ',',
+                    'title' => 'Euro',
+                    'value' => '0.773000',
+                ),
             2 =>
-            array (
-                'currencies_id' => 3,
-                'title' => 'GB Pound',
-                'code' => 'GBP',
-                'symbol_left' => '&pound;',
-                'symbol_right' => '',
-                'decimal_point' => '.',
-                'thousands_point' => ',',
-                'decimal_places' => '2',
-                'value' => '0.672600',
-                'last_updated' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'code' => 'GBP',
+                    'currencies_id' => 3,
+                    'decimal_places' => '2',
+                    'decimal_point' => '.',
+                    'last_updated' => '2023-06-29 12:14:04',
+                    'symbol_left' => '&pound;',
+                    'symbol_right' => '',
+                    'thousands_point' => ',',
+                    'title' => 'GB Pound',
+                    'value' => '0.672600',
+                ),
             3 =>
-            array (
-                'currencies_id' => 4,
-                'title' => 'Canadian Dollar',
-                'code' => 'CAD',
-                'symbol_left' => '$',
-                'symbol_right' => '',
-                'decimal_point' => '.',
-                'thousands_point' => ',',
-                'decimal_places' => '2',
-                'value' => '1.104200',
-                'last_updated' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'code' => 'CAD',
+                    'currencies_id' => 4,
+                    'decimal_places' => '2',
+                    'decimal_point' => '.',
+                    'last_updated' => '2023-06-29 12:14:04',
+                    'symbol_left' => '$',
+                    'symbol_right' => '',
+                    'thousands_point' => ',',
+                    'title' => 'Canadian Dollar',
+                    'value' => '1.104200',
+                ),
             4 =>
-            array (
-                'currencies_id' => 5,
-                'title' => 'Australian Dollar',
-                'code' => 'AUD',
-                'symbol_left' => '$',
-                'symbol_right' => '',
-                'decimal_point' => '.',
-                'thousands_point' => ',',
-                'decimal_places' => '2',
-                'value' => '1.178900',
-                'last_updated' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'code' => 'AUD',
+                    'currencies_id' => 5,
+                    'decimal_places' => '2',
+                    'decimal_point' => '.',
+                    'last_updated' => '2023-06-29 12:14:04',
+                    'symbol_left' => '$',
+                    'symbol_right' => '',
+                    'thousands_point' => ',',
+                    'title' => 'Australian Dollar',
+                    'value' => '1.178900',
+                ),
         ));
 
 

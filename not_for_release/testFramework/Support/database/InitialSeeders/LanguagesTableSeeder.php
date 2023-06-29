@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class LanguagesTableSeeder extends Seeder
 {
@@ -19,16 +19,16 @@ class LanguagesTableSeeder extends Seeder
 
         Capsule::table('languages')->truncate();
 
-        Capsule::table('languages')->insert(array (
+        Capsule::table('languages')->insert(array(
             0 =>
-            array (
-                'languages_id' => 1,
-                'name' => 'English',
-                'code' => 'en',
-                'image' => 'icon.gif',
-                'directory' => 'english',
-                'sort_order' => 1,
-            ),
+                array(
+                    'code' => 'en',
+                    'directory' => 'english',
+                    'image' => 'icon.gif',
+                    'languages_id' => 1,
+                    'name' => 'English',
+                    'sort_order' => 1,
+                ),
         ));
 
 

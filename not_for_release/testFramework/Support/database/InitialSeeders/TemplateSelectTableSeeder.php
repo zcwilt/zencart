@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class TemplateSelectTableSeeder extends Seeder
 {
@@ -19,13 +19,13 @@ class TemplateSelectTableSeeder extends Seeder
 
         Capsule::table('template_select')->truncate();
 
-        Capsule::table('template_select')->insert(array (
+        Capsule::table('template_select')->insert(array(
             0 =>
-            array (
-                'template_id' => 1,
-                'template_dir' => 'responsive_classic',
-                'template_language' => '0',
-            ),
+                array(
+                    'template_dir' => 'responsive_classic',
+                    'template_id' => 1,
+                    'template_language' => '0',
+                ),
         ));
 
 

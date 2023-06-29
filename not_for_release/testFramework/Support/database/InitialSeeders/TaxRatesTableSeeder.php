@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class TaxRatesTableSeeder extends Seeder
 {
@@ -19,18 +19,18 @@ class TaxRatesTableSeeder extends Seeder
 
         Capsule::table('tax_rates')->truncate();
 
-        Capsule::table('tax_rates')->insert(array (
+        Capsule::table('tax_rates')->insert(array(
             0 =>
-            array (
-                'tax_rates_id' => 1,
-                'tax_zone_id' => 1,
-                'tax_class_id' => 1,
-                'tax_priority' => 1,
-                'tax_rate' => '7.0000',
-                'tax_description' => 'FL TAX 7.0%',
-                'last_modified' => '2023-06-21 14:08:02',
-                'date_added' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'date_added' => '2023-06-29 12:14:04',
+                    'last_modified' => '2023-06-29 12:14:04',
+                    'tax_class_id' => 1,
+                    'tax_description' => 'FL TAX 7.0%',
+                    'tax_priority' => 1,
+                    'tax_rate' => '7.0000',
+                    'tax_rates_id' => 1,
+                    'tax_zone_id' => 1,
+                ),
         ));
 
 

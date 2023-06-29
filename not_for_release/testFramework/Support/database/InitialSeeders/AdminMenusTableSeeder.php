@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class AdminMenusTableSeeder extends Seeder
 {
@@ -19,73 +19,73 @@ class AdminMenusTableSeeder extends Seeder
 
         Capsule::table('admin_menus')->truncate();
 
-        Capsule::table('admin_menus')->insert(array (
+        Capsule::table('admin_menus')->insert(array(
             0 =>
-            array (
-                'menu_key' => 'configuration',
-                'language_key' => 'BOX_HEADING_CONFIGURATION',
-                'sort_order' => 1,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_ADMIN_ACCESS',
+                    'menu_key' => 'access',
+                    'sort_order' => 10,
+                ),
             1 =>
-            array (
-                'menu_key' => 'catalog',
-                'language_key' => 'BOX_HEADING_CATALOG',
-                'sort_order' => 2,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_CATALOG',
+                    'menu_key' => 'catalog',
+                    'sort_order' => 2,
+                ),
             2 =>
-            array (
-                'menu_key' => 'modules',
-                'language_key' => 'BOX_HEADING_MODULES',
-                'sort_order' => 3,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_CONFIGURATION',
+                    'menu_key' => 'configuration',
+                    'sort_order' => 1,
+                ),
             3 =>
-            array (
-                'menu_key' => 'customers',
-                'language_key' => 'BOX_HEADING_CUSTOMERS',
-                'sort_order' => 4,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_CUSTOMERS',
+                    'menu_key' => 'customers',
+                    'sort_order' => 4,
+                ),
             4 =>
-            array (
-                'menu_key' => 'taxes',
-                'language_key' => 'BOX_HEADING_LOCATION_AND_TAXES',
-                'sort_order' => 5,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_EXTRAS',
+                    'menu_key' => 'extras',
+                    'sort_order' => 11,
+                ),
             5 =>
-            array (
-                'menu_key' => 'localization',
-                'language_key' => 'BOX_HEADING_LOCALIZATION',
-                'sort_order' => 6,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_GV_ADMIN',
+                    'menu_key' => 'gv',
+                    'sort_order' => 9,
+                ),
             6 =>
-            array (
-                'menu_key' => 'reports',
-                'language_key' => 'BOX_HEADING_REPORTS',
-                'sort_order' => 7,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_LOCALIZATION',
+                    'menu_key' => 'localization',
+                    'sort_order' => 6,
+                ),
             7 =>
-            array (
-                'menu_key' => 'tools',
-                'language_key' => 'BOX_HEADING_TOOLS',
-                'sort_order' => 8,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_MODULES',
+                    'menu_key' => 'modules',
+                    'sort_order' => 3,
+                ),
             8 =>
-            array (
-                'menu_key' => 'gv',
-                'language_key' => 'BOX_HEADING_GV_ADMIN',
-                'sort_order' => 9,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_REPORTS',
+                    'menu_key' => 'reports',
+                    'sort_order' => 7,
+                ),
             9 =>
-            array (
-                'menu_key' => 'access',
-                'language_key' => 'BOX_HEADING_ADMIN_ACCESS',
-                'sort_order' => 10,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_LOCATION_AND_TAXES',
+                    'menu_key' => 'taxes',
+                    'sort_order' => 5,
+                ),
             10 =>
-            array (
-                'menu_key' => 'extras',
-                'language_key' => 'BOX_HEADING_EXTRAS',
-                'sort_order' => 11,
-            ),
+                array(
+                    'language_key' => 'BOX_HEADING_TOOLS',
+                    'menu_key' => 'tools',
+                    'sort_order' => 8,
+                ),
         ));
 
 

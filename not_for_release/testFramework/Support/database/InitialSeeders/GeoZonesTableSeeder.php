@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class GeoZonesTableSeeder extends Seeder
 {
@@ -19,15 +19,15 @@ class GeoZonesTableSeeder extends Seeder
 
         Capsule::table('geo_zones')->truncate();
 
-        Capsule::table('geo_zones')->insert(array (
+        Capsule::table('geo_zones')->insert(array(
             0 =>
-            array (
-                'geo_zone_id' => 1,
-                'geo_zone_name' => 'Florida',
-                'geo_zone_description' => 'Florida local sales tax zone',
-                'last_modified' => NULL,
-                'date_added' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'date_added' => '2023-06-29 12:14:04',
+                    'geo_zone_description' => 'Florida local sales tax zone',
+                    'geo_zone_id' => 1,
+                    'geo_zone_name' => 'Florida',
+                    'last_modified' => NULL,
+                ),
         ));
 
 

@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class TaxClassTableSeeder extends Seeder
 {
@@ -19,15 +19,15 @@ class TaxClassTableSeeder extends Seeder
 
         Capsule::table('tax_class')->truncate();
 
-        Capsule::table('tax_class')->insert(array (
+        Capsule::table('tax_class')->insert(array(
             0 =>
-            array (
-                'tax_class_id' => 1,
-                'tax_class_title' => 'Taxable Goods',
-                'tax_class_description' => 'The following types of products are included: non-food, services, etc',
-                'last_modified' => NULL,
-                'date_added' => '2023-06-21 14:08:02',
-            ),
+                array(
+                    'date_added' => '2023-06-29 12:14:04',
+                    'last_modified' => NULL,
+                    'tax_class_description' => 'The following types of products are included: non-food, services, etc',
+                    'tax_class_id' => 1,
+                    'tax_class_title' => 'Taxable Goods',
+                ),
         ));
 
 

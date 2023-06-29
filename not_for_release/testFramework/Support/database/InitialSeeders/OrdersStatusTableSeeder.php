@@ -2,8 +2,8 @@
 
 namespace InitialSeeders;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class OrdersStatusTableSeeder extends Seeder
 {
@@ -19,35 +19,35 @@ class OrdersStatusTableSeeder extends Seeder
 
         Capsule::table('orders_status')->truncate();
 
-        Capsule::table('orders_status')->insert(array (
+        Capsule::table('orders_status')->insert(array(
             0 =>
-            array (
-                'orders_status_id' => 1,
-                'language_id' => 1,
-                'orders_status_name' => 'Pending',
-                'sort_order' => 0,
-            ),
+                array(
+                    'language_id' => 1,
+                    'orders_status_id' => 1,
+                    'orders_status_name' => 'Pending',
+                    'sort_order' => 0,
+                ),
             1 =>
-            array (
-                'orders_status_id' => 2,
-                'language_id' => 1,
-                'orders_status_name' => 'Processing',
-                'sort_order' => 10,
-            ),
+                array(
+                    'language_id' => 1,
+                    'orders_status_id' => 2,
+                    'orders_status_name' => 'Processing',
+                    'sort_order' => 10,
+                ),
             2 =>
-            array (
-                'orders_status_id' => 3,
-                'language_id' => 1,
-                'orders_status_name' => 'Delivered',
-                'sort_order' => 20,
-            ),
+                array(
+                    'language_id' => 1,
+                    'orders_status_id' => 3,
+                    'orders_status_name' => 'Delivered',
+                    'sort_order' => 20,
+                ),
             3 =>
-            array (
-                'orders_status_id' => 4,
-                'language_id' => 1,
-                'orders_status_name' => 'Update',
-                'sort_order' => 30,
-            ),
+                array(
+                    'language_id' => 1,
+                    'orders_status_id' => 4,
+                    'orders_status_name' => 'Update',
+                    'sort_order' => 30,
+                ),
         ));
 
 
