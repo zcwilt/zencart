@@ -11,7 +11,6 @@ use App\Models\PluginControlVersion;
 use Zencart\FileSystem\FileSystem;
 use Zencart\PluginManager\PluginManager;
 use Zencart\PageLoader\PageLoader;
-define('STRICT_ERROR_REPORTING', true);
 /**
  * boolean if true the autoloader scripts will be parsed and their output shown. For debugging purposes only.
  */
