@@ -15,7 +15,9 @@ class AdminTest extends zcFeatureTestCaseAdmin
     protected array $quickTestMap = [
         'category_product_listing' => 'Admin Category Product Listing',
         'product_types' => 'Admin Product Types',
+        'products_price_manager' => 'Admin Products Price Manager',
         'options_name_manager' => 'Admin Options Name Manager',
+        'options_values_manager' => 'Admin Options Values Manager',
         'manufacturers' => 'Admin Manufacturers',
     ];
 
