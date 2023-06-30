@@ -76,6 +76,7 @@ define('TABLE_PLUGIN_CONTROL_VERSIONS', DB_PREFIX . 'plugin_control_versions');
 define('TABLE_PLUGIN_GROUPS', DB_PREFIX . 'plugin_groups');
 define('TABLE_PLUGIN_GROUPS_DESCRIPTION', DB_PREFIX . 'plugin_groups_description');
 define('TABLE_PRODUCTS', DB_PREFIX . 'products');
+define('TABLE_PRODUCTS_FACETED_SEARCH', DB_PREFIX . 'products_faceted_search');
 define('TABLE_PRODUCT_TYPES', DB_PREFIX . 'product_types');
 define('TABLE_PRODUCT_TYPE_LAYOUT', DB_PREFIX . 'product_type_layout');
 define('TABLE_PRODUCT_TYPES_TO_CATEGORY', DB_PREFIX . 'product_types_to_category');

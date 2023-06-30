@@ -37,13 +37,13 @@ function zen_has_product_attributes($product_id, $not_readonly = true)
         $sql = "SELECT pa.products_attributes_id
                 FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
                 LEFT JOIN " . TABLE_PRODUCTS_OPTIONS . " po ON (pa.options_id = po.products_options_id)
-                WHERE pa.products_id = " . (int)$product_id . "
+                WHERE pa.products_id = " . (int)$product_id . " AND pa.is_hidden = 0
                 AND po.products_options_type != '" . $db->prepare_input(PRODUCTS_OPTIONS_TYPE_READONLY) . "'";
     } else {
         // regardless of READONLY attributes
         $sql = "SELECT pa.products_attributes_id
                 FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-                WHERE pa.products_id = " . (int)$product_id;
+                WHERE pa.products_id = " . (int)$product_id . " AND pa.is_hidden = 0";
     }
 
     $result = $db->Execute($sql, 1);
@@ -781,4 +781,57 @@ function zen_check_for_misconfigured_downloads() {
       }
    }
    return true;
+}
+
+function zen_fs_has_searchable_attributes($productIds)
+{
+    global $db;
+    $sql = "SELECT * FROM " . TABLE_PRODUCTS_ATTRIBUTES . " AS pa
+            WHERE pa.products_id IN (:productIds:) AND is_searchable = 1";
+    $sql = $db->bindVars($sql, ':productIds:', $productIds, 'inConstructInteger');
+    $result = $db->execute($sql, false, true, 600);
+    if (count($result)) return true;
+    return false;
+}
+
+function zen_fs_get_searchable_attributes($productIds)
+{
+    global $db;
+    $sql = "SELECT * FROM " . TABLE_PRODUCTS_ATTRIBUTES . " AS pa
+            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS . " AS popt ON pa.options_id = popt.products_options_id
+            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " AS povtov ON popt.products_options_id = povtov.products_options_id
+            WHERE pa.products_id IN (:productId:) AND is_searchable = 1";
+    $sql = $db->bindVars($sql, ':productId:', $productIds, 'inConstructInteger');
+    $result = $db->execute($sql, false, true, 600);
+    return $result;
+}
+
+function zen_normalize_searchable_attributes($queryResults)
+{
+    $searchables = [];
+    foreach ($queryResults as $entry) {
+        $searchables[$entry['options_id']]['name'] = $entry['products_options_name'];
+    }
+    return $searchables;
+}
+
+function zen_fs_prepare_listing_sql($listingSql)
+{
+    $splitPoint = strpos($listingSql, ' FROM ' . TABLE_PRODUCTS);
+    if ($splitPoint == 0) return '';
+    $newSql = substr($listingSql, $splitPoint);
+    $newSql = "SELECT p.products_id " . $newSql;
+    return $newSql;
+}
+
+function zen_fs_create_productid_list($sql)
+{
+    global $db;
+    $idList = [];
+    $result = $db->execute($sql);
+    foreach ($result as $entry) {
+        $idList[] = $entry['products_id'];
+    }
+    $idList = implode(',', $idList);
+    return $idList;
 }

@@ -43,6 +43,8 @@ class CreateProductsAttributesTable extends Migration
             $table->decimal('attributes_price_letters', 15, 4)->default(0.0000);
             $table->integer('attributes_price_letters_free')->default(0);
             $table->boolean('attributes_required')->default(0);
+            $table->boolean('is_hidden')->default(0);
+            $table->boolean('is_searchable')->default(0);
 
             $table->index(['products_id', 'options_id', 'options_values_id'], 'idx_id_options_id_values_zen');
         });

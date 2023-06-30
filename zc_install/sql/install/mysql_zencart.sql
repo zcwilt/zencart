@@ -1697,6 +1697,8 @@ CREATE TABLE products_attributes (
   attributes_price_letters decimal(15,4) NOT NULL default '0.0000',
   attributes_price_letters_free int(4) NOT NULL default '0',
   attributes_required tinyint(1) NOT NULL default '0',
+  is_hidden tinyint(1) NOT NULL default '0',
+  is_searchable tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (products_attributes_id),
   KEY idx_id_options_id_values_zen (products_id,options_id,options_values_id),
   KEY idx_opt_sort_order_zen (products_options_sort_order)
