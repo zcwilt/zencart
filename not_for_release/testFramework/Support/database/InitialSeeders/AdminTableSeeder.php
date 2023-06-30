@@ -4,6 +4,7 @@ namespace InitialSeeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Support\Carbon;
 
 class AdminTableSeeder extends Seeder
 {
@@ -30,10 +31,10 @@ class AdminTableSeeder extends Seeder
                     'prev_pass1' => '',
                     'prev_pass2' => '',
                     'prev_pass3' => '',
-                    'pwd_last_change_date' => '2023-06-21 14:08:02',
+                    'pwd_last_change_date' => Carbon::now()->format('Y-m-d H:i:s'),
                     'reset_token' => '',
-                    'last_modified' => '2023-06-21 14:08:02',
-                    'last_login_date' => '2023-06-21 14:08:02',
+                    'last_modified' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'last_login_date' => Carbon::now()->format('Y-m-d H:i:s'),
                     'last_login_ip' => '',
                     'failed_logins' => 0,
                     'lockout_expires' => 0,
@@ -41,8 +42,5 @@ class AdminTableSeeder extends Seeder
                     'last_failed_ip' => '',
                 ),
         ));
-
-
-
     }
 }
