@@ -20,6 +20,7 @@ use Zencart\InitSystem\InitSystem;
 // Set session ID
 $zenSessionId = 'zenid';
 
+define('RUNNING_CONTEXT', defined('RUNNING_IN_PUBLIC') ? '../' :  '');
 /**
  * inoculate against hack attempts which waste CPU cycles
  */
@@ -83,17 +84,17 @@ define('PAGE_PARSE_START_TIME', microtime());
  * See https://www.zen-cart.com/requirements or run zc_install to see actual requirements!
  */
 if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 70205) {
-    require 'includes/templates/template_default/templates/tpl_zc_phpupgrade_default.php';
+    require RUNNING_CONTEXT . 'includes/templates/template_default/templates/tpl_zc_phpupgrade_default.php';
     exit(0);
 }
 /**
  * Set the local configuration parameters - mainly for developers
  */
-if (file_exists('includes/local/configure.php')) {
+if (file_exists('../includes/local/configure.php')) {
   /**
    * load any local(user created) configure file.
    */
-  include('includes/local/configure.php');
+  include(RUNNING_CONTEXT . 'includes/local/configure.php');
 }
 /**
  * boolean if true the autoloader scripts will be parsed and their output shown. For debugging purposes only.
@@ -116,32 +117,36 @@ if (DEBUG_AUTOLOAD || (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTI
 /**
  * check for and include load application parameters
  */
-if (file_exists('includes/configure.php')) {
+if (file_exists(RUNNING_CONTEXT . 'includes/configure.php')) {
   /**
    * load the main configure file.
    */
-  include('includes/configure.php');
+  include(RUNNING_CONTEXT . 'includes/configure.php');
 } else if (!defined('DIR_FS_CATALOG') && !defined('HTTP_SERVER') && !defined('DIR_WS_CATALOG') && !defined('DIR_WS_INCLUDES')) {
+    die('HETER');
+
   $problemString = 'includes/configure.php not found';
-  require('includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
+  require(RUNNING_CONTEXT . 'includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
   exit;
 }
 /**
  * if main configure file doesn't contain valid info (ie: is dummy or doesn't match filestructure, display assistance page to suggest running the installer)
  */
 if (!defined('DIR_FS_CATALOG') || !is_dir(DIR_FS_CATALOG.'/includes/classes')) {
-  $problemString = 'includes/configure.php file contents invalid.  ie: DIR_FS_CATALOG not valid or not set';
-  require('includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
+    die('HETER');
+
+    $problemString = RUNNING_CONTEXT . 'includes/configure.php file contents invalid.  ie: DIR_FS_CATALOG not valid or not set';
+  require(RUNNING_CONTEXT . 'includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
   exit;
 }
 /**
  * check for and load system defined path constants
  */
-if (file_exists('includes/defined_paths.php')) {
+if (file_exists(RUNNING_CONTEXT . 'includes/defined_paths.php')) {
     /**
      * load the system-defined path constants
      */
-    require('includes/defined_paths.php');
+    require(RUNNING_CONTEXT . 'includes/defined_paths.php');
 } else {
     die('ERROR: /includes/defined_paths.php file not found. Cannot continue.');
     exit;
@@ -170,13 +175,13 @@ if (isset($loaderPrefix)) {
   $loaderPrefix = 'config';
 }
 $loader_file = $loaderPrefix . '.core.php';
-require 'includes/initsystem.php';
+require RUNNING_CONTEXT . 'includes/initsystem.php';
 /**
  * determine install status
  */
-if (( (!file_exists('includes/configure.php') && !file_exists('includes/local/configure.php')) ) || (DB_TYPE == '') || (!file_exists('includes/classes/db/' .DB_TYPE . '/query_factory.php')) || !file_exists('includes/autoload_func.php')) {
-  $problemString = 'includes/configure.php file empty or file not found, OR wrong DB_TYPE set, OR cannot find includes/autoload_func.php which suggests paths are wrong or files were not uploaded correctly';
-  require('includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
+if (( (!file_exists(RUNNING_CONTEXT . 'includes/configure.php') && !file_exists('includes/local/configure.php')) ) || (DB_TYPE == '') || (!file_exists('includes/classes/db/' .DB_TYPE . '/query_factory.php')) || !file_exists('includes/autoload_func.php')) {
+  $problemString = RUNNING_CONTEXT . 'includes/configure.php file empty or file not found, OR wrong DB_TYPE set, OR cannot find includes/autoload_func.php which suggests paths are wrong or files were not uploaded correctly';
+  require(RUNNING_CONTEXT . 'includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
   header('location: zc_install/index.php');
   exit;
 }
@@ -187,7 +192,7 @@ require DIR_FS_CATALOG . DIR_WS_CLASSES . 'vendors/AuraAutoload/src/Loader.php';
 require DIR_FS_CATALOG . 'laravel/vendor/autoload.php';
 $psr4Autoloader = new \Aura\Autoload\Loader;
 $psr4Autoloader->register();
-require('includes/psr4Autoload.php');
+require(DIR_FS_CATALOG . 'includes/psr4Autoload.php');
 require DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.base.php';
 require DIR_FS_CATALOG . DIR_WS_CLASSES . 'query_cache.php';
 
@@ -195,8 +200,8 @@ $queryCache = new QueryCache();
 require DIR_FS_CATALOG . DIR_WS_CLASSES . 'cache.php';
 $zc_cache = new cache();
 
-require 'includes/init_includes/init_file_db_names.php';
-require 'includes/init_includes/init_database.php';
+require DIR_FS_CATALOG . 'includes/init_includes/init_file_db_names.php';
+require DIR_FS_CATALOG . 'includes/init_includes/init_database.php';
 
 require DIR_FS_CATALOG . 'includes/application_laravel.php';
 
