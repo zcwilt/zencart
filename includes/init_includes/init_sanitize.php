@@ -254,6 +254,7 @@ $pageLoader = PageLoader::getInstance();
 $pageLoader->init($installedPlugins, $_GET['main_page'], new FileSystem);
 
 $pageDir = $pageLoader->findModulePageDirectory();
+
 if ($pageDir === false) {
     if (MISSING_PAGE_CHECK === 'On' || MISSING_PAGE_CHECK === 'true') {
         zen_redirect(zen_href_link(FILENAME_DEFAULT));

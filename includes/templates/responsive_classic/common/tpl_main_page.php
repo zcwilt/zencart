@@ -122,7 +122,7 @@ $body_id = ($this_is_home_page) ? 'indexHome' : str_replace('_', '', $_GET['main
   if (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_HEADER_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in())) {
     $flag_disable_header = true;
   }
-  require($template->get_template_dir('tpl_header.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_header.php');?>
+  require($template->get_template_dir('tpl_header.php',DIR_FS_CATALOG . DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_header.php');?>
 
 <div id="contentMainWrapper">
 

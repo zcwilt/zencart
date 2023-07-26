@@ -25,7 +25,7 @@
   define('RUNNING_IN_PUBLIC' , true);
   require('../includes/application_top.php');
 
-  $language_page_directory = DIR_WS_LANGUAGES . $_SESSION['language'] . '/';
+  $language_page_directory = DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'] . '/';
   $directory_array = $template->get_template_part($code_page_directory, '/^header_php/');
   foreach ($directory_array as $value) {
 /**
@@ -40,13 +40,13 @@
  * it is overridable on a template and page basis.
  * In that a custom template can define its own common/html_header.php file
  */
-  require($template->get_template_dir('html_header.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/html_header.php');
+  require($template->get_template_dir('html_header.php',DIR_FS_CATALOG . DIR_WS_TEMPLATE, $current_page_base,'common'). '/html_header.php');
 /**
  * Define Template Variables are picked up from includes/main_template_vars.php unless a file exists in the
  * includes/pages/{page_name}/directory to override. This allows different pages to have different overall
  * templates.
  */
-  require($template->get_template_dir('main_template_vars.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/main_template_vars.php');
+  require($template->get_template_dir('main_template_vars.php',DIR_FS_CATALOG . DIR_WS_TEMPLATE, $current_page_base,'common'). '/main_template_vars.php');
 /**
  * Read the "on_load" scripts for the individual page, and from the site-wide template settings
  * NOTE: on_load_*.js files must contain just the raw code to be inserted in the <body> tag in the on_load="" parameter.
@@ -92,7 +92,7 @@
  * or using a default template. The default template installed will be a standard 3 column layout. This
  * template also loads the page body code based on the variable $body_code.
  */
-  require($template->get_template_dir('tpl_main_page.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_main_page.php');
+  require($template->get_template_dir('tpl_main_page.php',DIR_FS_CATALOG . DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_main_page.php');
 ?>
 </html>
 <?php

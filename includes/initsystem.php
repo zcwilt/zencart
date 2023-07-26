@@ -17,6 +17,7 @@ $base_dir = DIR_WS_INCLUDES . 'auto_loaders/';
 if (file_exists(DIR_WS_INCLUDES . 'auto_loaders/overrides/' . $loader_file)) {
   $base_dir = DIR_WS_INCLUDES . 'auto_loaders/overrides/';
 }
+
 /**
  * load the default application_top autoloader file.
  */

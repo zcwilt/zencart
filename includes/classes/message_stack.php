@@ -114,7 +114,7 @@ class messageStack extends base
         // remove duplicates before displaying
         // $output = array_values(array_unique($output));
 
-        require $template->get_template_dir('tpl_message_stack_default.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_message_stack_default.php';
+        require $template->get_template_dir('tpl_message_stack_default.php', DIR_FS_CATALOG . DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_message_stack_default.php';
     }
 
     function size($class)

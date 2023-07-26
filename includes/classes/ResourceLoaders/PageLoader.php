@@ -13,12 +13,12 @@ use Zencart\Traits\Singleton;
 class PageLoader
 {
     use Singleton;
-    
+
     private
         $installedPlugins,
         $mainPage,
         $fileSystem;
-    
+
     public function init(array $installedPlugins, $mainPage, $fileSystem)
     {
         $this->installedPlugins = $installedPlugins;
@@ -72,16 +72,16 @@ class PageLoader
 
     function getTemplateDirectory($templateCode, $currentTemplate, $currentPage, $templateDir)
     {
-        if ($currentTemplate === 'template_default') $currentTemplate = DIR_WS_TEMPLATES . $currentTemplate . '/';
+        if ($currentTemplate === 'template_default') $currentTemplate = DIR_FS_TEMPLATES . $currentTemplate . '/';
 
-        $path = DIR_WS_TEMPLATES . 'template_default/' . $templateDir;
+        $path = DIR_FS_TEMPLATES . 'template_default/' . $templateDir;
 
         if ($this->fileSystem->fileExistsInDirectory($currentTemplate . $currentPage, $templateCode)) {
             return $currentTemplate . $currentPage . '/';
         }
         if ($this->fileSystem->fileExistsInDirectory(
-            DIR_WS_TEMPLATES . 'template_default/' . $currentPage, preg_replace('/\//', '', $templateCode))) {
-            return DIR_WS_TEMPLATES . 'template_default/' . $currentPage;
+            DIR_FS_TEMPLATES . 'template_default/' . $currentPage, preg_replace('/\//', '', $templateCode))) {
+            return DIR_FS_TEMPLATES . 'template_default/' . $currentPage;
         }
         if ($this->fileSystem->fileExistsInDirectory(
             $currentTemplate . $templateDir, preg_replace('/\//', '', $templateCode))) {

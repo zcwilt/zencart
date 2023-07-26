@@ -11,12 +11,12 @@ namespace Zencart\InitSystem;
 class InitSystem
 {
 
-    private 
+    private
         $installedPlugins,
         $debug,
         $debugList,
         $actionList;
-        
+
     private $context;
     private $loaderPrefix;
     private $fileSystem;
@@ -82,7 +82,7 @@ class InitSystem
 
     protected function processAutoTypeClass($entry)
     {
-        $filePath = DIR_FS_CATALOG . DIR_WS_CLASSES;
+        $filePath = DIR_WS_CLASSES;
         if (isset($entry['classPath'])) {
             $filePath = $entry['classPath'];
         }

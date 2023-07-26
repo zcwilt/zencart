@@ -17,6 +17,7 @@ if (isset($_SESSION['session_counter']) && $_SESSION['session_counter'] == true)
   $session_counter = 1;
   $_SESSION['session_counter'] = true;
 }
+
 $date_now = date('Ymd');
 $counter_query = "select startdate, counter, session_counter from " . TABLE_COUNTER_HISTORY . " where startdate='" . $date_now . "'";
 $counter = $db->Execute($counter_query);
@@ -50,3 +51,4 @@ if ($counter->RecordCount() <= 0) {
 }
 
 $counter_startdate_formatted = $zcDate->output(DATE_FORMAT_LONG, mktime(0, 0, 0, substr($counter_startdate, 4, 2), substr($counter_startdate, -2), substr($counter_startdate, 0, 4)));
+

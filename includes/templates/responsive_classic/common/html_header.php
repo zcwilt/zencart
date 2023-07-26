@@ -92,7 +92,7 @@ if (count($lng->catalog_languages) > 1) {
 /**
  * load all template-specific stylesheets, named like "style*.css", alphabetically
  */
-  $directory_array = $template->get_template_part($template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css'), '/^style/', '.css');
+  $directory_array = $template->get_template_asset($template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css'), '/^style/', '.css');
   foreach($directory_array as $key => $value) {
     echo '<link rel="stylesheet" href="' . $template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css') . '/' . $value . '">'."\n";
   }

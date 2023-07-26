@@ -100,6 +100,7 @@ if (file_exists('../includes/local/configure.php')) {
  * boolean if true the autoloader scripts will be parsed and their output shown. For debugging purposes only.
  */
 define('DEBUG_AUTOLOAD', false);
+define('STRICT_ERROR_REPORTING', true);
 /**
  * set the level of error reporting
  *
@@ -123,23 +124,24 @@ if (file_exists(RUNNING_CONTEXT . 'includes/configure.php')) {
    */
   include(RUNNING_CONTEXT . 'includes/configure.php');
 } else if (!defined('DIR_FS_CATALOG') && !defined('HTTP_SERVER') && !defined('DIR_WS_CATALOG') && !defined('DIR_WS_INCLUDES')) {
-    die('HETER');
 
   $problemString = 'includes/configure.php not found';
   require(RUNNING_CONTEXT . 'includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
   exit;
 }
+
 /**
  * if main configure file doesn't contain valid info (ie: is dummy or doesn't match filestructure, display assistance page to suggest running the installer)
  */
 if (!defined('DIR_FS_CATALOG') || !is_dir(DIR_FS_CATALOG.'/includes/classes')) {
-    die('HETER');
 
     $problemString = RUNNING_CONTEXT . 'includes/configure.php file contents invalid.  ie: DIR_FS_CATALOG not valid or not set';
   require(RUNNING_CONTEXT . 'includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
   exit;
 }
+
 /**
+
  * check for and load system defined path constants
  */
 if (file_exists(RUNNING_CONTEXT . 'includes/defined_paths.php')) {
@@ -151,8 +153,10 @@ if (file_exists(RUNNING_CONTEXT . 'includes/defined_paths.php')) {
     die('ERROR: /includes/defined_paths.php file not found. Cannot continue.');
     exit;
 }
-require DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'php_polyfills.php';
-require DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'zen_define_default.php';
+
+require DIR_WS_FUNCTIONS . 'php_polyfills.php';
+require DIR_WS_FUNCTIONS . 'zen_define_default.php';
+
 /**
  * include the list of extra configure files
  */
@@ -168,6 +172,7 @@ if ($za_dir = @dir(DIR_WS_INCLUDES . 'extra_configures')) {
   $za_dir->close();
   unset($za_dir);
 }
+
 $autoLoadConfig = [];
 if (isset($loaderPrefix)) {
  $loaderPrefix = preg_replace('/[^a-z_]/', '', $loaderPrefix);
@@ -176,11 +181,13 @@ if (isset($loaderPrefix)) {
 }
 $loader_file = $loaderPrefix . '.core.php';
 require RUNNING_CONTEXT . 'includes/initsystem.php';
+
 /**
  * determine install status
  */
-if (( (!file_exists(RUNNING_CONTEXT . 'includes/configure.php') && !file_exists('includes/local/configure.php')) ) || (DB_TYPE == '') || (!file_exists('includes/classes/db/' .DB_TYPE . '/query_factory.php')) || !file_exists('includes/autoload_func.php')) {
-  $problemString = RUNNING_CONTEXT . 'includes/configure.php file empty or file not found, OR wrong DB_TYPE set, OR cannot find includes/autoload_func.php which suggests paths are wrong or files were not uploaded correctly';
+if (( (!file_exists(RUNNING_CONTEXT . 'includes/configure.php') && !file_exists(RUNNING_CONTEXT . 'includes/local/configure.php')) ) || (DB_TYPE == '') || (!file_exists(RUNNING_CONTEXT . 'includes/classes/db/' .DB_TYPE . '/query_factory.php')) || !file_exists(RUNNING_CONTEXT . 'includes/autoload_func.php')) {
+
+$problemString = RUNNING_CONTEXT . 'includes/configure.php file empty or file not found, OR wrong DB_TYPE set, OR cannot find includes/autoload_func.php which suggests paths are wrong or files were not uploaded correctly';
   require(RUNNING_CONTEXT . 'includes/templates/template_default/templates/tpl_zc_install_suggested_default.php');
   header('location: zc_install/index.php');
   exit;
@@ -188,16 +195,17 @@ if (( (!file_exists(RUNNING_CONTEXT . 'includes/configure.php') && !file_exists(
 /**
  * psr-4 autoloading
  */
-require DIR_FS_CATALOG . DIR_WS_CLASSES . 'vendors/AuraAutoload/src/Loader.php';
+require DIR_WS_CLASSES . 'vendors/AuraAutoload/src/Loader.php';
 require DIR_FS_CATALOG . 'laravel/vendor/autoload.php';
 $psr4Autoloader = new \Aura\Autoload\Loader;
 $psr4Autoloader->register();
 require(DIR_FS_CATALOG . 'includes/psr4Autoload.php');
-require DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.base.php';
-require DIR_FS_CATALOG . DIR_WS_CLASSES . 'query_cache.php';
+require DIR_WS_CLASSES . 'class.base.php';
+require DIR_WS_CLASSES . 'query_cache.php';
+
 
 $queryCache = new QueryCache();
-require DIR_FS_CATALOG . DIR_WS_CLASSES . 'cache.php';
+require DIR_WS_CLASSES . 'cache.php';
 $zc_cache = new cache();
 
 require DIR_FS_CATALOG . 'includes/init_includes/init_file_db_names.php';
@@ -240,6 +248,7 @@ $loaderList = $initSystem->loadAutoLoaders();
 $initSystemList = $initSystem->processLoaderList($loaderList);
 
 require DIR_FS_CATALOG . 'includes/autoload_func.php';
+
 /**
  * load the counter code
 **/
@@ -252,3 +261,4 @@ $customers_ip_address = $_SERVER['REMOTE_ADDR'];
 if (!isset($_SESSION['customers_ip_address'])) {
   $_SESSION['customers_ip_address'] = $customers_ip_address;
 }
+

@@ -34,6 +34,7 @@ if (!isset($PHP_SELF)) $PHP_SELF = $_SERVER['SCRIPT_NAME'];
  * require global definitons for Filenames
  */
 require(DIR_WS_INCLUDES . 'filenames.php');
+
 /**
  * require global definitons for Database Table Names
  */

@@ -17,7 +17,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 class template_func extends base {
 
         private $info = [];
-        
+
   function __construct($template_dir = 'default') {
     $this->info = [];
   }
@@ -27,6 +27,11 @@ class template_func extends base {
       $directory_array = $pageLoader->getTemplatePart($page_directory, $template_part, $file_extension);
       return $directory_array;
   }
+    function get_template_asset($page_directory, $template_part, $file_extension = '.php') {
+        $pageLoader = Zencart\PageLoader\PageLoader::getInstance();
+        $directory_array = $pageLoader->getTemplateAsset($page_directory, $template_part, $file_extension);
+        return $directory_array;
+    }
 
   function get_template_dir($template_code, $current_template, $current_page, $template_dir, $debug=false) {
       $pageLoader = Zencart\PageLoader\PageLoader::getInstance();

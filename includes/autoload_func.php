@@ -15,6 +15,8 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 $debugAutoload = false;
 if (defined('DEBUG_AUTOLOAD') && DEBUG_AUTOLOAD == true) $debugAutoload = true;
+//$debugAutoload = true;
+
 if ($debugAutoload) {
     echo '<pre>$initSystemList=<br>';
     print_r($initSystemList);
