@@ -65,6 +65,7 @@ $define = [
     'TEXT_META_EXCLUDED' => '<span class="alert">EXCLUDED</span>',
     'TEXT_TITLE_PLUS_TAGLINE' => 'Store Title+Tagline',
     'TEXT_PRODUCTS_PRICE_INFO' => 'Price:',
+    'TEXT_PRODUCTS_WHOLESALE_PRICE' => 'Wholesale Price:',
 ];
 
 return $define;
