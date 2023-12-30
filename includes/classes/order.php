@@ -49,7 +49,7 @@ class order extends base
      */
     public $delivery = [];
     /**
-     * $doStockDecrement is a flag used by a notifier to prevent the default stock decrement processing 
+     * $doStockDecrement is a flag used by a notifier to prevent the default stock decrement processing
      * @var boolean
      */
     public $doStockDecrement;
@@ -80,7 +80,7 @@ class order extends base
     protected $orderId = null;
     /**
      * $products is an array containing details of the products for the order
-     * @var array 
+     * @var array
      */
     public $products = [];
     /**
@@ -115,17 +115,17 @@ class order extends base
     public $statuses = [];
     /**
      * $total_cost is the total cost of the order
-     * @var float 
+     * @var float
      */
     public $total_cost;
     /**
      * $total_tax is the total amount of tax for the order
-     * @var float 
+     * @var float
      */
     public $total_tax;
     /**
      * $total_weight is the total weight of the order
-     * @var float 
+     * @var float
      */
     public $total_weight;
     /**
@@ -181,6 +181,8 @@ class order extends base
                          ORDER BY sort_order";
 
         $totals = $db->Execute($totals_query);
+
+        $precision = QUANTITY_DECIMALS > 0 ? (int)QUANTITY_DECIMALS : 0;
 
         while (!$totals->EOF) {
             if ($totals->fields['class'] == 'ot_coupon') {
@@ -292,7 +294,7 @@ class order extends base
 
         while (!$orders_products->EOF) {
             // convert quantity to proper decimals - account history
-            if (QUANTITY_DECIMALS != 0) {
+            if ($precision !== 0) {
                 $fix_qty = $orders_products->fields['products_quantity'];
                 switch (true) {
                     case (false === strpos($fix_qty, '.')):
@@ -306,7 +308,7 @@ class order extends base
                 $new_qty = $orders_products->fields['products_quantity'];
             }
 
-            $new_qty = round($new_qty, QUANTITY_DECIMALS);
+            $new_qty = round($new_qty, $precision);
 
             if ($new_qty == (int)$new_qty) {
                 $new_qty = (int)$new_qty;
@@ -448,7 +450,7 @@ class order extends base
     protected function getCountryZoneId(int $countries_id, string $state)
     {
         global $db;
-        
+
         $sql =
             "SELECT zone_id
                FROM " . TABLE_ZONES . "
