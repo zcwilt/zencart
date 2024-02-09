@@ -11,6 +11,7 @@ trait DatabaseConcerns
 {
     public static function databaseSetup(): void
     {
+        global $db;
         $capsule = new Capsule;
         $capsule->addConnection([
             'driver'    => DB_TYPE,
@@ -34,7 +35,9 @@ trait DatabaseConcerns
         if (!defined('IS_ADMIN_FLAG')) {
             define('IS_ADMIN_FLAG', false);
         }
-
+        //require(ROOTCWD . 'includes/classes/db/' .DB_TYPE . '/query_factory.php');
+        $db = new \queryFactory();
+        $db->connect(DB_SERVER, DB_SERVER_USERNAME, DB_SERVER_PASSWORD, DB_DATABASE);
     }
 
     public static function runMigrations()

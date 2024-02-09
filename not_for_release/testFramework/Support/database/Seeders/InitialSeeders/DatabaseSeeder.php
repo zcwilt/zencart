@@ -79,5 +79,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ZonesTableSeeder::class);
         $this->call(ZonesToGeoZonesTableSeeder::class);
         $this->call(CouponTableSeeder::class);
+        $this->call(SimpleBasketSeeder::class);
     }
 }

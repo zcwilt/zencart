@@ -19,7 +19,7 @@ $pages_to_debug = [];
  * Specify the pages you wish to enable debugging for (ie: main_page=xxxxxxxx)
  * Using '*' will cause all pages to be enabled
  */
-$pages_to_debug[] = '*';
+//$pages_to_debug[] = '*';
 //   $pages_to_debug[] = '';
 //   $pages_to_debug[] = '';
 

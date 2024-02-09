@@ -635,37 +635,55 @@ CREATE TABLE customers (
 # --------------------------------------------------------
 
 #
-# Table structure for table 'customers_basket'
+# Table structure for table 'baskets'
 #
 
-DROP TABLE IF EXISTS customers_basket;
-CREATE TABLE customers_basket (
-  customers_basket_id int(11) NOT NULL auto_increment,
-  customers_id int(11) NOT NULL default '0',
-  products_id tinytext NOT NULL,
-  customers_basket_quantity float NOT NULL default '0',
-  customers_basket_date_added varchar(8) default NULL,
-  PRIMARY KEY  (customers_basket_id),
-  KEY idx_customers_id_zen (customers_id)
+DROP TABLE IF EXISTS baskets;
+CREATE TABLE baskets (
+   id int(11) NOT NULL auto_increment,
+   customer_id int(11) default '0',
+   unique_id varchar(64) default '',
+   name varchar(255) default 'default',
+   created_at datetime,
+   updated_at datetime,
+   PRIMARY KEY  (id),
+   KEY idx_customer_id_zen (customer_id)
+) ENGINE=MyISAM;
+
+
+# --------------------------------------------------------
+
+#
+# Table structure for table 'basket_products'
+#
+
+DROP TABLE IF EXISTS basket_products;
+CREATE TABLE basket_products (
+  id int(11) NOT NULL auto_increment,
+  basket_id int(11) NOT NULL,
+  product_id tinytext NOT NULL,
+  quantity float NOT NULL default '0',
+  date_added varchar(8) default NULL,
+  PRIMARY KEY  (id),
+  KEY idx_products_id_zen (product_id)
 ) ENGINE=MyISAM;
 
 # --------------------------------------------------------
 
 #
-# Table structure for table 'customers_basket_attributes'
+# Table structure for table 'basket_attributes'
 #
 
-DROP TABLE IF EXISTS customers_basket_attributes;
-CREATE TABLE customers_basket_attributes (
-  customers_basket_attributes_id int(11) NOT NULL auto_increment,
-  customers_id int(11) NOT NULL default '0',
-  products_id tinytext NOT NULL,
-  products_options_id varchar(64) NOT NULL default '0',
-  products_options_value_id int(11) NOT NULL default '0',
-  products_options_value_text BLOB NULL,
-  products_options_sort_order text NOT NULL,
-  PRIMARY KEY  (customers_basket_attributes_id),
-  KEY idx_cust_id_prod_id_zen (customers_id,products_id(36))
+DROP TABLE IF EXISTS basket_attributes;
+CREATE TABLE basket_attributes (
+  id int(11) NOT NULL auto_increment,
+  basket_product_id int(11) NOT NULL,
+  options_id varchar(64) NOT NULL default '0',
+  options_values_id int(11) NOT NULL default '0',
+  options_value_text BLOB NULL,
+  options_sort_order text NOT NULL,
+  PRIMARY KEY  (id),
+  KEY idx_basket_id_zen (basket_product_id)
 ) ENGINE=MyISAM;
 
 # --------------------------------------------------------

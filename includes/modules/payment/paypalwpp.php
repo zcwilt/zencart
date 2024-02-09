@@ -2932,7 +2932,7 @@ if (false) { // disabled until clarification is received about coupons in PayPal
     $db->Execute($sql);
     $sql = "DELETE FROM " . TABLE_CUSTOMERS_INFO . " WHERE customers_info_id = " . $cid;
     $db->Execute($sql);
-    $sql = "DELETE FROM " . TABLE_CUSTOMERS_BASKET . " WHERE customers_id = " . $cid;
+    $sql = "DELETE FROM " . TABLE_CUSTOMERS_BASKET_PRODUCTS . " WHERE customers_id = " . $cid;
     $db->Execute($sql);
     $sql = "DELETE FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . " WHERE customers_id = " . $cid;
     $db->Execute($sql);

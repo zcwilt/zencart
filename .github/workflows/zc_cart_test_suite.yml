@@ -1,4 +1,4 @@
-name: Zen Cart Unit Tests
+name: Zen Cart Cart Class Tests
 
 on: [push, pull_request]
 
@@ -36,8 +36,8 @@ jobs:
         run: |
           touch includes/configure.php
 
-      - name: Run UnitTests suite
-        run: php vendor/bin/phpunit -c phpunit-unit.xml --verbose --process-isolation --testsuite=Unit --debug
+      - name: Run CartTests suite
+        run: php vendor/bin/phpunit -c phpunit-cart.xml --verbose --process-isolation --testsuite=Cart --debug --coverage-html ./not_for_release/testFramework/cart-coverage-report/
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

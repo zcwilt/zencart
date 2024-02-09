@@ -498,7 +498,7 @@ class Customer extends base
     public function resetCustomerCart()
     {
         global $db;
-        $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET . " WHERE customers_id= " . $this->customer_id);
+        $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET_PRODUCTS . " WHERE customers_id= " . $this->customer_id);
         $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . " WHERE customers_id= " . $this->customer_id);
         $_SESSION['cart']->reset(true);
         $this->forceLogout();
@@ -805,7 +805,7 @@ class Customer extends base
         }
 
         $db->Execute(
-            "DELETE FROM " . TABLE_CUSTOMERS_BASKET . "
+            "DELETE FROM " . TABLE_CUSTOMERS_BASKET_PRODUCTS . "
               WHERE customers_id = " . (int)$this->customer_id
         );
 

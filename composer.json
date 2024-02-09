@@ -31,6 +31,7 @@
         "illuminate/events": "^9.52",
         "kitloong/laravel-migrations-generator": "^6.10",
         "mikey179/vfsstream": "^1.6",
+        "phpunit/php-code-coverage": "^9.2",
         "phpunit/phpunit": "^9.6",
         "sempro/phpunit-pretty-print": "^1.4",
         "symfony/browser-kit": "^6.0",
@@ -51,7 +52,8 @@
             "Tests\\": "not_for_release/testFramework/",
             "App\\": "laravel/app/",
             "Seeders\\": "not_for_release/testFramework/Support/database/Seeders/",
-            "Migrations\\": "not_for_release/testFramework/Support/database/migrations/"
+            "Migrations\\": "not_for_release/testFramework/Support/database/migrations/",
+            "Zencart\\": "includes/classes/"
 
         }
     },
@@ -66,10 +68,11 @@
         "optimize-autoloader": true
     },
     "scripts": {
-        "feature-tests": "phpunit --verbose --testsuite FeatureStore,FeatureAdmin --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
-        "feature-tests-store": "phpunit --verbose --testsuite FeatureStore --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
-        "feature-tests-admin": "phpunit --verbose --testsuite FeatureAdmin --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
-        "unit-tests": "phpunit --verbose  --process-isolation --testsuite Unit --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'"
+        "feature-tests": "phpunit -c phpunit-feature.xml --verbose --testsuite FeatureStore,FeatureAdmin --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
+        "feature-tests-store": "phpunit -c phpunit-feature.xml --verbose --testsuite FeatureStore --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
+        "feature-tests-admin": "phpunit -c phpunit-feature.xml --verbose --testsuite FeatureAdmin --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
+        "unit-tests": "phpunit -c phpunit-unit.xml --verbose  --process-isolation --testsuite Unit --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
+        "cart-tests": "phpunit -c phpunit-cart.xml --verbose  --process-isolation --testsuite Cart --coverage-html ./not_for_release/testFramework/cart-coverage-report/ --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

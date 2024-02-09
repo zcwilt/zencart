@@ -919,7 +919,7 @@ function zen_remove_product($product_id, $ptc = 'true')
 
     $db->Execute("DELETE FROM " . TABLE_PRODUCTS_ATTRIBUTES . " WHERE products_id = $product_id");
 
-    $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET . " WHERE products_id LIKE '$product_id:%'");
+    $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET_PRODUCTS . " WHERE products_id LIKE '$product_id:%'");
 
     $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . " WHERE products_id LIKE '$product_id:%'");
 

@@ -645,7 +645,10 @@ class queryFactory extends base
      */
     public function __destruct()
     {
-        $this->close();
+        if (!defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
+            return;
+        }
+        //$this->close();
     }
 
     /**
