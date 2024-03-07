@@ -9,12 +9,10 @@ use App\Models\BasketProduct;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use Zencart\Traits\NotifierManager;
-use Zencart\Traits\ObserverManager;
 
 class Cart
 {
-    use NotifierManager;
-    use ObserverManager;
+    use NotifierManager, CartActionsTrait;
 
     public static bool $createBrowser = false;
     protected \queryFactory $db;
@@ -113,7 +111,7 @@ class Cart
     {
         if ($this->canAddAttributeOrQuantity($product_id, $attributes)) {
             $attributes = $this->buildAttributes($product_id, $attributes);
-            $qty += $this->in_cart_product_total_quantity($product_id);
+            $qty += $this->inCartProductTotalQuantity($product_id);
         }
         $qty = $this->adjustQtyWhenNotAValue($qty, $product_id);
         $this->notify('NOTIFIER_CART_ADD_CART_START', null, $product_id, $qty, $attributes, $notify);
@@ -122,7 +120,9 @@ class Cart
             $_SESSION['new_product_id_in_cart'] = $uprid;
         }
         $qty = $this->adjustQuantity($qty, $uprid, 'shopping_cart');
-        $this->updateQuantity($uprid, $qty, $attributes);
+        if (!$this->updateQuantity($uprid, $qty, $attributes)) {
+            $this->addNewItemToCart($uprid, $qty, $attributes);
+        }
         $this->cartID = $this->generateCartId();
         $this->notify('NOTIFIER_CART_ADD_CART_END', null, $product_id, $qty, $attributes, $notify);
         $this->cleanup();
@@ -142,13 +142,27 @@ class Cart
 
     public function inCartMixed(string $uprid)
     {
-        $inCart = BasketProduct::where('basket_id', $this->basket->id)->where('product_id', $uprid)->first();
+        $basketProducts = BasketProduct::where('basket_id', $this->basket->id);
+        $inCart = $basketProducts->where('product_id', $uprid)->first();
         if (!$inCart) {
             return 0;
         }
-        $product = Product::find((int)$uprid);
-        //var_dump($product);
+        $basketProducts = $basketProducts->get();
+        $product = Product::find((int)$uprid)->first();
+        if ($product['products_quantity_mixed'] === '0') {
+            return $this->getQuantity($uprid);
+        }
+        $in_cart_mixed_qty = 0;
+        $chk_products_id = zen_get_prid($uprid);
+
+        foreach ($basketProducts as $basketProduct) {
+            if (zen_get_prid($basketProduct['product_id']) === $chk_products_id) {
+                $in_cart_mixed_qty += $basketProduct['quantity'];
+            }
+        }
+        return $in_cart_mixed_qty;
     }
+
     public function countContents(): float
     {
         $this->notify('NOTIFIER_CART_COUNT_CONTENTS_START');
@@ -169,60 +183,124 @@ class Cart
         $this->notify('NOTIFIER_CART_GET_PRODUCTS_START', null, $check_for_valid_cart);
         $products_array = [];
         $basketProducts = BasketProduct::where('basket_id', $this->basket->id)->with('basketAttributes')->with('product')->with('product.attributes')->get();
-        //var_dump($basketProducts);
         if (count($basketProducts) === 0) {
             return $products_array;
         }
-        foreach ($basketProducts as $basketProduct)
-        {
-            $prid = zen_get_prid($basketProduct->id);
-            $uprid = $basketProduct->product_id;
-            $this->notify('NOTIFY_CART_GET_PRODUCTS_NEXT', $uprid, $basketProduct);
+        foreach ($basketProducts as $basketProduct) {
+            $this->cartPricing->buildProductDetail($basketProduct);
+            $this->notify('NOTIFY_CART_GET_PRODUCTS_NEXT', $this->cartPricing->getUniqueProductId(), $basketProduct);
             $this->cartPricing->calculateProductPricing($basketProduct);
-            $action = $this->cartValidator->validateCart($this, $basketProduct, $uprid, $check_for_valid_cart);
+            $this->cartPricing->calculateAttributePricing($basketProduct);
+            $action = $this->cartValidator->validateCart($this, $basketProduct, $this->cartPricing->getUniqueProductId(), $check_for_valid_cart);
             if (!$action) {
                 continue;
             }
-//            $products_array[] = [
-//                'id' => $uprid,
-//                'category' => $basketProduct->product['master_categories_id'],
-//                'name' => $basketProduct->product['products_name'],
-//                'model' => $basketProduct->product['products_model'],
-//                'image' => $basketProduct->product['products_image'],
-//                'price' => ($basketProduct->product['product_is_free'] === '1') ? 0 : $this->cartPricing->getProductPrice(),
-//                'quantity' => $this->cartValidator->getNewQuantity(),
-//                'weight' => $basketProduct->product['products_weight'] + $this->attributesWeight($basketProduct),
-//
-//                'weight_type' => $basketProduct->product['products_weight_type'] ?? null,
-//                'dim_type' => $basketProduct->product['products_dim_type'] ?? null,
-//                'length' => $basketProduct->product['products_length'] ?? null,
-//                'width' => $basketProduct->product['products_width'] ?? null,
-//                'height' => $basketProduct->product['products_height'] ?? null,
-//                'ready_to_ship' => $basketProduct->product['products_ready_to_ship'] ?? null,
-//
-//                'final_price' => $this->cartPricing->getProductPrice() + $this->attributesPrice($basketProduct),
-//                'onetime_charges' => $this->attributesPriceOnetimeCharges($basketProduct, $this->cartValidator->getNewQuantity()),
-//                'tax_class_id' => $basketProduct->product['products_tax_class_id'],
-//                'attributes' => $data['attributes'] ?? '',
+            $products_array[] = [
+                'id' => $this->cartPricing->getUniqueProductId(),
+                'category' => $basketProduct->product['master_categories_id'],
+                'name' => $basketProduct->product['products_name'],
+                'model' => $basketProduct->product['products_model'],
+                'image' => $basketProduct->product['products_image'],
+                'price' => ($basketProduct->product['product_is_free'] === '1') ? 0 : $this->cartPricing->getProductPrice(),
+                'quantity' => $this->cartValidator->getNewQuantity(),
+                'weight' => $basketProduct->product['products_weight'] + $this->attributesWeight($basketProduct),
+
+                'weight_type' => $basketProduct->product['products_weight_type'] ?? null,
+                'dim_type' => $basketProduct->product['products_dim_type'] ?? null,
+                'length' => $basketProduct->product['products_length'] ?? null,
+                'width' => $basketProduct->product['products_width'] ?? null,
+                'height' => $basketProduct->product['products_height'] ?? null,
+                'ready_to_ship' => $basketProduct->product['products_ready_to_ship'] ?? null,
+
+                'final_price' => $this->cartPricing->getProductPrice() + $this->cartPricing->getAttributePrice(),
+                'onetime_charges' => $this->cartPricing->getAttributePriceOnetimeCharge(),
+                'tax_class_id' => $basketProduct->product['products_tax_class_id'],
+                'attributes' => $basketProduct?->basketAttributes ?? '',
 //                'attributes_values' => $data['attributes_values'] ?? '',
-//                'products_priced_by_attribute' => $basketProduct->product['products_priced_by_attribute'],
-//                'product_is_free' => $basketProduct->product['product_is_free'],
-//                'products_discount_type' => $basketProduct->product['products_discount_type'],
-//                'products_discount_type_from' => $basketProduct->product['products_discount_type_from'],
-//                'products_virtual' => (int)$basketProduct->product['products_virtual'],
-//                'product_is_always_free_shipping' => (int)$basketProduct->product['product_is_always_free_shipping'],
-//                'products_quantity_order_min' => (float)$basketProduct->product['products_quantity_order_min'],
-//                'products_quantity_order_units' => (float)$basketProduct->product['products_quantity_order_units'],
-//                'products_quantity_order_max' => (float)$basketProduct->product['products_quantity_order_max'],
-//                'products_quantity_mixed' => (int)$basketProduct->product['products_quantity_mixed'],
-//                'products_mixed_discount_quantity' => (int)$basketProduct->product['products_mixed_discount_quantity'],
-//            ];
-     //       var_dump($products_array);
+                'products_priced_by_attribute' => $basketProduct->product['products_priced_by_attribute'],
+                'product_is_free' => $basketProduct->product['product_is_free'],
+                'products_discount_type' => $basketProduct->product['products_discount_type'],
+                'products_discount_type_from' => $basketProduct->product['products_discount_type_from'],
+                'products_virtual' => (int)$basketProduct->product['products_virtual'],
+                'product_is_always_free_shipping' => (int)$basketProduct->product['product_is_always_free_shipping'],
+                'products_quantity_order_min' => (float)$basketProduct->product['products_quantity_order_min'],
+                'products_quantity_order_units' => (float)$basketProduct->product['products_quantity_order_units'],
+                'products_quantity_order_max' => (float)$basketProduct->product['products_quantity_order_max'],
+                'products_quantity_mixed' => (int)$basketProduct->product['products_quantity_mixed'],
+                'products_mixed_discount_quantity' => (int)$basketProduct->product['products_mixed_discount_quantity'],
+            ];
         }
 
         $this->notify('NOTIFIER_CART_GET_PRODUCTS_END', null, $products_array);
         return $products_array;
     }
+
+    public function inCartProductTotalQuantity($productId)
+    {
+        $products = $this->getProducts();
+
+        $in_cart_product_quantity = 0;
+        foreach ($products as $key => $val) {
+            if ((int)$productId === (int)$val['id']) {
+                $in_cart_product_quantity += $val['quantity'];
+            }
+        }
+        return $in_cart_product_quantity;
+    }
+
+    protected function addNewItemToCart($uprid, $quantity, $attributes)
+    {
+        $basketProduct = new BasketProduct();
+        $basketProduct->basket_id = $this->basket->id;
+        $basketProduct->product_id = $uprid;
+        $basketProduct->quantity = $quantity;
+        $basketProduct->save();
+        if (!is_array($attributes)) {
+            return;
+        }
+        foreach ($attributes as $option => $value) {
+            $blank_value = false;
+            if (is_string($option) && str_starts_with($option, TEXT_PREFIX) && trim($value) === '') {
+                $blank_value = true;
+            }
+            if ($blank_value) {
+                return;
+            }
+            if (is_array($value)) {
+                $this->addNewAttributeArrayValuesToCart($uprid, $value, $option, $basketProduct);
+            } else {
+                $this->addNewAttributeSingleValueToCart($uprid, $value, $option, $basketProduct);
+            }
+        }
+    }
+
+    protected function addNewAttributeArrayValuesToCart($uprid, $values, $option, $basketProduct)
+    {
+//        var_dump('addNewAttributeArrayValuesToCart');
+        foreach ($values as $opt => $val) {
+            $products_options_sort_order = zen_get_attributes_options_sort_order((int)$uprid, $option, $opt);
+            $basketAttribute = new BasketAttribute();
+            $basketAttribute->basket_product_id = $basketProduct->id;
+            $basketAttribute->options_id = $option . '_chk' . $val;
+            $basketAttribute->options_values_id = $val;
+            $basketAttribute->options_sort_order = $products_options_sort_order;
+            $basketAttribute->save();
+        }
+    }
+
+    protected function addNewAttributeSingleValueToCart($uprid, $value, $option, $basketProduct)
+    {
+//        var_dump('addNewAttributeSingleValueToCart');
+        $products_options_sort_order = zen_get_attributes_options_sort_order((int)$uprid, $option, $value);
+        $basketAttribute = new BasketAttribute();
+        $basketAttribute->basket_product_id = $basketProduct->id;
+        $basketAttribute->options_id = $option;
+        $basketAttribute->options_values_id = $value;
+        $basketAttribute->options_value_text = '';
+        $basketAttribute->options_sort_order = $products_options_sort_order;
+        $basketAttribute->save();
+    }
+
     protected function restoreBasket()
     {
         $basket = $this->getCurrentBasket();
@@ -238,17 +316,20 @@ class Cart
         return $this->getCurrentBasket()->with(['basketProducts'])->with('basketProducts.basketAttributes')->first();;
 
     }
+
     protected function updateQuantity($uprid, $quantity, $attributes)
     {
         if (!$this->inCart($uprid)) {
-            return;
+            return false;
         }
         $quantity = $this->adjustQtyWhenNotAValue($quantity, $uprid);
+        //var_dump($quantity);
         $this->notify('NOTIFIER_CART_UPDATE_QUANTITY_START', null, $uprid, $quantity, $attributes);
         if (empty($quantity)) {
             return; // nothing needs to be updated if theres no quantity, so we return.
         }
         $chk_current_qty = zen_get_products_stock($uprid);
+        //var_dump($chk_current_qty);
         if (STOCK_ALLOW_CHECKOUT === 'false' && $quantity > $chk_current_qty) {
             $quantity = $chk_current_qty;
             if (!$this->flag_duplicate_msgs_set) {
@@ -262,6 +343,7 @@ class Cart
         $this->updateAttributes($basketProduct, $attributes, $prid, $uprid);
         $this->cartID = $this->generateCartId();
         $this->notify('NOTIFIER_CART_UPDATE_QUANTITY_END');
+        return true;
     }
 
     protected function updateAttributes($basketProduct, $attributes, $prid, $uprid)
@@ -298,6 +380,7 @@ class Cart
         }
 
     }
+
     protected function adjustQuantity($check_qty, $product_id, $messageStackPosition = 'shopping_cart')
     {
         if (empty($messageStackPosition)) {
@@ -342,7 +425,8 @@ class Cart
     protected function buildAttributes(int $product_id, array $attributes): array
     {
         $attributes = [];
-        $results = ProductAttribute::where('product_id', $product_id)->get();
+        $results = ProductAttribute::where('products_id', $product_id)->get();
+        //var_dump($results);
         foreach ($results as $attribute) {
             $attributes[$attribute['options_id']] = $attribute['options_values_id'];
         }
@@ -382,71 +466,6 @@ class Cart
         return $attribute_weight;
     }
 
-    protected function attributesPrice(BasketProduct $basketProduct)
-    {
-        $this->notify('NOTIFY_CART_ATTRIBUTES_PRICE_START', $basketProduct['products_id']);
-        if (!isset($basketProduct->product->attributes)) {
-            return 0;
-        }
-        zen_define_default('ATTRIBUTES_PRICE_FACTOR_FROM_SPECIAL', 1);
-        $total_attributes_price = 0;
-        $qty = $basketProduct['quantity'];
-        foreach ($basketProduct->product->attributes as $attribute) {
-            $this->notify('NOTIFY_CART_ATTRIBUTES_PRICE_NEXT', (int)$basketProduct['products_id'], $attribute);
-            $attributePrice = 0;
-            $new_attributes_price = 0;
-            $discount_type_id = '';
-            $sale_maker_discount = '';
-            $options_values_price = zen_get_retail_or_wholesale_price(
-                $attribute['options_values_price'],
-                $attribute['options_values_price_w']
-            );
-            $attributePrice = $this->addAdditionalAttributePrices((int)$basketProduct['products_id'], $attribute, $attributePrice, $options_values_price, $qty);
-        }
-    }
-
-    protected function addAdditionalAttributePrices($productId, $attribute, $attributePrice, $options_values_price, $qty)
-    {
-        if ($attribute['product_attribute_is_free'] === '1' && zen_get_products_price_is_free($productId)) {
-            return $attributePrice;
-        }
-        $attributePrice = $this->attributePriceHandleDiscounted($productId, $attribute, $attributePrice, $options_values_price, $qty);
-        return $attributePrice;
-    }
-    protected function attributePriceHandleDiscounted($productId, $attribute, $attributePrice, $options_values_price, $qty)
-    {
-        if ($attribute['price_prefix'] === '-') {
-            $attributePrice = $this->attributePriceHandlePricePrefix($productId, $attribute, $attributePrice, $options_values_price, $qty);
-        } elseif ($attribute['attributes_discounted'] === '1') {
-            $attributePrice = $this->attributePriceHandlePrefixDiscount($productId, $attribute, $attributePrice, $options_values_price, $qty);
-        } else {
-            $attributePrice += zen_str_to_numeric($options_values_price);
-        }
-        return $attributePrice;
-    }
-
-    protected function attributePriceHandlePrefixDiscount($productId, $attribute, $attributePrice, $options_values_price, $qty)
-    {
-        $products_raw_price = zen_get_product_retail_or_wholesale_price($productId);
-        $products_raw_attribute_base_price = (zen_get_products_price_is_priced_by_attributes($productId)) ? $products_raw_price : 0.0;
-        $new_attributes_price = zen_get_discount_calc($productId, $attribute['products_attributes_id'], zen_str_to_numeric($options_values_price) + $products_raw_attribute_base_price, $qty);
-        $new_attributes_price -= $products_raw_attribute_base_price;
-        $attributePrice += $new_attributes_price;
-        return $attributePrice;
-    }
-    protected function attributePriceHandlingPricePrefix($productId, $attribute, $attributePrice, $options_values_price, $qty)
-    {
-        if ($attribute['attributes_discounted'] !== '1') {
-            return $attributePrice -= options_values_price;
-        }
-        $discount_type_id = '';
-        $sale_maker_discount = '';
-        $new_attributes_price = zen_get_discount_calc($productId, $attribute['products_attributes_id'], $options_values_price, $qty);
-        $attributePrice -= $new_attributes_price;
-        return $attributePrice;
-
-    }
-
     public function getCurrentBasket(): ?Basket
     {
         $basketName = $this->basketName();
@@ -474,6 +493,7 @@ class Cart
         $this->notify('NOTIFIER_CART_REMOVE_END');
 
     }
+
     protected function removeProductFromCart($productId)
     {
         BasketProduct::where('product_id', $productId)->delete();

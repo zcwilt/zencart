@@ -13,8 +13,9 @@ class CartValidator
 
     public function validateCart(Cart $cart, BasketProduct $basketProduct, $uprid, bool $check_for_valid_cart): bool
     {
+        $this->newQuantity = $basketProduct['quantity'];
         if (!$check_for_valid_cart) {
-            return '';
+            return true;
         }
         $product = $basketProduct->product;
         $this->fixOnce = 0;

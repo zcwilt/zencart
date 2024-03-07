@@ -4,12 +4,16 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version GIT: $Id: $
  */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Product extends Eloquent
+class Product extends Model
 {
+    use HasFactory;
+
     protected $table = TABLE_PRODUCTS;
     protected $primaryKey = 'products_id';
     public $timestamps = false;
@@ -17,5 +21,9 @@ class Product extends Eloquent
     public function attributes()
     {
         return $this->hasMany(Attribute::class, 'products_id', 'products_id');
+    }
+    public function productType()
+    {
+        return $this->hasOne(ProductType::class, 'type_id', 'product_type');
     }
 }

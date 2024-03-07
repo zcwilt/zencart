@@ -68,7 +68,7 @@
         "optimize-autoloader": true
     },
     "scripts": {
-        "feature-tests": "phpunit -c phpunit-feature.xml --verbose --testsuite FeatureStore,FeatureAdmin --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
+        "feature-tests": "phpunit -c phpunit-feature.xml --verbose --testsuite FeatureStore,FeatureAdmin --coverage-html ./not_for_release/testFramework/feature-coverage-report/ --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
         "feature-tests-store": "phpunit -c phpunit-feature.xml --verbose --testsuite FeatureStore --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
         "feature-tests-admin": "phpunit -c phpunit-feature.xml --verbose --testsuite FeatureAdmin --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
         "unit-tests": "phpunit -c phpunit-unit.xml --verbose  --process-isolation --testsuite Unit --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'",
