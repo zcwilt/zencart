@@ -110,10 +110,12 @@ class Cart
     public function addToCart($product_id, $qty = 1, $attributes = [], $notify = true)
     {
         if ($this->canAddAttributeOrQuantity($product_id, $attributes)) {
+            var_dump('HERE');
             $attributes = $this->buildAttributes($product_id, $attributes);
             $qty += $this->inCartProductTotalQuantity($product_id);
         }
         $qty = $this->adjustQtyWhenNotAValue($qty, $product_id);
+        var_dump($qty);
         $this->notify('NOTIFIER_CART_ADD_CART_START', null, $product_id, $qty, $attributes, $notify);
         $uprid = zen_get_uprid($product_id, $attributes);
         if ($notify) {
@@ -326,7 +328,7 @@ class Cart
         //var_dump($quantity);
         $this->notify('NOTIFIER_CART_UPDATE_QUANTITY_START', null, $uprid, $quantity, $attributes);
         if (empty($quantity)) {
-            return; // nothing needs to be updated if theres no quantity, so we return.
+            return; // nothing needs to be updated if there's no quantity, so we return.
         }
         $chk_current_qty = zen_get_products_stock($uprid);
         //var_dump($chk_current_qty);
