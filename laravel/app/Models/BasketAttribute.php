@@ -15,6 +15,7 @@ class BasketAttribute extends Eloquent
 {
     protected $table = TABLE_BASKET_ATTRIBUTES;
     public $timestamps = false;
+    protected $guarded = [];
 
     public function basketProduct(): BelongsTo
     {

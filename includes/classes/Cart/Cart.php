@@ -28,6 +28,7 @@ class Cart
     protected $content_type;
     protected CartPricing $cartPricing;
     protected CartValidator $cartValidator;
+    protected $cartErrors = [];
 
 
     /**
@@ -69,7 +70,7 @@ class Cart
         $this->cartType = $this->setCartType();
         $this->basket = $this->restoreBasket();
         $this->cartPricing = new CartPricing();
-        $this->cartValidator = new CartValidator();
+        $this->cartValidator = new CartValidator($this);
         $this->reset();
         $this->notify('NOTIFIER_CART_INSTANTIATE_END');
     }
@@ -110,12 +111,12 @@ class Cart
     public function addToCart($product_id, $qty = 1, $attributes = [], $notify = true)
     {
         if ($this->canAddAttributeOrQuantity($product_id, $attributes)) {
-            var_dump('HERE');
+//            var_dump('HERE');
             $attributes = $this->buildAttributes($product_id, $attributes);
             $qty += $this->inCartProductTotalQuantity($product_id);
         }
         $qty = $this->adjustQtyWhenNotAValue($qty, $product_id);
-        var_dump($qty);
+//        var_dump($qty);
         $this->notify('NOTIFIER_CART_ADD_CART_START', null, $product_id, $qty, $attributes, $notify);
         $uprid = zen_get_uprid($product_id, $attributes);
         if ($notify) {
@@ -342,7 +343,7 @@ class Cart
         $prid = zen_get_prid($uprid);
         $basketProduct = BasketProduct::where('product_id', $uprid)->where('basket_id', $this->basket->id);
         $basketProduct->update(['quantity' => $quantity]);
-        $this->updateAttributes($basketProduct, $attributes, $prid, $uprid);
+        $this->updateAttributes($basketProduct->first(), $attributes, $prid, $uprid);
         $this->cartID = $this->generateCartId();
         $this->notify('NOTIFIER_CART_UPDATE_QUANTITY_END');
         return true;
@@ -366,19 +367,21 @@ class Cart
                 }
             }
             if ($blank_value === false) {
-                $this->updateAttributesBasket($basketProduct, $value, $option, $prid, $uprid, $attr_value);
+                $this->updateAttributesBasket($basketProduct, $value, $option, $attr_value);
             }
         }
     }
 
-    protected function updateAttributesBasket($basketProduct, $value, $option, $prid, $uprid)
+    protected function updateAttributesBasket($basketProduct, $value, $option, $attr_value)
     {
         if (is_array($value)) {
             foreach ($value as $opt => $val) {
-                BasketAttribute::where('basket_product_id', $basketProduct->id)->where('products_options_id', (int)$option . '_chk . (int)$val')->update(['products_options_value_id' => $val]);
+                BasketAttribute::where('basket_product_id', $basketProduct->id)->where('options_id', (int)$option . '_chk . (int)$val')->update(['products_options_value_id' => $val]);
             }
         } else {
-            BasketAttribute::where('basket_product_id', $basketProduct->id)->where('products_options_id', $option)->update(['products_options_value_id' => (int)$value, 'products_options_value_text' => $attr_value]);
+            //var_dump($basketProduct);
+            $attr = BasketAttribute::where('basket_product_id', $basketProduct->id)->where('options_id', $option)->first();
+            $attr->update(['options_values_id' => (int)$value, 'options_value_text' => $attr_value]);
         }
 
     }
@@ -420,7 +423,7 @@ class Cart
             zen_get_products_name($product_id) .
             '</a>';
 
-        $this->messageStack->add_session('header', ERROR_CORRECTIONS_HEADING . ERROR_PRODUCT_QUANTITY_UNITS_SHOPPING_CART . $chk_link . ' ' . PRODUCTS_ORDER_QTY_TEXT . zen_output_string_protected($qty), 'caution');
+        $this->setCartErrors(['type' =>'messageStack', 'level' => 'caution', 'detail' => ERROR_CORRECTIONS_HEADING . ERROR_PRODUCT_QUANTITY_UNITS_SHOPPING_CART . $chk_link . ' ' . PRODUCTS_ORDER_QTY_TEXT . zen_output_string_protected($qty)]);
         return 0;
     }
 
@@ -558,4 +561,15 @@ class Cart
     {
         return $this->cartType;
     }
+
+    public function getCartErrors(): array
+    {
+        return $this->cartErrors;
+    }
+
+    public function setCartErrors(array $cartError): void
+    {
+        $this->cartErrors[] = $cartError;
+    }
+
 }

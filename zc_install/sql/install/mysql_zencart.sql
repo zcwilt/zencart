@@ -643,6 +643,7 @@ CREATE TABLE baskets (
    id int(11) NOT NULL auto_increment,
    customer_id int(11) default '0',
    unique_id varchar(64) default '',
+   cart_id varchar(64) default '',
    name varchar(255) default 'default',
    created_at datetime,
    updated_at datetime,

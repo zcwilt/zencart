@@ -11,6 +11,13 @@ class CartValidator
     protected int $fixOnce;
     protected float $newQuantity;
 
+    protected Cart $cart;
+
+    public function __construct(Cart $cart)
+    {
+        $this->cart = $cart;
+    }
+
     public function validateCart(Cart $cart, BasketProduct $basketProduct, $uprid, bool $check_for_valid_cart): bool
     {
         $this->newQuantity = $basketProduct['quantity'];
@@ -21,8 +28,8 @@ class CartValidator
         $this->fixOnce = 0;
         if ($product['products_status'] === '0') {
             $this->fixOnce++;
-            $_SESSION['valid_to_checkout'] = false;
-            $_SESSION['cart_errors'] .= ERROR_PRODUCT . $product['products_name'] . ERROR_PRODUCT_STATUS_SHOPPING_CART . '<br>';
+            //$_SESSION['valid_to_checkout'] = false; //@todo cart dont use session here
+            $this->cart->setCartErrors( ['detail' => ERROR_PRODUCT . $product['products_name'] . ERROR_PRODUCT_STATUS_SHOPPING_CART . '<br>']);
             $cart->remove($uprid);
             return false;
         }
@@ -41,12 +48,12 @@ class CartValidator
             $chk_attributes_exist = zen_get_attribute_details(zen_get_prid($uprid), (int)$attribute['options_id'], (int)$attribute['options_values_id']);
             if ($chk_attributes_exist->EOF) {
                 $this->fixOnce++;
-                $_SESSION['valid_to_checkout'] = false;
+                //$_SESSION['valid_to_checkout'] = false;
                 $chk_products_link =
                     '<a href="' . zen_href_link(zen_get_info_page(zen_get_prid($uprid)), 'cPath=' . zen_get_generated_category_path_rev($product['master_categories_id']) . '&products_id=' . zen_get_prid($uprid)) . '">' .
                     $product['products_name'] .
                     '</a>';
-                $_SESSION['cart_errors'] .= ERROR_PRODUCT_ATTRIBUTES . $chk_products_link . ERROR_PRODUCT_STATUS_SHOPPING_CART_ATTRIBUTES . '<br>';
+                $this->cart->setCartErrors(['detail' => ERROR_PRODUCT_ATTRIBUTES . $chk_products_link . ERROR_PRODUCT_STATUS_SHOPPING_CART_ATTRIBUTES . '<br>']);
                 $cart->remove($uprid);
                 break;
             }
@@ -88,15 +95,16 @@ class CartValidator
         if (fmod_round($checkQuantity, $checkUnits) == 0 || !isset($this->flag_duplicate_quantity_msgs_set[(int)$uprid]['units'])) {
             return;
         }
-        $_SESSION['valid_to_checkout'] = false;
-        $_SESSION['cart_errors'] .=
+        //$_SESSION['valid_to_checkout'] = false;
+        $this->cart->setCartErrors(['detail' =>
             ERROR_PRODUCT .
             $basketProduct->product['products_name'] .
             ERROR_PRODUCT_QUANTITY_UNITS_SHOPPING_CART .
             ERROR_PRODUCT_QUANTITY_ORDERED .
             $checkQuantity .
             ' <span class="alertBlack">' . zen_get_products_quantity_min_units_display((int)$uprid, false, true) . '</span> ' .
-            '<br>';
+            '<br>'
+        ]);
         $this->flag_duplicate_quantity_msgs_set[(int)$uprid]['units'] = true;
     }
 
@@ -109,15 +117,15 @@ class CartValidator
             return;
         }
         $this->fixOnce++;
-        $_SESSION['valid_to_checkout'] = false;
-        $_SESSION['cart_errors'] .=
+        //$_SESSION['valid_to_checkout'] = false;
+        $this->cart->setCartErrors(['detail' =>
             ERROR_PRODUCT .
             $basketProduct->product['products_name'] .
             ERROR_PRODUCT_QUANTITY_MIN_SHOPPING_CART .
             ERROR_PRODUCT_QUANTITY_ORDERED .
             $checkQuantity .
             ' <span class="alertBlack">' . zen_get_products_quantity_min_units_display((int)$uprid, false, true) . '</span> ' .
-            '<br>';
+            '<br>']);
         $this->flag_duplicate_quantity_msgs_set[(int)$uprid]['min'] = true;
     }
 
@@ -130,15 +138,15 @@ class CartValidator
             return;
         }
         $this->fixOnce++;
-        $_SESSION['valid_to_checkout'] = false;
-        $_SESSION['cart_errors'] .=
+        //$_SESSION['valid_to_checkout'] = false;
+        $this->cart->setCartErrors(['detail' =>
             ERROR_PRODUCT .
             $basketProduct->product['products_name'] .
             ERROR_PRODUCT_QUANTITY_MAX_SHOPPING_CART .
             ERROR_PRODUCT_QUANTITY_ORDERED .
             $checkQuantity .
             ' <span class="alertBlack">' . zen_get_products_quantity_min_units_display((int)$uprid, false, true) . '</span> ' .
-            '<br>';
+            '<br>']);
         $this->flag_duplicate_quantity_msgs_set[(int)$uprid]['max'] = true;
     }
 
@@ -165,5 +173,4 @@ class CartValidator
     {
         return $this->fixOnce;
     }
-
 }
