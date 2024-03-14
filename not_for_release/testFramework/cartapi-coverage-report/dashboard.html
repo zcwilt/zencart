@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /var/www/html/includes/classes/Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="_css/bootstrap.min.css?v=9.2.30" rel="stylesheet" type="text/css">
+  <link href="_css/nv.d3.min.css?v=9.2.30" rel="stylesheet" type="text/css">
+  <link href="_css/style.css?v=9.2.30" rel="stylesheet" type="text/css">
+  <link href="_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="index.html">/var/www/html/includes/classes/Cart</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Cart.php.html#13">Zencart\Cart\Cart</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#10">Zencart\Cart\CartPricing</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#8">Zencart\Cart\CartValidator</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#5">Zencart\Cart\CartActionsTrait</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="CartActionsTrait.php.html#5">Zencart\Cart\CartActionsTrait</a></td><td class="text-right">28730</td></tr>
+       <tr><td><a href="Cart.php.html#13">Zencart\Cart\Cart</a></td><td class="text-right">8190</td></tr>
+       <tr><td><a href="CartPricing.php.html#10">Zencart\Cart\CartPricing</a></td><td class="text-right">1722</td></tr>
+       <tr><td><a href="CartValidator.php.html#8">Zencart\Cart\CartValidator</a></td><td class="text-right">1056</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Cart.php.html#65"><abbr title="Zencart\Cart\Cart::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#78"><abbr title="Zencart\Cart\Cart::reset">reset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#102"><abbr title="Zencart\Cart\Cart::restoreContents">restoreContents</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#111"><abbr title="Zencart\Cart\Cart::addToCart">addToCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#134"><abbr title="Zencart\Cart\Cart::inCart">inCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#146"><abbr title="Zencart\Cart\Cart::inCartMixed">inCartMixed</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#169"><abbr title="Zencart\Cart\Cart::countContents">countContents</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#184"><abbr title="Zencart\Cart\Cart::getProducts">getProducts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#241"><abbr title="Zencart\Cart\Cart::inCartProductTotalQuantity">inCartProductTotalQuantity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#254"><abbr title="Zencart\Cart\Cart::addNewItemToCart">addNewItemToCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#280"><abbr title="Zencart\Cart\Cart::addNewAttributeArrayValuesToCart">addNewAttributeArrayValuesToCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#294"><abbr title="Zencart\Cart\Cart::addNewAttributeSingleValueToCart">addNewAttributeSingleValueToCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#307"><abbr title="Zencart\Cart\Cart::restoreBasket">restoreBasket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#323"><abbr title="Zencart\Cart\Cart::updateQuantity">updateQuantity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#352"><abbr title="Zencart\Cart\Cart::updateAttributes">updateAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#375"><abbr title="Zencart\Cart\Cart::updateAttributesBasket">updateAttributesBasket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#389"><abbr title="Zencart\Cart\Cart::adjustQuantity">adjustQuantity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#410"><abbr title="Zencart\Cart\Cart::adjustQtyWhenNotAValue">adjustQtyWhenNotAValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#430"><abbr title="Zencart\Cart\Cart::buildAttributes">buildAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#442"><abbr title="Zencart\Cart\Cart::canAddAttributeOrQuantity">canAddAttributeOrQuantity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#453"><abbr title="Zencart\Cart\Cart::attributesWeight">attributesWeight</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#474"><abbr title="Zencart\Cart\Cart::getCurrentBasket">getCurrentBasket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#484"><abbr title="Zencart\Cart\Cart::removeCart">removeCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#491"><abbr title="Zencart\Cart\Cart::remove">remove</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#502"><abbr title="Zencart\Cart\Cart::removeProductFromCart">removeProductFromCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#507"><abbr title="Zencart\Cart\Cart::basketWhereColumn">basketWhereColumn</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#516"><abbr title="Zencart\Cart\Cart::basketWhereValue">basketWhereValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#525"><abbr title="Zencart\Cart\Cart::basketName">basketName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#530"><abbr title="Zencart\Cart\Cart::generateCartId">generateCartId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#546"><abbr title="Zencart\Cart\Cart::cleanup">cleanup</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#555"><abbr title="Zencart\Cart\Cart::setCartType">setCartType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#560"><abbr title="Zencart\Cart\Cart::getCartType">getCartType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#565"><abbr title="Zencart\Cart\Cart::getCartErrors">getCartErrors</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Cart.php.html#570"><abbr title="Zencart\Cart\Cart::setCartErrors">setCartErrors</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#24"><abbr title="Zencart\Cart\CartPricing::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#36"><abbr title="Zencart\Cart\CartPricing::buildProductDetail">buildProductDetail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#42"><abbr title="Zencart\Cart\CartPricing::calculateProductPricing">calculateProductPricing</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#57"><abbr title="Zencart\Cart\CartPricing::calculateAttributePricing">calculateAttributePricing</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#86"><abbr title="Zencart\Cart\CartPricing::calculateAttributePricingOnetimeCharge">calculateAttributePricingOnetimeCharge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#112"><abbr title="Zencart\Cart\CartPricing::addAdditionalAttributePrices">addAdditionalAttributePrices</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#124"><abbr title="Zencart\Cart\CartPricing::attributesPriceHandlePriceFactor">attributesPriceHandlePriceFactor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#139"><abbr title="Zencart\Cart\CartPricing::attributePriceHandleQuantity">attributePriceHandleQuantity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#148"><abbr title="Zencart\Cart\CartPricing::attributePriceHandleDiscounted">attributePriceHandleDiscounted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#160"><abbr title="Zencart\Cart\CartPricing::attributesPriceHandleTextPricing">attributesPriceHandleTextPricing</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#179"><abbr title="Zencart\Cart\CartPricing::adjustWhenPricedByAttribute">adjustWhenPricedByAttribute</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#193"><abbr title="Zencart\Cart\CartPricing::getProductPrice">getProductPrice</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#198"><abbr title="Zencart\Cart\CartPricing::getProductRawPrice">getProductRawPrice</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#203"><abbr title="Zencart\Cart\CartPricing::getSpecialPrice">getSpecialPrice</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#208"><abbr title="Zencart\Cart\CartPricing::getUniqueProductId">getUniqueProductId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#213"><abbr title="Zencart\Cart\CartPricing::getRealProductId">getRealProductId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#218"><abbr title="Zencart\Cart\CartPricing::getAttributePrice">getAttributePrice</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartPricing.php.html#223"><abbr title="Zencart\Cart\CartPricing::getAttributePriceOnetimeCharge">getAttributePriceOnetimeCharge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#16"><abbr title="Zencart\Cart\CartValidator::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#21"><abbr title="Zencart\Cart\CartValidator::validateCart">validateCart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#41"><abbr title="Zencart\Cart\CartValidator::validateAttributes">validateAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#63"><abbr title="Zencart\Cart\CartValidator::fixupQuantities">fixupQuantities</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#72"><abbr title="Zencart\Cart\CartValidator::adjustQuantityPrecision">adjustQuantityPrecision</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#89"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderUnitsWithError">checkQuantityOrderUnitsWithError</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#111"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderMinWithError">checkQuantityOrderMinWithError</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#132"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderMaxWithError">checkQuantityOrderMaxWithError</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#153"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderMin">checkQuantityOrderMin</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#167"><abbr title="Zencart\Cart\CartValidator::getNewQuantity">getNewQuantity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartValidator.php.html#172"><abbr title="Zencart\Cart\CartValidator::getFixOnce">getFixOnce</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#7"><abbr title="Zencart\Cart\CartActionsTrait::actionUpdateProduct">actionUpdateProduct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#173"><abbr title="Zencart\Cart\CartActionsTrait::actionAddProduct">actionAddProduct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#380"><abbr title="Zencart\Cart\CartActionsTrait::actionBuyNow">actionBuyNow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#444"><abbr title="Zencart\Cart\CartActionsTrait::actionMultipleAddProduct">actionMultipleAddProduct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#529"><abbr title="Zencart\Cart\CartActionsTrait::actionNotify">actionNotify</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#564"><abbr title="Zencart\Cart\CartActionsTrait::actionNotifyRemove">actionNotifyRemove</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#586"><abbr title="Zencart\Cart\CartActionsTrait::actionCustomerOrder">actionCustomerOrder</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#618"><abbr title="Zencart\Cart\CartActionsTrait::actionCartUserAction">actionCartUserAction</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#629"><abbr title="Zencart\Cart\CartActionsTrait::actionRemoveProduct">actionRemoveProduct</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="CartActionsTrait.php.html#173"><abbr title="Zencart\Cart\CartActionsTrait::actionAddProduct">actionAddProduct</abbr></a></td><td class="text-right">2862</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#7"><abbr title="Zencart\Cart\CartActionsTrait::actionUpdateProduct">actionUpdateProduct</abbr></a></td><td class="text-right">2256</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#444"><abbr title="Zencart\Cart\CartActionsTrait::actionMultipleAddProduct">actionMultipleAddProduct</abbr></a></td><td class="text-right">756</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#380"><abbr title="Zencart\Cart\CartActionsTrait::actionBuyNow">actionBuyNow</abbr></a></td><td class="text-right">420</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#586"><abbr title="Zencart\Cart\CartActionsTrait::actionCustomerOrder">actionCustomerOrder</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Cart.php.html#254"><abbr title="Zencart\Cart\Cart::addNewItemToCart">addNewItemToCart</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Cart.php.html#323"><abbr title="Zencart\Cart\Cart::updateQuantity">updateQuantity</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Cart.php.html#352"><abbr title="Zencart\Cart\Cart::updateAttributes">updateAttributes</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Cart.php.html#389"><abbr title="Zencart\Cart\Cart::adjustQuantity">adjustQuantity</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="CartPricing.php.html#86"><abbr title="Zencart\Cart\CartPricing::calculateAttributePricingOnetimeCharge">calculateAttributePricingOnetimeCharge</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#529"><abbr title="Zencart\Cart\CartActionsTrait::actionNotify">actionNotify</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Cart.php.html#146"><abbr title="Zencart\Cart\Cart::inCartMixed">inCartMixed</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Cart.php.html#184"><abbr title="Zencart\Cart\Cart::getProducts">getProducts</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Cart.php.html#453"><abbr title="Zencart\Cart\Cart::attributesWeight">attributesWeight</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="CartPricing.php.html#179"><abbr title="Zencart\Cart\CartPricing::adjustWhenPricedByAttribute">adjustWhenPricedByAttribute</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="CartValidator.php.html#72"><abbr title="Zencart\Cart\CartValidator::adjustQuantityPrecision">adjustQuantityPrecision</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="CartValidator.php.html#132"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderMaxWithError">checkQuantityOrderMaxWithError</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Cart.php.html#111"><abbr title="Zencart\Cart\Cart::addToCart">addToCart</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Cart.php.html#442"><abbr title="Zencart\Cart\Cart::canAddAttributeOrQuantity">canAddAttributeOrQuantity</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="CartPricing.php.html#42"><abbr title="Zencart\Cart\CartPricing::calculateProductPricing">calculateProductPricing</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="CartPricing.php.html#57"><abbr title="Zencart\Cart\CartPricing::calculateAttributePricing">calculateAttributePricing</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="CartValidator.php.html#41"><abbr title="Zencart\Cart\CartValidator::validateAttributes">validateAttributes</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="CartValidator.php.html#89"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderUnitsWithError">checkQuantityOrderUnitsWithError</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="CartValidator.php.html#111"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderMinWithError">checkQuantityOrderMinWithError</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#564"><abbr title="Zencart\Cart\CartActionsTrait::actionNotifyRemove">actionNotifyRemove</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Cart.php.html#241"><abbr title="Zencart\Cart\Cart::inCartProductTotalQuantity">inCartProductTotalQuantity</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Cart.php.html#375"><abbr title="Zencart\Cart\Cart::updateAttributesBasket">updateAttributesBasket</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Cart.php.html#410"><abbr title="Zencart\Cart\Cart::adjustQtyWhenNotAValue">adjustQtyWhenNotAValue</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="CartPricing.php.html#112"><abbr title="Zencart\Cart\CartPricing::addAdditionalAttributePrices">addAdditionalAttributePrices</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="CartPricing.php.html#148"><abbr title="Zencart\Cart\CartPricing::attributePriceHandleDiscounted">attributePriceHandleDiscounted</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="CartPricing.php.html#160"><abbr title="Zencart\Cart\CartPricing::attributesPriceHandleTextPricing">attributesPriceHandleTextPricing</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="CartValidator.php.html#21"><abbr title="Zencart\Cart\CartValidator::validateCart">validateCart</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="CartValidator.php.html#153"><abbr title="Zencart\Cart\CartValidator::checkQuantityOrderMin">checkQuantityOrderMin</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Cart.php.html#78"><abbr title="Zencart\Cart\Cart::reset">reset</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Cart.php.html#134"><abbr title="Zencart\Cart\Cart::inCart">inCart</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Cart.php.html#280"><abbr title="Zencart\Cart\Cart::addNewAttributeArrayValuesToCart">addNewAttributeArrayValuesToCart</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Cart.php.html#307"><abbr title="Zencart\Cart\Cart::restoreBasket">restoreBasket</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Cart.php.html#430"><abbr title="Zencart\Cart\Cart::buildAttributes">buildAttributes</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Cart.php.html#507"><abbr title="Zencart\Cart\Cart::basketWhereColumn">basketWhereColumn</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Cart.php.html#516"><abbr title="Zencart\Cart\Cart::basketWhereValue">basketWhereValue</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Cart.php.html#555"><abbr title="Zencart\Cart\Cart::setCartType">setCartType</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="CartPricing.php.html#124"><abbr title="Zencart\Cart\CartPricing::attributesPriceHandlePriceFactor">attributesPriceHandlePriceFactor</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="CartPricing.php.html#139"><abbr title="Zencart\Cart\CartPricing::attributePriceHandleQuantity">attributePriceHandleQuantity</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="CartActionsTrait.php.html#629"><abbr title="Zencart\Cart\CartActionsTrait::actionRemoveProduct">actionRemoveProduct</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 9.2.30</a> using <a href="https://secure.php.net/" target="_top">PHP 8.0.30</a> and <a href="https://phpunit.de/">PHPUnit 9.6.17</a> at Mon Mar 11 19:36:43 UTC 2024.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="_js/jquery.min.js?v=9.2.30" type="text/javascript"></script>
+  <script src="_js/d3.min.js?v=9.2.30" type="text/javascript"></script>
+  <script src="_js/nv.d3.min.js?v=9.2.30" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([4,0,0,0,0,0,0,0,0,0,0,1], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([72,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,90,"<a href=\"Cart.php.html#13\">Zencart\\Cart\\Cart<\/a>"],[0,41,"<a href=\"CartPricing.php.html#10\">Zencart\\Cart\\CartPricing<\/a>"],[0,32,"<a href=\"CartValidator.php.html#8\">Zencart\\Cart\\CartValidator<\/a>"],[0,169,"<a href=\"CartActionsTrait.php.html#5\">Zencart\\Cart\\CartActionsTrait<\/a>"],[100,0,"<a href=\"CartAttributesTrait.php.html#5\">Zencart\\Cart\\CartAttributesTrait<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Cart.php.html#65\">Zencart\\Cart\\Cart::__construct<\/a>"],[0,2,"<a href=\"Cart.php.html#78\">Zencart\\Cart\\Cart::reset<\/a>"],[0,1,"<a href=\"Cart.php.html#102\">Zencart\\Cart\\Cart::restoreContents<\/a>"],[0,4,"<a href=\"Cart.php.html#111\">Zencart\\Cart\\Cart::addToCart<\/a>"],[0,2,"<a href=\"Cart.php.html#134\">Zencart\\Cart\\Cart::inCart<\/a>"],[0,5,"<a href=\"Cart.php.html#146\">Zencart\\Cart\\Cart::inCartMixed<\/a>"],[0,1,"<a href=\"Cart.php.html#169\">Zencart\\Cart\\Cart::countContents<\/a>"],[0,5,"<a href=\"Cart.php.html#184\">Zencart\\Cart\\Cart::getProducts<\/a>"],[0,3,"<a href=\"Cart.php.html#241\">Zencart\\Cart\\Cart::inCartProductTotalQuantity<\/a>"],[0,8,"<a href=\"Cart.php.html#254\">Zencart\\Cart\\Cart::addNewItemToCart<\/a>"],[0,2,"<a href=\"Cart.php.html#280\">Zencart\\Cart\\Cart::addNewAttributeArrayValuesToCart<\/a>"],[0,1,"<a href=\"Cart.php.html#294\">Zencart\\Cart\\Cart::addNewAttributeSingleValueToCart<\/a>"],[0,2,"<a href=\"Cart.php.html#307\">Zencart\\Cart\\Cart::restoreBasket<\/a>"],[0,7,"<a href=\"Cart.php.html#323\">Zencart\\Cart\\Cart::updateQuantity<\/a>"],[0,7,"<a href=\"Cart.php.html#352\">Zencart\\Cart\\Cart::updateAttributes<\/a>"],[0,3,"<a href=\"Cart.php.html#375\">Zencart\\Cart\\Cart::updateAttributesBasket<\/a>"],[0,6,"<a href=\"Cart.php.html#389\">Zencart\\Cart\\Cart::adjustQuantity<\/a>"],[0,3,"<a href=\"Cart.php.html#410\">Zencart\\Cart\\Cart::adjustQtyWhenNotAValue<\/a>"],[0,2,"<a href=\"Cart.php.html#430\">Zencart\\Cart\\Cart::buildAttributes<\/a>"],[0,4,"<a href=\"Cart.php.html#442\">Zencart\\Cart\\Cart::canAddAttributeOrQuantity<\/a>"],[0,5,"<a href=\"Cart.php.html#453\">Zencart\\Cart\\Cart::attributesWeight<\/a>"],[0,1,"<a href=\"Cart.php.html#474\">Zencart\\Cart\\Cart::getCurrentBasket<\/a>"],[0,1,"<a href=\"Cart.php.html#484\">Zencart\\Cart\\Cart::removeCart<\/a>"],[0,1,"<a href=\"Cart.php.html#491\">Zencart\\Cart\\Cart::remove<\/a>"],[0,1,"<a href=\"Cart.php.html#502\">Zencart\\Cart\\Cart::removeProductFromCart<\/a>"],[0,2,"<a href=\"Cart.php.html#507\">Zencart\\Cart\\Cart::basketWhereColumn<\/a>"],[0,2,"<a href=\"Cart.php.html#516\">Zencart\\Cart\\Cart::basketWhereValue<\/a>"],[0,1,"<a href=\"Cart.php.html#525\">Zencart\\Cart\\Cart::basketName<\/a>"],[0,1,"<a href=\"Cart.php.html#530\">Zencart\\Cart\\Cart::generateCartId<\/a>"],[0,1,"<a href=\"Cart.php.html#546\">Zencart\\Cart\\Cart::cleanup<\/a>"],[0,2,"<a href=\"Cart.php.html#555\">Zencart\\Cart\\Cart::setCartType<\/a>"],[0,1,"<a href=\"Cart.php.html#560\">Zencart\\Cart\\Cart::getCartType<\/a>"],[0,1,"<a href=\"Cart.php.html#565\">Zencart\\Cart\\Cart::getCartErrors<\/a>"],[0,1,"<a href=\"Cart.php.html#570\">Zencart\\Cart\\Cart::setCartErrors<\/a>"],[0,1,"<a href=\"CartPricing.php.html#24\">Zencart\\Cart\\CartPricing::__construct<\/a>"],[0,1,"<a href=\"CartPricing.php.html#36\">Zencart\\Cart\\CartPricing::buildProductDetail<\/a>"],[0,4,"<a href=\"CartPricing.php.html#42\">Zencart\\Cart\\CartPricing::calculateProductPricing<\/a>"],[0,4,"<a href=\"CartPricing.php.html#57\">Zencart\\Cart\\CartPricing::calculateAttributePricing<\/a>"],[0,6,"<a href=\"CartPricing.php.html#86\">Zencart\\Cart\\CartPricing::calculateAttributePricingOnetimeCharge<\/a>"],[0,3,"<a href=\"CartPricing.php.html#112\">Zencart\\Cart\\CartPricing::addAdditionalAttributePrices<\/a>"],[0,2,"<a href=\"CartPricing.php.html#124\">Zencart\\Cart\\CartPricing::attributesPriceHandlePriceFactor<\/a>"],[0,2,"<a href=\"CartPricing.php.html#139\">Zencart\\Cart\\CartPricing::attributePriceHandleQuantity<\/a>"],[0,3,"<a href=\"CartPricing.php.html#148\">Zencart\\Cart\\CartPricing::attributePriceHandleDiscounted<\/a>"],[0,3,"<a href=\"CartPricing.php.html#160\">Zencart\\Cart\\CartPricing::attributesPriceHandleTextPricing<\/a>"],[0,5,"<a href=\"CartPricing.php.html#179\">Zencart\\Cart\\CartPricing::adjustWhenPricedByAttribute<\/a>"],[0,1,"<a href=\"CartPricing.php.html#193\">Zencart\\Cart\\CartPricing::getProductPrice<\/a>"],[0,1,"<a href=\"CartPricing.php.html#198\">Zencart\\Cart\\CartPricing::getProductRawPrice<\/a>"],[0,1,"<a href=\"CartPricing.php.html#203\">Zencart\\Cart\\CartPricing::getSpecialPrice<\/a>"],[0,1,"<a href=\"CartPricing.php.html#208\">Zencart\\Cart\\CartPricing::getUniqueProductId<\/a>"],[0,1,"<a href=\"CartPricing.php.html#213\">Zencart\\Cart\\CartPricing::getRealProductId<\/a>"],[0,1,"<a href=\"CartPricing.php.html#218\">Zencart\\Cart\\CartPricing::getAttributePrice<\/a>"],[0,1,"<a href=\"CartPricing.php.html#223\">Zencart\\Cart\\CartPricing::getAttributePriceOnetimeCharge<\/a>"],[0,1,"<a href=\"CartValidator.php.html#16\">Zencart\\Cart\\CartValidator::__construct<\/a>"],[0,3,"<a href=\"CartValidator.php.html#21\">Zencart\\Cart\\CartValidator::validateCart<\/a>"],[0,4,"<a href=\"CartValidator.php.html#41\">Zencart\\Cart\\CartValidator::validateAttributes<\/a>"],[0,1,"<a href=\"CartValidator.php.html#63\">Zencart\\Cart\\CartValidator::fixupQuantities<\/a>"],[0,5,"<a href=\"CartValidator.php.html#72\">Zencart\\Cart\\CartValidator::adjustQuantityPrecision<\/a>"],[0,4,"<a href=\"CartValidator.php.html#89\">Zencart\\Cart\\CartValidator::checkQuantityOrderUnitsWithError<\/a>"],[0,4,"<a href=\"CartValidator.php.html#111\">Zencart\\Cart\\CartValidator::checkQuantityOrderMinWithError<\/a>"],[0,5,"<a href=\"CartValidator.php.html#132\">Zencart\\Cart\\CartValidator::checkQuantityOrderMaxWithError<\/a>"],[0,3,"<a href=\"CartValidator.php.html#153\">Zencart\\Cart\\CartValidator::checkQuantityOrderMin<\/a>"],[0,1,"<a href=\"CartValidator.php.html#167\">Zencart\\Cart\\CartValidator::getNewQuantity<\/a>"],[0,1,"<a href=\"CartValidator.php.html#172\">Zencart\\Cart\\CartValidator::getFixOnce<\/a>"],[0,47,"<a href=\"CartActionsTrait.php.html#7\">Zencart\\Cart\\CartActionsTrait::actionUpdateProduct<\/a>"],[0,53,"<a href=\"CartActionsTrait.php.html#173\">Zencart\\Cart\\CartActionsTrait::actionAddProduct<\/a>"],[0,20,"<a href=\"CartActionsTrait.php.html#380\">Zencart\\Cart\\CartActionsTrait::actionBuyNow<\/a>"],[0,27,"<a href=\"CartActionsTrait.php.html#444\">Zencart\\Cart\\CartActionsTrait::actionMultipleAddProduct<\/a>"],[0,6,"<a href=\"CartActionsTrait.php.html#529\">Zencart\\Cart\\CartActionsTrait::actionNotify<\/a>"],[0,4,"<a href=\"CartActionsTrait.php.html#564\">Zencart\\Cart\\CartActionsTrait::actionNotifyRemove<\/a>"],[0,9,"<a href=\"CartActionsTrait.php.html#586\">Zencart\\Cart\\CartActionsTrait::actionCustomerOrder<\/a>"],[0,1,"<a href=\"CartActionsTrait.php.html#618\">Zencart\\Cart\\CartActionsTrait::actionCartUserAction<\/a>"],[0,2,"<a href=\"CartActionsTrait.php.html#629\">Zencart\\Cart\\CartActionsTrait::actionRemoveProduct<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f060cf9b4599ac974f82c7e120e9cb9",
+    "content-hash": "8522bad6e72a5f0d6587caf68e507c1a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1023,6 +1023,72 @@
                 }
             ],
             "time": "2023-12-03T20:05:35+00:00"
+        },
+        {
+            "name": "laravel-restive/restive",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-restive/restive.git",
+                "reference": "d61578b53efbe432929068f8ce8be49c7a4a6acf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-restive/restive/zipball/d61578b53efbe432929068f8ce8be49c7a4a6acf",
+                "reference": "d61578b53efbe432929068f8ce8be49c7a4a6acf",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "^8.0|^9.0|^10.0",
+                "illuminate/database": "^8.0|^9.0|^10.0"
+            },
+            "require-dev": {
+                "codedungeon/phpunit-result-printer": "^0.32.0",
+                "mockery/mockery": "^1.1",
+                "nunomaduro/collision": "^4.0",
+                "orchestra/testbench": "~5.0|~6.0",
+                "phpunit/phpunit": "^8.0|^9.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Restive\\RestiveServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Restive\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ian C Wilson"
+                }
+            ],
+            "description": "An API framework for Laravel",
+            "keywords": [
+                "api",
+                "laravel",
+                "rest"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel-restive/restive/issues",
+                "source": "https://github.com/laravel-restive/restive/tree/master"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/zcwilt",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-01-06T15:17:18+00:00"
         },
         {
             "name": "laravel/framework",
@@ -8472,7 +8538,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "laravel-restive/restive": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

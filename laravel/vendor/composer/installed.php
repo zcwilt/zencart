@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '82af1e1a04433941eea799416c2ebce271b23f51',
+        'reference' => '855031ecfc20b88154218fc58e2aea3952db8311',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -430,6 +430,17 @@
                 0 => '*',
             ),
         ),
+        'laravel-restive/restive' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'd61578b53efbe432929068f8ce8be49c7a4a6acf',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel-restive/restive',
+            'aliases' => array(
+                0 => '9999999-dev',
+            ),
+            'dev_requirement' => false,
+        ),
         'laravel/framework' => array(
             'pretty_version' => 'v8.83.27',
             'version' => '8.83.27.0',
@@ -442,7 +453,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '82af1e1a04433941eea799416c2ebce271b23f51',
+            'reference' => '855031ecfc20b88154218fc58e2aea3952db8311',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -808,8 +819,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0',
-                1 => '1.0.0 || 2.0.0 || 3.0.0',
+                0 => '1.0.0 || 2.0.0 || 3.0.0',
+                1 => '1.0|2.0',
             ),
         ),
         'psr/simple-cache' => array(

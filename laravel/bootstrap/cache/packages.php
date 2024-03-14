@@ -17,6 +17,13 @@
       0 => 'Fruitcake\\Cors\\CorsServiceProvider',
     ),
   ),
+  'laravel-restive/restive' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Restive\\RestiveServiceProvider',
+    ),
+  ),
   'laravel/sail' => 
   array (
     'providers' => 
