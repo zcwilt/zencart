@@ -1,9 +1,7 @@
 name: "PHP Codesniffer"
 
-on:
-  push:
-    branches:
-      - "/**"
+on: [push, pull_request]
+
 jobs:
   phpcs:
     runs-on: ubuntu-latest
