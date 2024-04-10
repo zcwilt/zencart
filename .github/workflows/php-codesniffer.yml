@@ -1,10 +1,9 @@
 name: "PHP Codesniffer"
 
-on:
-  pull_request:
+on: [push, pull_request]:
     paths:
       - "**.php"
-      - "cs-zc-header.xml"
+      - ".github/workflows/phpcs-zc-header.xml"
 
 jobs:
   phpcs:
