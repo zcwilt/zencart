@@ -2,10 +2,8 @@ name: "PHP Codesniffer"
 
 on:
   push:
-    paths:
-      - "**.php"
-      - ".github/workflows/phpcs-zc-header.xml"
-
+    branches:
+      - "/**"
 jobs:
   phpcs:
     runs-on: ubuntu-latest
