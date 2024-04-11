@@ -22,5 +22,5 @@ jobs:
         with:
           files: "app/**.php" # you may customize glob as needed
           phpcs_path: php phpcs.phar
-          standard: cs-zc-header.xml
+          standard: .github/cs-zc-header.xml
           fail_on_warnings: false
