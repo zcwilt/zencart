@@ -5,11 +5,13 @@ namespace App\Services;
 class SeederRunner
 {
 
-    public function  run($seederClass, $parameters = [])
+    public function  run($seederNamespace, $seederClass)
     {
-        $namespace = '\\Seeders\\';
+        $namespace = '\\Seeders\\' . $seederNamespace . '\\';
         $class = $namespace . $seederClass;
+
         $seeder = new $class;
-        $seeder->run($parameters);
+        $seeder->run();
+
     }
 }

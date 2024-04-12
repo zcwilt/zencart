@@ -7,12 +7,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Currency extends Eloquent
+class Currency extends Model
 {
+    use HasFactory;
+
     protected $table = TABLE_CURRENCIES;
     protected $primaryKey = 'currencies_id';
-    public $timestamps = false;
     protected $guarded = [];
+    public $timestamps = false;
 }

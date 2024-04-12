@@ -1,34 +1,25 @@
 <?php
-/**
- * @copyright Copyright 2003-2024 Zen Cart Development Team
- * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id:  $
- */
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Http\Kernel;
 
-$capsule = new Capsule;
-$capsule->addConnection([
-    'driver'    => DB_TYPE,
-    'host'      => DB_SERVER,
-    'database'  => DB_DATABASE,
-    'username'  => DB_SERVER_USERNAME,
-    'password'  => DB_SERVER_PASSWORD,
-    'charset'   => DB_CHARSET,
-    // do not pass prefix; this is included in the table definition
-]);
-$capsule->setAsGlobal();
-$capsule->bootEloquent();
+require __DIR__ . '/../laravel/vendor/autoload.php';
+$app = require_once __DIR__ . '/../laravel/bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
+if (!file_exists(__DIR__ . '/../laravel/.env')) {
+    copy(__DIR__ . '/../laravel/.env.example', __DIR__ . '/../laravel/.env');
+    exec('php ' . __DIR__ . '/../laravel/' . 'artisan key:generate ');
+}
+try {
+    $response = $kernel->handle(
+        $request = Request::capture()
+    )->send();
 
-$container = new Container;
-$lRequest = Request::capture();
-$container->instance('Illuminate\Http\Request', $lRequest);
-$events = new Dispatcher($container);
-$router = new Router($events, $container);
-require_once DIR_FS_CATALOG . 'laravel/routes/routes.php';
+    $kernel->terminate($request, $response);
 
-$redirect = new \Illuminate\Routing\Redirector(new \Illuminate\Routing\UrlGenerator($router->getRoutes(), $lRequest));
+    exit();
+
+} catch (\Exception $e) {
+    // do nothing here as we want to drop through to let Zen Cart handle stuff.
+}
+config(['app.zencart' => true]);
