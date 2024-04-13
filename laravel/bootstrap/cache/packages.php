@@ -73,6 +73,17 @@
       0 => 'Fruitcake\\Cors\\CorsServiceProvider',
     ),
   ),
+  'jeffgreco13/filament-breezy' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'JeffGreco13\\FilamentBreezy\\FilamentBreezyServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'FilamentBreezy' => 'JeffGreco13\\FilamentBreezy\\Facades\\FilamentBreezy',
+    ),
+  ),
   'laravel/sail' => 
   array (
     'providers' => 

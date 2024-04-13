@@ -18,20 +18,20 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'e125f489d647ae664b0af7b573079de7' => __DIR__ . '/..' . '/filament/support/src/helpers.php',
         '40275907c8566c390185147049ef6e5d' => __DIR__ . '/..' . '/livewire/livewire/src/helpers.php',
         '29ffe97919493792170d47eb03a68da9' => __DIR__ . '/..' . '/blade-ui-kit/blade-icons/src/helpers.php',
-        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         'b69d5f1f95cd1ed438c038b6cbcc45b5' => __DIR__ . '/..' . '/filament/notifications/src/Testing/Autoload.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
-        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '9261e07cd92c53dcc971c7c88c176c04' => __DIR__ . '/..' . '/danharrin/date-format-converter/src/helpers.php',
         '9720327d09ed9a4ba00c9b5071b71c7d' => __DIR__ . '/..' . '/danharrin/date-format-converter/src/standards.php',
+        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '2ad94ea6f6f6013119e9abcf4e302a08' => __DIR__ . '/..' . '/filament/forms/src/helpers.php',
         '2c620c99f96a2b964346b45a4d1d1e64' => __DIR__ . '/..' . '/spatie/invade/src/functions.php',
         'eee56a36884c3af04e64bac85043e771' => __DIR__ . '/..' . '/akaunting/laravel-money/src/helpers.php',
         '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
+        'ebb446bb6d02e998480945fbbb73dc64' => __DIR__ . '/..' . '/filament/filament/src/helpers.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
-        'ebb446bb6d02e998480945fbbb73dc64' => __DIR__ . '/..' . '/filament/filament/src/helpers.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '35a6ad97d21e794e7e22a17d806652e4' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Functions.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
@@ -114,8 +114,10 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
             'Psr\\Container\\' => 14,
             'Psr\\Clock\\' => 10,
             'Psr\\Cache\\' => 10,
+            'PragmaRX\\Google2FA\\' => 19,
             'PhpParser\\' => 10,
             'PhpOption\\' => 10,
+            'ParagonIE\\ConstantTime\\' => 23,
         ),
         'M' => 
         array (
@@ -136,6 +138,11 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
             'Laravel\\SerializableClosure\\' => 28,
             'Laravel\\Sanctum\\' => 16,
             'Laravel\\Sail\\' => 13,
+        ),
+        'J' => 
+        array (
+            'JeffGreco13\\FilamentBreezy\\Database\\Factories\\' => 46,
+            'JeffGreco13\\FilamentBreezy\\' => 27,
         ),
         'I' => 
         array (
@@ -184,6 +191,7 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
             'Database\\Factories\\' => 19,
             'DanHarrin\\LivewireRateLimiting\\' => 31,
             'DanHarrin\\DateFormatConverter\\' => 30,
+            'DASPRiD\\Enum\\' => 13,
         ),
         'C' => 
         array (
@@ -198,6 +206,7 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
             'BladeUI\\Heroicons\\' => 18,
             'BezhanSalleh\\FilamentShield\\Database\\Factories\\' => 47,
             'BezhanSalleh\\FilamentShield\\' => 28,
+            'BaconQrCode\\' => 12,
         ),
         'A' => 
         array (
@@ -405,6 +414,10 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
         ),
+        'PragmaRX\\Google2FA\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/pragmarx/google2fa/src',
+        ),
         'PhpParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
@@ -412,6 +425,10 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
+        ),
+        'ParagonIE\\ConstantTime\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
         'Monolog\\' => 
         array (
@@ -468,6 +485,14 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'Laravel\\Sail\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/sail/src',
+        ),
+        'JeffGreco13\\FilamentBreezy\\Database\\Factories\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/database/factories',
+        ),
+        'JeffGreco13\\FilamentBreezy\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src',
         ),
         'Illuminate\\Support\\' => 
         array (
@@ -592,6 +617,10 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         array (
             0 => __DIR__ . '/..' . '/danharrin/date-format-converter/src',
         ),
+        'DASPRiD\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
+        ),
         'Cron\\' => 
         array (
             0 => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron',
@@ -623,6 +652,10 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'BezhanSalleh\\FilamentShield\\' => 
         array (
             0 => __DIR__ . '/..' . '/bezhansalleh/filament-shield/src',
+        ),
+        'BaconQrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
         'Asm89\\Stack\\' => 
         array (
@@ -692,6 +725,7 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'App\\Models\\ProjectVersion' => __DIR__ . '/../..' . '/app/Models/ProjectVersion.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\Zone' => __DIR__ . '/../..' . '/app/Models/Zone.php',
+        'App\\Policies\\RolePolicy' => __DIR__ . '/../..' . '/app/Policies/RolePolicy.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
@@ -702,6 +736,66 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'Asm89\\Stack\\Cors' => __DIR__ . '/..' . '/asm89/stack-cors/src/Cors.php',
         'Asm89\\Stack\\CorsService' => __DIR__ . '/..' . '/asm89/stack-cors/src/CorsService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'BaconQrCode\\Common\\BitArray' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/BitArray.php',
+        'BaconQrCode\\Common\\BitMatrix' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/BitMatrix.php',
+        'BaconQrCode\\Common\\BitUtils' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/BitUtils.php',
+        'BaconQrCode\\Common\\CharacterSetEci' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/CharacterSetEci.php',
+        'BaconQrCode\\Common\\EcBlock' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/EcBlock.php',
+        'BaconQrCode\\Common\\EcBlocks' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/EcBlocks.php',
+        'BaconQrCode\\Common\\ErrorCorrectionLevel' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/ErrorCorrectionLevel.php',
+        'BaconQrCode\\Common\\FormatInformation' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/FormatInformation.php',
+        'BaconQrCode\\Common\\Mode' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/Mode.php',
+        'BaconQrCode\\Common\\ReedSolomonCodec' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/ReedSolomonCodec.php',
+        'BaconQrCode\\Common\\Version' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/Version.php',
+        'BaconQrCode\\Encoder\\BlockPair' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Encoder/BlockPair.php',
+        'BaconQrCode\\Encoder\\ByteMatrix' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Encoder/ByteMatrix.php',
+        'BaconQrCode\\Encoder\\Encoder' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Encoder/Encoder.php',
+        'BaconQrCode\\Encoder\\MaskUtil' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Encoder/MaskUtil.php',
+        'BaconQrCode\\Encoder\\MatrixUtil' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Encoder/MatrixUtil.php',
+        'BaconQrCode\\Encoder\\QrCode' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Encoder/QrCode.php',
+        'BaconQrCode\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Exception/ExceptionInterface.php',
+        'BaconQrCode\\Exception\\InvalidArgumentException' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Exception/InvalidArgumentException.php',
+        'BaconQrCode\\Exception\\OutOfBoundsException' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Exception/OutOfBoundsException.php',
+        'BaconQrCode\\Exception\\RuntimeException' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Exception/RuntimeException.php',
+        'BaconQrCode\\Exception\\UnexpectedValueException' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Exception/UnexpectedValueException.php',
+        'BaconQrCode\\Exception\\WriterException' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Exception/WriterException.php',
+        'BaconQrCode\\Renderer\\Color\\Alpha' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Color/Alpha.php',
+        'BaconQrCode\\Renderer\\Color\\Cmyk' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Color/Cmyk.php',
+        'BaconQrCode\\Renderer\\Color\\ColorInterface' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Color/ColorInterface.php',
+        'BaconQrCode\\Renderer\\Color\\Gray' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Color/Gray.php',
+        'BaconQrCode\\Renderer\\Color\\Rgb' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Color/Rgb.php',
+        'BaconQrCode\\Renderer\\Eye\\CompositeEye' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Eye/CompositeEye.php',
+        'BaconQrCode\\Renderer\\Eye\\EyeInterface' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Eye/EyeInterface.php',
+        'BaconQrCode\\Renderer\\Eye\\ModuleEye' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Eye/ModuleEye.php',
+        'BaconQrCode\\Renderer\\Eye\\SimpleCircleEye' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Eye/SimpleCircleEye.php',
+        'BaconQrCode\\Renderer\\Eye\\SquareEye' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Eye/SquareEye.php',
+        'BaconQrCode\\Renderer\\ImageRenderer' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/ImageRenderer.php',
+        'BaconQrCode\\Renderer\\Image\\EpsImageBackEnd' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Image/EpsImageBackEnd.php',
+        'BaconQrCode\\Renderer\\Image\\ImageBackEndInterface' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Image/ImageBackEndInterface.php',
+        'BaconQrCode\\Renderer\\Image\\ImagickImageBackEnd' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Image/ImagickImageBackEnd.php',
+        'BaconQrCode\\Renderer\\Image\\SvgImageBackEnd' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Image/SvgImageBackEnd.php',
+        'BaconQrCode\\Renderer\\Image\\TransformationMatrix' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Image/TransformationMatrix.php',
+        'BaconQrCode\\Renderer\\Module\\DotsModule' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Module/DotsModule.php',
+        'BaconQrCode\\Renderer\\Module\\EdgeIterator\\Edge' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Module/EdgeIterator/Edge.php',
+        'BaconQrCode\\Renderer\\Module\\EdgeIterator\\EdgeIterator' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Module/EdgeIterator/EdgeIterator.php',
+        'BaconQrCode\\Renderer\\Module\\ModuleInterface' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Module/ModuleInterface.php',
+        'BaconQrCode\\Renderer\\Module\\RoundnessModule' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Module/RoundnessModule.php',
+        'BaconQrCode\\Renderer\\Module\\SquareModule' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Module/SquareModule.php',
+        'BaconQrCode\\Renderer\\Path\\Close' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Path/Close.php',
+        'BaconQrCode\\Renderer\\Path\\Curve' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Path/Curve.php',
+        'BaconQrCode\\Renderer\\Path\\EllipticArc' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Path/EllipticArc.php',
+        'BaconQrCode\\Renderer\\Path\\Line' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Path/Line.php',
+        'BaconQrCode\\Renderer\\Path\\Move' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Path/Move.php',
+        'BaconQrCode\\Renderer\\Path\\OperationInterface' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Path/OperationInterface.php',
+        'BaconQrCode\\Renderer\\Path\\Path' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/Path/Path.php',
+        'BaconQrCode\\Renderer\\PlainTextRenderer' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/PlainTextRenderer.php',
+        'BaconQrCode\\Renderer\\RendererInterface' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/RendererInterface.php',
+        'BaconQrCode\\Renderer\\RendererStyle\\EyeFill' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/RendererStyle/EyeFill.php',
+        'BaconQrCode\\Renderer\\RendererStyle\\Fill' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/RendererStyle/Fill.php',
+        'BaconQrCode\\Renderer\\RendererStyle\\Gradient' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/RendererStyle/Gradient.php',
+        'BaconQrCode\\Renderer\\RendererStyle\\GradientType' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/RendererStyle/GradientType.php',
+        'BaconQrCode\\Renderer\\RendererStyle\\RendererStyle' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Renderer/RendererStyle/RendererStyle.php',
+        'BaconQrCode\\Writer' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Writer.php',
         'BezhanSalleh\\FilamentShield\\Commands\\Concerns\\CanGeneratePolicy' => __DIR__ . '/..' . '/bezhansalleh/filament-shield/src/Commands/Concerns/CanGeneratePolicy.php',
         'BezhanSalleh\\FilamentShield\\Commands\\Concerns\\CanManipulateFiles' => __DIR__ . '/..' . '/bezhansalleh/filament-shield/src/Commands/Concerns/CanManipulateFiles.php',
         'BezhanSalleh\\FilamentShield\\Commands\\Concerns\\CanValidateInput' => __DIR__ . '/..' . '/bezhansalleh/filament-shield/src/Commands/Concerns/CanValidateInput.php',
@@ -848,6 +942,16 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'Cron\\HoursField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/HoursField.php',
         'Cron\\MinutesField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/MinutesField.php',
         'Cron\\MonthField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/MonthField.php',
+        'DASPRiD\\Enum\\AbstractEnum' => __DIR__ . '/..' . '/dasprid/enum/src/AbstractEnum.php',
+        'DASPRiD\\Enum\\EnumMap' => __DIR__ . '/..' . '/dasprid/enum/src/EnumMap.php',
+        'DASPRiD\\Enum\\Exception\\CloneNotSupportedException' => __DIR__ . '/..' . '/dasprid/enum/src/Exception/CloneNotSupportedException.php',
+        'DASPRiD\\Enum\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/dasprid/enum/src/Exception/ExceptionInterface.php',
+        'DASPRiD\\Enum\\Exception\\ExpectationException' => __DIR__ . '/..' . '/dasprid/enum/src/Exception/ExpectationException.php',
+        'DASPRiD\\Enum\\Exception\\IllegalArgumentException' => __DIR__ . '/..' . '/dasprid/enum/src/Exception/IllegalArgumentException.php',
+        'DASPRiD\\Enum\\Exception\\MismatchException' => __DIR__ . '/..' . '/dasprid/enum/src/Exception/MismatchException.php',
+        'DASPRiD\\Enum\\Exception\\SerializeNotSupportedException' => __DIR__ . '/..' . '/dasprid/enum/src/Exception/SerializeNotSupportedException.php',
+        'DASPRiD\\Enum\\Exception\\UnserializeNotSupportedException' => __DIR__ . '/..' . '/dasprid/enum/src/Exception/UnserializeNotSupportedException.php',
+        'DASPRiD\\Enum\\NullValue' => __DIR__ . '/..' . '/dasprid/enum/src/NullValue.php',
         'DanHarrin\\DateFormatConverter\\Converter' => __DIR__ . '/..' . '/danharrin/date-format-converter/src/Converter.php',
         'DanHarrin\\LivewireRateLimiting\\Exceptions\\TooManyRequestsException' => __DIR__ . '/..' . '/danharrin/livewire-rate-limiting/src/Exceptions/TooManyRequestsException.php',
         'DanHarrin\\LivewireRateLimiting\\WithRateLimiting' => __DIR__ . '/..' . '/danharrin/livewire-rate-limiting/src/WithRateLimiting.php',
@@ -3948,6 +4052,20 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'Illuminate\\View\\ViewFinderInterface' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewFinderInterface.php',
         'Illuminate\\View\\ViewName' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewName.php',
         'Illuminate\\View\\ViewServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
+        'JeffGreco13\\FilamentBreezy\\Actions\\PasswordButtonAction' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Actions/PasswordButtonAction.php',
+        'JeffGreco13\\FilamentBreezy\\Events\\LoginSuccess' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Events/LoginSuccess.php',
+        'JeffGreco13\\FilamentBreezy\\Facades\\FilamentBreezy' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Facades/FilamentBreezy.php',
+        'JeffGreco13\\FilamentBreezy\\FilamentBreezy' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/FilamentBreezy.php',
+        'JeffGreco13\\FilamentBreezy\\FilamentBreezyServiceProvider' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/FilamentBreezyServiceProvider.php',
+        'JeffGreco13\\FilamentBreezy\\Http\\Controllers\\EmailVerificationController' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Http/Controllers/EmailVerificationController.php',
+        'JeffGreco13\\FilamentBreezy\\Http\\Livewire\\Auth\\Login' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Http/Livewire/Auth/Login.php',
+        'JeffGreco13\\FilamentBreezy\\Http\\Livewire\\Auth\\Register' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Http/Livewire/Auth/Register.php',
+        'JeffGreco13\\FilamentBreezy\\Http\\Livewire\\Auth\\ResetPassword' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Http/Livewire/Auth/ResetPassword.php',
+        'JeffGreco13\\FilamentBreezy\\Http\\Livewire\\Auth\\Verify' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Http/Livewire/Auth/Verify.php',
+        'JeffGreco13\\FilamentBreezy\\Http\\Livewire\\BreezySanctumTokens' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Http/Livewire/BreezySanctumTokens.php',
+        'JeffGreco13\\FilamentBreezy\\Pages\\MyProfile' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Pages/MyProfile.php',
+        'JeffGreco13\\FilamentBreezy\\Traits\\HasBreezyTwoFactor' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Traits/HasBreezyTwoFactor.php',
+        'JeffGreco13\\FilamentBreezy\\Traits\\TwoFactorAuthenticatable' => __DIR__ . '/..' . '/jeffgreco13/filament-breezy/src/Traits/TwoFactorAuthenticatable.php',
         'Laravel\\Sail\\Console\\AddCommand' => __DIR__ . '/..' . '/laravel/sail/src/Console/AddCommand.php',
         'Laravel\\Sail\\Console\\Concerns\\InteractsWithDockerComposeServices' => __DIR__ . '/..' . '/laravel/sail/src/Console/Concerns/InteractsWithDockerComposeServices.php',
         'Laravel\\Sail\\Console\\InstallCommand' => __DIR__ . '/..' . '/laravel/sail/src/Console/InstallCommand.php',
@@ -4507,6 +4625,7 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'Mockery\\CountValidator\\AtLeast' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/CountValidator/AtLeast.php',
         'Mockery\\CountValidator\\AtMost' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/CountValidator/AtMost.php',
         'Mockery\\CountValidator\\CountValidatorAbstract' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/CountValidator/CountValidatorAbstract.php',
+        'Mockery\\CountValidator\\CountValidatorInterface' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/CountValidator/CountValidatorInterface.php',
         'Mockery\\CountValidator\\Exact' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/CountValidator/Exact.php',
         'Mockery\\CountValidator\\Exception' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/CountValidator/Exception.php',
         'Mockery\\Exception' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Exception.php',
@@ -5111,6 +5230,17 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'PHPUnit\\Util\\Xml\\SuccessfulSchemaDetectionResult' => __DIR__ . '/..' . '/phpunit/phpunit/src/Util/Xml/SuccessfulSchemaDetectionResult.php',
         'PHPUnit\\Util\\Xml\\ValidationResult' => __DIR__ . '/..' . '/phpunit/phpunit/src/Util/Xml/ValidationResult.php',
         'PHPUnit\\Util\\Xml\\Validator' => __DIR__ . '/..' . '/phpunit/phpunit/src/Util/Xml/Validator.php',
+        'ParagonIE\\ConstantTime\\Base32' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base32.php',
+        'ParagonIE\\ConstantTime\\Base32Hex' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base32Hex.php',
+        'ParagonIE\\ConstantTime\\Base64' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64.php',
+        'ParagonIE\\ConstantTime\\Base64DotSlash' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64DotSlash.php',
+        'ParagonIE\\ConstantTime\\Base64DotSlashOrdered' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64DotSlashOrdered.php',
+        'ParagonIE\\ConstantTime\\Base64UrlSafe' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64UrlSafe.php',
+        'ParagonIE\\ConstantTime\\Binary' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Binary.php',
+        'ParagonIE\\ConstantTime\\EncoderInterface' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/EncoderInterface.php',
+        'ParagonIE\\ConstantTime\\Encoding' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Encoding.php',
+        'ParagonIE\\ConstantTime\\Hex' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Hex.php',
+        'ParagonIE\\ConstantTime\\RFC4648' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/RFC4648.php',
         'PharIo\\Manifest\\Application' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Application.php',
         'PharIo\\Manifest\\ApplicationName' => __DIR__ . '/..' . '/phar-io/manifest/src/values/ApplicationName.php',
         'PharIo\\Manifest\\Author' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Author.php',
@@ -5152,6 +5282,7 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'PharIo\\Manifest\\ManifestLoader' => __DIR__ . '/..' . '/phar-io/manifest/src/ManifestLoader.php',
         'PharIo\\Manifest\\ManifestLoaderException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/ManifestLoaderException.php',
         'PharIo\\Manifest\\ManifestSerializer' => __DIR__ . '/..' . '/phar-io/manifest/src/ManifestSerializer.php',
+        'PharIo\\Manifest\\NoEmailAddressException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/NoEmailAddressException.php',
         'PharIo\\Manifest\\PhpElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/PhpElement.php',
         'PharIo\\Manifest\\PhpExtensionRequirement' => __DIR__ . '/..' . '/phar-io/manifest/src/values/PhpExtensionRequirement.php',
         'PharIo\\Manifest\\PhpVersionRequirement' => __DIR__ . '/..' . '/phar-io/manifest/src/values/PhpVersionRequirement.php',
@@ -5437,6 +5568,20 @@ class ComposerStaticInit6ece7cd49bf82c9adaa9012ae26d0d5e
         'PhpParser\\PrettyPrinter\\Standard' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/PrettyPrinter/Standard.php',
         'PhpParser\\Token' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Token.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
+        'PragmaRX\\Google2FA\\Exceptions\\Contracts\\Google2FA' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/Contracts/Google2FA.php',
+        'PragmaRX\\Google2FA\\Exceptions\\Contracts\\IncompatibleWithGoogleAuthenticator' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/Contracts/IncompatibleWithGoogleAuthenticator.php',
+        'PragmaRX\\Google2FA\\Exceptions\\Contracts\\InvalidAlgorithm' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/Contracts/InvalidAlgorithm.php',
+        'PragmaRX\\Google2FA\\Exceptions\\Contracts\\InvalidCharacters' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/Contracts/InvalidCharacters.php',
+        'PragmaRX\\Google2FA\\Exceptions\\Contracts\\SecretKeyTooShort' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/Contracts/SecretKeyTooShort.php',
+        'PragmaRX\\Google2FA\\Exceptions\\Google2FAException' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/Google2FAException.php',
+        'PragmaRX\\Google2FA\\Exceptions\\IncompatibleWithGoogleAuthenticatorException' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/IncompatibleWithGoogleAuthenticatorException.php',
+        'PragmaRX\\Google2FA\\Exceptions\\InvalidAlgorithmException' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/InvalidAlgorithmException.php',
+        'PragmaRX\\Google2FA\\Exceptions\\InvalidCharactersException' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/InvalidCharactersException.php',
+        'PragmaRX\\Google2FA\\Exceptions\\SecretKeyTooShortException' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Exceptions/SecretKeyTooShortException.php',
+        'PragmaRX\\Google2FA\\Google2FA' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Google2FA.php',
+        'PragmaRX\\Google2FA\\Support\\Base32' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Support/Base32.php',
+        'PragmaRX\\Google2FA\\Support\\Constants' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Support/Constants.php',
+        'PragmaRX\\Google2FA\\Support\\QRCode' => __DIR__ . '/..' . '/pragmarx/google2fa/src/Support/QRCode.php',
         'Psr\\Cache\\CacheException' => __DIR__ . '/..' . '/psr/cache/src/CacheException.php',
         'Psr\\Cache\\CacheItemInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemInterface.php',
         'Psr\\Cache\\CacheItemPoolInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemPoolInterface.php',

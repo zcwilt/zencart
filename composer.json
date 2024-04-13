@@ -72,5 +72,8 @@
         "unit-tests": "phpunit --verbose  --process-isolation --testsuite Unit --printer 'Sempro\\PHPUnitPrettyPrinter\\PrettyPrinterForPhpUnit9'"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require": {
+        "jeffgreco13/filament-breezy": "^1.5"
+    }
 }
