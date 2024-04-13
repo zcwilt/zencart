@@ -70,7 +70,6 @@ class LoopContextPass extends CodeCleanerPass
                     throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getStartLine());
                 }
 
-                // @todo Rename to Int_ and Float_ once we drop support for PHP-Parser 4.x
                 if ($node->num instanceof LNumber || $node->num instanceof DNumber) {
                     $num = $node->num->value;
                     if ($node->num instanceof DNumber || $num < 1) {

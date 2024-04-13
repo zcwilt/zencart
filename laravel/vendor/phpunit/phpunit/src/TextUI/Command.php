@@ -16,7 +16,6 @@ use function array_keys;
 use function assert;
 use function class_exists;
 use function copy;
-use function explode;
 use function extension_loaded;
 use function fgets;
 use function file_get_contents;
@@ -61,7 +60,6 @@ use PHPUnit\Util\XmlTestListRenderer;
 use ReflectionClass;
 use SebastianBergmann\CodeCoverage\Filter;
 use SebastianBergmann\CodeCoverage\StaticAnalysis\CacheWarmer;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use SebastianBergmann\Timer\Timer;
 use Throwable;
 
@@ -600,31 +598,17 @@ class Command
     {
         $this->printVersionString();
 
-        $latestVersion           = file_get_contents('https://phar.phpunit.de/latest-version-of/phpunit');
-        $latestCompatibleVersion = file_get_contents('https://phar.phpunit.de/latest-version-of/phpunit-' . explode('.', Version::series())[0]);
+        $latestVersion = file_get_contents('https://phar.phpunit.de/latest-version-of/phpunit');
+        $isOutdated    = version_compare($latestVersion, Version::id(), '>');
 
-        $notLatest           = version_compare($latestVersion, Version::id(), '>');
-        $notLatestCompatible = version_compare($latestCompatibleVersion, Version::id(), '>');
-
-        if ($notLatest || $notLatestCompatible) {
-            print 'You are not using the latest version of PHPUnit.' . PHP_EOL;
-        } else {
-            print 'You are using the latest version of PHPUnit.' . PHP_EOL;
-        }
-
-        if ($notLatestCompatible) {
+        if ($isOutdated) {
             printf(
-                'The latest version compatible with PHPUnit %s is PHPUnit %s.' . PHP_EOL,
-                Version::id(),
-                $latestCompatibleVersion,
-            );
-        }
-
-        if ($notLatest) {
-            printf(
+                'You are not using the latest version of PHPUnit.' . PHP_EOL .
                 'The latest version is PHPUnit %s.' . PHP_EOL,
                 $latestVersion,
             );
+        } else {
+            print 'You are using the latest version of PHPUnit.' . PHP_EOL;
         }
 
         exit(TestRunner::SUCCESS_EXIT);
@@ -738,7 +722,7 @@ class Command
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     private function handleListTests(TestSuite $suite, bool $exit): int
     {
@@ -765,7 +749,7 @@ class Command
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     private function handleListTestsXml(TestSuite $suite, string $target, bool $exit): int
     {

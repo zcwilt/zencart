@@ -293,13 +293,13 @@ class DB2Platform extends AbstractPlatform
     {
         switch ($unit) {
             case DateIntervalUnit::WEEK:
-                $interval = $this->multiplyInterval((string) $interval, 7);
-                $unit     = DateIntervalUnit::DAY;
+                $interval *= 7;
+                $unit      = DateIntervalUnit::DAY;
                 break;
 
             case DateIntervalUnit::QUARTER:
-                $interval = $this->multiplyInterval((string) $interval, 3);
-                $unit     = DateIntervalUnit::MONTH;
+                $interval *= 3;
+                $unit      = DateIntervalUnit::MONTH;
                 break;
         }
 

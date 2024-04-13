@@ -4,15 +4,13 @@
  * Mockery (https://docs.mockery.io/)
  *
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
- * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
- * @link https://github.com/mockery/mockery for the canonical source repository
+ * @license   https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link      https://github.com/mockery/mockery for the canonical source repository
  */
 
 namespace Mockery\Generator\StringManipulation\Pass;
 
 use Mockery\Generator\MockConfiguration;
-
-use function preg_replace;
 
 /**
  * The standard Mockery\Mock class includes some methods to ease mocking, such
@@ -22,29 +20,23 @@ use function preg_replace;
  */
 class RemoveBuiltinMethodsThatAreFinalPass
 {
-    protected $methods = [
+    protected $methods = array(
         '__wakeup' => '/public function __wakeup\(\)\s+\{.*?\}/sm',
         '__toString' => '/public function __toString\(\)\s+(:\s+string)?\s*\{.*?\}/sm',
-    ];
+    );
 
     public function apply($code, MockConfiguration $config)
     {
         $target = $config->getTargetClass();
 
-        if (! $target) {
+        if (!$target) {
             return $code;
         }
 
         foreach ($target->getMethods() as $method) {
-            if (! $method->isFinal()) {
-                continue;
+            if ($method->isFinal() && isset($this->methods[$method->getName()])) {
+                $code = preg_replace($this->methods[$method->getName()], '', $code);
             }
-
-            if (! isset($this->methods[$method->getName()])) {
-                continue;
-            }
-
-            $code = preg_replace($this->methods[$method->getName()], '', $code);
         }
 
         return $code;

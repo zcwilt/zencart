@@ -141,10 +141,6 @@ trait InteractsWithDockerComposeServices
             $environment = str_replace('DB_HOST=127.0.0.1', "DB_HOST=pgsql", $environment);
             $environment = str_replace('DB_PORT=3306', "DB_PORT=5432", $environment);
         } elseif (in_array('mariadb', $services)) {
-            if ($this->laravel->config->has('database.connections.mariadb')) {
-                $environment = preg_replace('/DB_CONNECTION=.*/', 'DB_CONNECTION=mariadb', $environment);
-            }
-
             $environment = str_replace('DB_HOST=127.0.0.1', "DB_HOST=mariadb", $environment);
         }
 
@@ -185,9 +181,7 @@ trait InteractsWithDockerComposeServices
         }
 
         if (in_array('mailpit', $services)) {
-            $environment = preg_replace("/^MAIL_MAILER=(.*)/m", "MAIL_MAILER=smtp", $environment);
             $environment = preg_replace("/^MAIL_HOST=(.*)/m", "MAIL_HOST=mailpit", $environment);
-            $environment = preg_replace("/^MAIL_PORT=(.*)/m", "MAIL_PORT=1025", $environment);
         }
 
         file_put_contents($this->laravel->basePath('.env'), $environment);
@@ -254,14 +248,22 @@ trait InteractsWithDockerComposeServices
         }
 
         if (count($services) > 0) {
-            $this->runCommands([
+            $status = $this->runCommands([
                 './vendor/bin/sail pull '.implode(' ', $services),
             ]);
+
+            if ($status === 0) {
+                $this->info('Sail images installed successfully.');
+            }
         }
 
-        $this->runCommands([
+        $status = $this->runCommands([
             './vendor/bin/sail build',
         ]);
+
+        if ($status === 0) {
+            $this->info('Sail build successful.');
+        }
     }
 
     /**

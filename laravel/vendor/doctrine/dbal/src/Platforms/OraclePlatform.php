@@ -114,11 +114,11 @@ class OraclePlatform extends AbstractPlatform
             case DateIntervalUnit::YEAR:
                 switch ($unit) {
                     case DateIntervalUnit::QUARTER:
-                        $interval = $this->multiplyInterval((string) $interval, 3);
+                        $interval *= 3;
                         break;
 
                     case DateIntervalUnit::YEAR:
-                        $interval = $this->multiplyInterval((string) $interval, 12);
+                        $interval *= 12;
                         break;
                 }
 
