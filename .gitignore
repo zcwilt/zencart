@@ -19,8 +19,10 @@ dev-*.*
 .project
 .settings
 .buildpath
-# Ignore phpStorm stuff
+
+# Ignore phpStorm/intellij stuff
 .idea
+*.iml
 
 # dbv
 /data/meta/revision
@@ -239,4 +241,9 @@ modified_files.txt
 # laravel
 
 laravel/.env
+laravel/storage/*
 
+# stripepay - temp
+#includes/modules/payment/stripepay.php
+#includes/modules/payment/stripe_pay
+#includes/languages/english/modules/payment/lang.stripepay.php

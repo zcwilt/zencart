@@ -21,6 +21,9 @@ $psr4Autoloader->addPrefix('Zencart\ViewBuilders', DIR_FS_CATALOG . DIR_WS_CLASS
 $psr4Autoloader->addPrefix('Zencart\Exceptions', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Exceptions');
 $psr4Autoloader->addPrefix('Zencart\Filters', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Filters');
 $psr4Autoloader->addPrefix('Zencart\Request', DIR_FS_CATALOG . DIR_WS_CLASSES);
+$psr4Autoloader->addPrefix('Zencart\ModuleSupport', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ModuleSupport');
+
+$psr4Autoloader->addPrefix('Monolog', DIR_FS_CATALOG . DIR_WS_CLASSES . 'vendors/monolog/src/Monolog');
 if (defined('DIR_FS_ADMIN')) {
     $psr4Autoloader->addPrefix('Zencart\Paginator', DIR_FS_ADMIN . DIR_WS_CLASSES);
 }
