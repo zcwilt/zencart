@@ -10,7 +10,7 @@
  * @copyright Portions Copyright 2003 osCommerce
  * @todo Need to add/fine-tune ability to override or insert entry-points on a per-product-type basis
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 11 Modified in v2.0.0-beta1 $
+ * @version $Id: DrByte 2024 Mar 21 Modified in v2.0.0 $
  */
 /**
  * @var queryFactory $db
@@ -84,7 +84,7 @@ $listing_sql = str_replace('m.manufacturers_name', 'r.record_company_name as man
 
 // $default_sort_order could be set in header_php or main_template_vars before we get here
 $order_by = $default_sort_order ?? '';
-if (empty($order_by)) {
+if (empty($order_by) || !empty($_GET['disp_order'])) {
     // Build ORDER BY sort chosen from dropdown, or apply defaults
     $order_by_backup = $order_by;
     require(DIR_WS_MODULES . zen_get_module_directory(FILENAME_LISTING_DISPLAY_ORDER));

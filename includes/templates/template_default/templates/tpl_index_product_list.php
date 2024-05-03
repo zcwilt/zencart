@@ -8,7 +8,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 11 Modified in v2.0.0-beta1 $
+ * @version $Id: Scott Wilson 2024 Mar 09 Modified in v2.0.0-rc2 $
  */
 ?>
 <div class="centerColumn" id="indexProductList">
@@ -80,7 +80,7 @@ if (PRODUCT_LIST_CATEGORIES_IMAGE_STATUS == 'true') {
 
   // draw filter_id (ie: category/mfg depending on $options)
   if ($do_filter_list) {
-    echo zen_draw_pull_down_menu('filter_id', $options, (isset($_GET['filter_id']) ? $_GET['filter_id'] : ''), 'onchange="this.form.submit()"');
+    echo zen_draw_pull_down_menu('filter_id', $options, (isset($_GET['filter_id']) ? $_GET['filter_id'] : ''), 'aria-label="' . TEXT_SHOW . '" onchange="this.form.submit()"');
   }
 
   // draw alpha sorter

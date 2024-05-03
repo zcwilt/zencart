@@ -3,7 +3,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 11 Modified in v2.0.0-beta1 $
+ * @version $Id: DrByte 2024 Mar 23 Modified in v2.0.0 $
  */
 
 
@@ -95,7 +95,6 @@ function zen_get_languages(): array
      */
     global $lng;
     if ($lng === null) {
-        include_once DIR_FS_CATALOG . DIR_WS_CLASSES . 'language.php';
         $lng = new language();
     }
     return array_values($lng->get_languages_by_code());
@@ -343,7 +342,7 @@ function zen_get_system_information($privacy = false)
         $output = '';
         if (DISPLAY_SERVER_UPTIME == 'true') {
             @exec('uptime 2>&1', $output, $errnum);
-            if ($errnum == 0) {
+            if ($errnum == 0 && isset($output[0])) {
                 $uptime = $output[0];
             }
         }
@@ -428,11 +427,11 @@ function zen_remove_order($order_id, $restock = false)
 
 function zen_call_function($function, $parameter, $object = '')
 {
-    if ($object == '') {
-        return call_user_func($function, $parameter);
+    if ($object === '') {
+        return $function($parameter);
     }
 
-    return call_user_func(array($object, $function), $parameter);
+    return call_user_func([$object, $function], $parameter);
 }
 
 //@todo - is there a function already for this query?
@@ -717,7 +716,7 @@ function zen_getOrdersStatuses(bool $keyed = false): array
     $orders_statuses = [];
     $orders_status_array = [];
     $orders_status_query = $db->Execute('SELECT orders_status_id, orders_status_name FROM ' . TABLE_ORDERS_STATUS . '
-                                 WHERE language_id = "' . (int)$_SESSION['languages_id'] . '" ORDER BY sort_order, orders_status_id');
+                                 WHERE language_id = ' . (int)$_SESSION['languages_id'] . ' ORDER BY sort_order, orders_status_id');
     foreach ($orders_status_query as $next_status) {
         if (!$keyed) {
             $orders_statuses[] = [

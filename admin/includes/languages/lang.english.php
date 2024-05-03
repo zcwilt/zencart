@@ -3,7 +3,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 23 Modified in v2.0.0-beta1 $
+ * @version $Id: Steve 2024 Mar 23 Modified in v2.0.0 $
 */
 
 @setlocale(LC_TIME, ['en_US', 'en_US.utf8', 'en', 'English_United States.1252']);
@@ -463,6 +463,8 @@ $define = [
     'TEXT_CHECK_ALL' => 'Check All',
     'TEXT_CLOSE_WINDOW' => '[ close window ]',
     'TEXT_CONFIRM_PASSWORD' => 'Confirm Password',
+    'TEXT_COPY' => 'Copy',
+    'TEXT_COPIED' => 'Copied!',
     'TEXT_COPY_ATTRIBUTES_CONDITIONS' => '<strong>How should existing product attributes be handled?</strong>',
     'TEXT_COPY_ATTRIBUTES_DELETE' => '<strong>Delete</strong> first, then copy new attributes',
     'TEXT_COPY_ATTRIBUTES_IGNORE' => '<strong>Ignore</strong> existing attributes and add only new attributes',

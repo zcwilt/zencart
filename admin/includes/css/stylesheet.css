@@ -2,7 +2,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 22 Modified in v2.0.0-beta1 $
+ * @version $Id: Steve 2024 Mar 23 Modified in v2.0.0 $
  */
 
 body {
@@ -203,11 +203,6 @@ input.cfgInput {
 
 textarea {
     width: 80%;
-}
-
-/* to handle textareas for browsers which don't like % widths */
-textarea.sqlpatchKeyedQuery, TEXTAREA#file_contents {
-    width: auto;
 }
 
 form {
@@ -920,3 +915,41 @@ input.faint {
 tbody>tr>td.align-bottom {
   vertical-align: bottom;
 }
+
+.m-0 {
+    margin: 0 !important;
+}
+.m-1 {
+    margin: 0.25rem !important;
+}
+.m-2 {
+    margin: 0.5rem !important;
+}
+.m-3 {
+    margin: 1rem !important;
+}
+.m-4 {
+    margin: 1.5rem !important;
+}
+.m-5 {
+    margin: 3rem !important;
+}
+.mt-0 {
+    margin-top: 0 !important;
+}
+.mt-1 {
+    margin-top: 0.25rem !important;
+}
+.mt-2 {
+    margin-top: 0.5rem !important;
+}
+.mt-3 {
+    margin-top: 1rem !important;
+}
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+.mt-5 {
+    margin-top: 3rem !important;
+}
+/**/

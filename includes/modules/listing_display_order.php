@@ -6,7 +6,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Jan 31 Modified in v2.0.0-beta1 $
+ * @version $Id: DrByte 2024 Mar 21 Modified in v2.0.0 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -55,7 +55,7 @@ switch ((int)$_GET['disp_order']) {
         $order_by = " ORDER BY p.products_date_added, pd.products_name";
         break;
     case 8:
-        $order_by = " ORDER BY p.products_sort_order, pd.products_name ";
+        $order_by = $default_sort_order ??  " ORDER BY p.products_sort_order, pd.products_name ";
         break;
     case 0:
         // reset

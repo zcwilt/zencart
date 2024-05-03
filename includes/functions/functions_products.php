@@ -5,7 +5,7 @@
  *
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Jan 31 Modified in v2.0.0-beta1 $
+ * @version $Id: neekfenwick 2024 Mar 08 Modified in v2.0.0-rc1 $
  */
 
 /**
@@ -179,10 +179,10 @@ function zen_get_new_date_range($time_limit = false)
 
     $zc_new_date = date('Ymd', $date_range);
     switch (true) {
-        case (SHOW_NEW_PRODUCTS_LIMIT === '0'):
+        case (SHOW_NEW_PRODUCTS_LIMIT === 0):
             $new_range = '';
             break;
-        case (SHOW_NEW_PRODUCTS_LIMIT === '1'):
+        case (SHOW_NEW_PRODUCTS_LIMIT === 1):
             $zc_new_date = date('Ym', time()) . '01';
             $new_range = ' AND p.products_date_added >= ' . $zc_new_date;
             break;
@@ -197,47 +197,6 @@ function zen_get_new_date_range($time_limit = false)
     }
     return $new_range;
 }
-
-/**
- * build New Products query clause
- * @param int $time_limit
- * @return string
- */
-function zen_get_products_new_timelimit($time_limit = false)
-{
-    if ($time_limit == false) {
-        $time_limit = SHOW_NEW_PRODUCTS_LIMIT;
-    }
-    $time_limit = (int)$time_limit;
-    switch ($time_limit) {
-        case 1:
-            $display_limit = " AND date_format(p.products_date_added, '%Y%m') >= date_format(now(), '%Y%m')";
-            break;
-        case 7:
-            $display_limit = ' AND TO_DAYS(NOW()) - TO_DAYS(p.products_date_added) <= 7';
-            break;
-        case 14:
-            $display_limit = ' AND TO_DAYS(NOW()) - TO_DAYS(p.products_date_added) <= 14';
-            break;
-        case 30:
-            $display_limit = ' AND TO_DAYS(NOW()) - TO_DAYS(p.products_date_added) <= 30';
-            break;
-        case 60:
-            $display_limit = ' AND TO_DAYS(NOW()) - TO_DAYS(p.products_date_added) <= 60';
-            break;
-        case 90:
-            $display_limit = ' AND TO_DAYS(NOW()) - TO_DAYS(p.products_date_added) <= 90';
-            break;
-        case 120:
-            $display_limit = ' AND TO_DAYS(NOW()) - TO_DAYS(p.products_date_added) <= 120';
-            break;
-        default:
-            $display_limit = '';
-            break;
-    }
-    return $display_limit;
-}
-
 
 /**
  * Return a product's category (master_categories_id)
@@ -836,6 +795,19 @@ function zen_has_product_discounts($product_id)
 }
 
 /**
+ * Check if a product in the catalogue has a special price defined or not.
+ *
+ * @param int $product_id
+ * @return boolean
+ */
+function zen_has_product_specials(int $product_id): bool
+{
+    global $db;
+    $result = $db->Execute('SELECT products_id FROM ' . TABLE_SPECIALS . " WHERE products_id = $product_id", 1);
+    return !$result->EOF;
+}
+
+/**
  * Set the status of a product.
  * Used for toggling
  *
@@ -964,6 +936,40 @@ function zen_products_attributes_download_delete($product_id)
 }
 
 /**
+ * Copy specials pricing from one product to another.
+ *
+ * @param int $copy_from Source products_id
+ * @param int $copy_to   Target products_id
+ * @return bool Indicates whether there was a special on $copy_from or not.
+ */
+function zen_copy_specials_to_product(int $copy_from, int $copy_to): bool {
+    global $db;
+
+    // Fetch existing special for $copy_from, if any.
+    $from_result = $db->Execute('SELECT * FROM ' . TABLE_SPECIALS . " WHERE products_id = $copy_from");
+    if ($from_result->EOF) {
+        return false;
+    }
+
+    // Take the data row, modified ready to insert/update
+    $sql_data = $from_result->fields;
+    unset($sql_data['specials_id']);
+    $sql_data['products_id'] = $copy_to;
+
+    // Test for existing special for $copy_to, and insert/update as required.
+    $result = $db->Execute('SELECT products_id FROM ' . TABLE_SPECIALS . " WHERE products_id = $copy_to", 1);
+    if ($result->EOF) {
+        // Insert new specials row
+        zen_db_perform(TABLE_SPECIALS, $sql_data);
+    } else {
+        // Update existing specials row
+        zen_db_perform(TABLE_SPECIALS, $sql_data, 'update', "products_id = $copy_to");
+    }
+
+    return true;
+}
+
+/**
  * copy quantity-discounts from one product to another
  * @param int $copy_from
  * @param int $copy_to
@@ -1002,13 +1008,15 @@ function zen_copy_discounts_to_product($copy_from, $copy_to)
         );
         $cnt_discount++;
     }
+
+    return true;
 }
 
 function zen_products_sort_order($includeOrderBy = true): string
 {
     switch (PRODUCT_INFO_PREVIOUS_NEXT_SORT) {
         case (0):
-            $productSort = 'LPAD(p.products_id,11,"0")';
+            $productSort = "LPAD(p.products_id,11,'0')";
             $productSort = 'p.products_id';
             break;
         case (1):
@@ -1027,7 +1035,7 @@ function zen_products_sort_order($includeOrderBy = true): string
             $productSort = 'pd.products_name, p.products_model';
             break;
         case (6):
-            $productSort = 'LPAD(p.products_sort_order,11,"0"), pd.products_name';
+            $productSort = "LPAD(p.products_sort_order,11,'0'), pd.products_name";
             $productSort = 'products_sort_order, pd.products_name';
             break;
         default:

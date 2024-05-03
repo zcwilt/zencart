@@ -5,7 +5,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 17 Modified in v2.0.0-beta1 $
+ * @version $Id: lat9 2024 Mar 15 Modified in v2.0.0-rc2 $
  */
 
 if (!defined('IS_ADMIN_FLAG')) {
@@ -170,7 +170,7 @@ class shoppingCart extends base
             $this->contents[$uprid] = ['qty' => $next_product['customers_basket_quantity']];
 
             // set contents in sort order
-            $order_by = ' ORDER BY LPAD(products_options_sort_order,11,"0")';
+            $order_by = " ORDER BY LPAD(products_options_sort_order,11,'0')";
 
             $attributes = $db->Execute(
                 "SELECT products_options_id, products_options_value_id, products_options_value_text
@@ -926,7 +926,7 @@ class shoppingCart extends base
                     }
                     ////////////////////////////////////////////////
 
-                    $attributesTotal += zen_round($productTotal, $decimalPlaces);
+                    $attributesTotal += $productTotal;
                 } // eof foreach
             } // attributes price
             $productTotal = $savedProductTotal + $attributesTotal;
@@ -976,11 +976,11 @@ class shoppingCart extends base
                   }
             */
 
-            $this->total += zen_round(zen_add_tax($productTotal, $products_tax), $decimalPlaces) * $qty;
-            $this->total += zen_round(zen_add_tax($totalOnetimeCharge, $products_tax), $decimalPlaces);
-            $this->free_shipping_price += zen_round(zen_add_tax($freeShippingTotal, $products_tax), $decimalPlaces) * $qty;
+            $this->total += zen_add_tax($productTotal, $products_tax) * $qty;
+            $this->total += zen_add_tax($totalOnetimeCharge, $products_tax);
+            $this->free_shipping_price += zen_add_tax($freeShippingTotal, $products_tax) * $qty;
             if ($is_free_shipping === true) {
-                $this->free_shipping_price += zen_round(zen_add_tax($totalOnetimeCharge, $products_tax), $decimalPlaces);
+                $this->free_shipping_price += zen_add_tax($totalOnetimeCharge, $products_tax);
             }
 
 // ******* WARNING ADD ONE TIME ATTRIBUTES, PRICE FACTOR
@@ -1106,7 +1106,7 @@ class shoppingCart extends base
             $_SESSION['cart_errors'] .= zen_get_products_name($attribute_price['products_id'], $_SESSION['languages_id'])  . ERROR_PRODUCT_OPTION_SELECTION . '<br>';
             }
             */
-            $total_attributes_price += zen_round($attributes_price, $currencies->get_decimal_places($_SESSION['currency']));
+            $total_attributes_price += $attributes_price;
         }
 
         return $total_attributes_price;
@@ -1672,7 +1672,7 @@ class shoppingCart extends base
         foreach ($this->contents as $uprid => $data) {
             // check if field it true
             $product_check = zen_get_product_details(zen_get_prid($uprid));
-            if (array_key_exists($check_value, $product_check->fields) && (string)$product_check->fields[$check_what] === (string)$check_value) {
+            if (array_key_exists($check_what, $product_check->fields) && (string)$product_check->fields[$check_what] === (string)$check_value) {
                 $in_cart_check_qty += $data['qty'];
             }
         }

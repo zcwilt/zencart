@@ -1,6 +1,9 @@
 <?php
-
-namespace Zencart;
+/**
+ * @copyright Copyright 2003-2024 Zen Cart Development Team
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id: DrByte 2024 Apr 03 Modified in v2.0.0 $
+ */
 
 use TypeError;
 
@@ -9,7 +12,7 @@ class MeasurementUnits
     /**
      * Convert weight from one unit to another
      */
-    public static function convertWeight(float|int $incoming, string $from_unit, string $to_unit, ?int $precision): float|int
+    public static function convertWeight(float|int $incoming, string $from_unit, string $to_unit, ?int $precision = null): float|int
     {
         if (!in_array($from_unit, ['lbs', 'kgs', 'oz', 'g'])) {
             throw new TypeError('Invalid weight unit for $from_unit: ' . $from_unit);
@@ -51,7 +54,7 @@ class MeasurementUnits
     /**
      * Convert lengths from one unit to another
      */
-    public static function convertLength(float|int $incoming, string $from_unit, string $to_unit, ?int $precision): float
+    public static function convertLength(float|int $incoming, string $from_unit, string $to_unit, ?int $precision = null): float
     {
         if (!in_array($from_unit, ['in', 'cm'])) {
             throw new TypeError('Invalid length unit for $from_unit: ' . $from_unit);

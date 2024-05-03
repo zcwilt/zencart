@@ -3,7 +3,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: neekfenwick 2024 Feb 23 Modified in v2.0.0-beta1 $
+ * @version $Id: neekfenwick 2024 Feb 29 Modified in v2.0.0-rc1 $
 */
 
 $define = [
@@ -89,7 +89,7 @@ $define = [
     'COUPON_SALE_HELP' => 'If you choose <i>NOT allowed</i>, products on sale or special will not be discounted or counted towards the coupon minimum order.',
     'COUPON_USES_COUPON_HELP' => 'The maximum number of times the coupon can be used, leave blank if you want no limit.',
     'COUPON_USES_USER_HELP' => 'Number of times a user can use the coupon, leave blank for no limit.',
-    'COUPON_REFERRER_HELP' => 'Domains to automatically apply the coupon when visiting from, comma separated. e.g. &quot;jills-blog.com&quot; or &quot;bobsbits.com,thisandthat.com&quot;.',
+    'COUPON_REFERRER_HELP' => 'Domains to automatically apply the coupon when visiting from, one per row. e.g. &quot;jills-blog.com&quot; or &quot;bobsbits.com&quot;.  Click the green <i class=&quot;fa-solid fa-plus&quot;></i> icon to add a new row, or the red <i class=&quot;fa-solid fa-times&quot;></i> icon to remove a row.',
     'COUPON_BUTTON_PREVIEW' => 'Preview',
     'COUPON_BUTTON_CONFIRM' => 'Confirm',
     'COUPON_ACTIVE' => 'Status',

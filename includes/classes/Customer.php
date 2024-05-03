@@ -2,7 +2,7 @@
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 20 Modified in v2.0.0-beta1 $
+ * @version $Id: lat9 2024 Feb 28 Modified in v2.0.0-rc1 $
  */
 
 class Customer extends base
@@ -559,7 +559,7 @@ class Customer extends base
         }
 
         $sql =
-            "SELECT address_book_id,
+            "SELECT ab.*,
                     entry_firstname AS firstname, entry_lastname AS lastname,
                     entry_company AS company, entry_street_address AS street_address,
                     entry_suburb AS suburb, entry_city AS city, entry_postcode AS postcode,

@@ -2,92 +2,10 @@
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 24 Modified in v2.0.0-beta1 $
+ * @version $Id: DrByte 2024 Mar 04 Modified in v2.0.0-rc1 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
-}
-
-/**
- * Template settings access helper function.
- * This will first look to the global $tpl_settings array for the setting key (the name of the constant being overridden)
- * Lookup order:
- * - $tpl_settings array key
- * - global CONSTANT
- * - global $var by same name, if requested
- *
- * All returned values will be passed through zen_cast() to allow casting to desired type, if specified.
- *
- * If nothing is found, the supplied default will be returned. Else null.
- */
-function tpl(string $setting, string $cast_to = null, $default = null, bool $check_globals = false): mixed
-{
-    // Check whether the $tpl_settings array contains the $setting
-    // It could be populated from the template_settings.php file or the template_settings JSON field in the db
-    global $tpl_settings;
-    if (isset($tpl_settings[$setting])) {
-        return zen_cast($tpl_settings[$setting], $cast_to);
-    }
-
-    // Fallback to a globally-defined constant, if it exists
-    if (defined($setting)) {
-        return zen_cast(constant($setting), $cast_to);
-    }
-
-    // Else fall back to a global variable
-    if ($check_globals) {
-        // first exact case as supplied
-        if (isset($GLOBALS[$setting])) {
-            return zen_cast($GLOBALS[$setting], $cast_to);
-        }
-        // next check all lower-case
-        $setting = strtolower($setting); // $setting is not used again below, so convert directly
-        if (isset($GLOBALS[$setting])) {
-            return zen_cast($GLOBALS[$setting], $cast_to);
-        }
-    }
-
-    // Else return the provided default, if any
-    if ($default !== null) {
-        return zen_cast($default, $cast_to);
-    }
-
-    return null;
-}
-
-/**
- * Cast an input to a desired type; Frequently used by the tpl() template-settings helper function.
- * (Note: does not operate recursively on arrays)
- */
-function zen_cast($input, ?string $cast_to): mixed
-{
-    // null case is listed first because it's likely to be the most common when called from the tpl() function
-    // null treats it as a passthrough, doing no casting.
-    if ($cast_to === null) {
-        return $input;
-    }
-
-    switch ($cast_to) {
-        case 'string':
-            return (string)$input;
-        case 'boolean':
-        case 'bool':
-            return (bool)$input;
-        case 'int':
-        case 'integer':
-            return (int)$input;
-        case 'double':
-        case 'float':
-            return (float)$input;
-        case 'array':
-            if (is_array($input)) {
-                return $input;
-            }
-            return [$input];
-        case 'passthru':
-        default:
-            return $input;
-    }
 }
 
 /**
@@ -124,6 +42,8 @@ function zen_get_catalog_template_directories($include_template_default = false)
                 'description' => $template_description,
                 'screenshot' => $template_screenshot,
                 'uses_single_column_layout_settings' => !empty($uses_single_column_layout_settings),
+                'template_path' => $path,
+                'has_template_settings' => file_exists($path . '/template_settings.php'),
             ];
         }
     }

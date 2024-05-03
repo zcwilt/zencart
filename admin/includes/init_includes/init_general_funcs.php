@@ -3,7 +3,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2023 Aug 23 Modified in v2.0.0-alpha1 $
+ * @version $Id: DrByte 2024 Mar 22 Modified in v2.0.0 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
@@ -13,6 +13,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 define('BOX_WIDTH', 125); // how wide the boxes should be in pixels (default: 125)
 
 
+require 'includes/init_includes/init_pci_settings.php';
 
 require DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'database.php';
 

@@ -2,7 +2,7 @@
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 24 Modified in v2.0.0-beta1 $
+ * @version $Id: Scott Wilson 2024 Mar 10 Modified in v2.0.0-rc2 $
  */
 
 function page_has_help()
@@ -154,6 +154,7 @@ function page_has_help()
         FILENAME_GV_SENT => 'https://docs.zen-cart.com/user/admin_pages/discounts/gift_certificates_sent/',
         FILENAME_PROFILES => 'https://docs.zen-cart.com/user/admin_pages/admins/admin_profiles/',
         FILENAME_USERS => 'https://docs.zen-cart.com/user/admin_pages/admins/admin_users/',
+        FILENAME_ADMIN_ACCOUNT => 'https://docs.zen-cart.com/user/admin_pages/admins/admin_account/',
         FILENAME_ADMIN_PAGE_REGISTRATION => 'https://docs.zen-cart.com/user/admin_pages/admins/admin_page_registration/',
         FILENAME_ADMIN_ACTIVITY => 'https://docs.zen-cart.com/user/admin_pages/admins/admin_activity_logs/',
         FILENAME_RECORD_ARTISTS => 'https://docs.zen-cart.com/user/admin_pages/extras/record_artists/',

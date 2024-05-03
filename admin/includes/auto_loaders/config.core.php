@@ -1,10 +1,9 @@
 <?php
-
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Jan 11 Modified in v2.0.0-alpha1 $
+ * @version $Id: lat9 2024 Mar 20 Modified in v2.0.0 $
  */
 if (!defined('USE_PCONNECT')) {
     define('USE_PCONNECT', 'false');
@@ -25,7 +24,6 @@ if (!defined('USE_PCONNECT')) {
  * require DIR_WS_CLASSES . 'table_block.php';
  * require DIR_WS_CLASSES . 'box.php';
  * require DIR_WS_CLASSES . 'message_stack.php';
- * require DIR_WS_CLASSES . 'split_page_results.php';
  * require DIR_WS_CLASSES . 'object_info.php';
  * require DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.phpmailer.php';
  * require DIR_FS_CATALOG . DIR_WS_CLASSES . 'upload.php';
@@ -74,11 +72,6 @@ $autoLoadConfig[0][] = [
 $autoLoadConfig[0][] = [
     'autoType' => 'class',
     'loadFile' => 'message_stack.php',
-    'classPath' => DIR_WS_CLASSES,
-];
-$autoLoadConfig[0][] = [
-    'autoType' => 'class',
-    'loadFile' => 'split_page_results.php',
     'classPath' => DIR_WS_CLASSES,
 ];
 $autoLoadConfig[0][] = [
@@ -186,6 +179,15 @@ $autoLoadConfig[25][] = [
     'loadFile' => 'init_non_db_settings_admin.php',
 ];
 /**
+ * Breakpoint 27
+ *
+ * require 'includes/init_includes/init_split_page_results.php';
+ */
+$autoLoadConfig[27][] = [
+    'autoType' => 'init_script',
+    'loadFile' => 'init_split_page_results.php',
+];
+/**
  * Breakpoint 30.
  *
  * require 'includes/init_includes/init_gzip.php';
@@ -277,13 +279,14 @@ $autoLoadConfig[60][] = [
  * Breakpoint 65.
  *
  * require 'includes/init_includes/init_languages.php';
- * Expecting nothing loaded before init_sanitize to require $_POST/$_GET sanitization.
  */
 $autoLoadConfig[65][] = [
     'autoType' => 'init_script',
     'loadFile' => 'init_languages.php',
 ];
 /**
+ * Expecting nothing loaded before init_sanitize to require $_POST/$_GET sanitization.
+ *
  * Breakpoint 70.
  *
  * require 'includes/init_includes/init_sanitize.php';

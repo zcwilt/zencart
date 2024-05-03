@@ -4,7 +4,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Feb 17 Modified in v2.0.0-beta1 $
+ * @version $Id: neekfenwick 2024 Mar 08 Modified in v2.0.0-rc1 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -210,6 +210,13 @@ if (isset($_POST['products_id'], $_POST['categories_id'])) {
             foreach ($categories_from as $row) {
                 zen_link_product_to_category($dup_products_id, (int)$row);
                 $messageStack->add_session(sprintf(TEXT_COPY_AS_DUPLICATE_CATEGORIES, (int)$row, $products_id, $dup_products_id), 'success');
+            }
+        }
+
+// copy specials to Duplicate
+        if (!empty($_POST['copy_specials']) && $_POST['copy_specials'] === 'copy_specials_yes') {
+            if (zen_copy_specials_to_product($products_id, $dup_products_id)) {
+                $messageStack->add_session(sprintf(TEXT_COPY_AS_DUPLICATE_SPECIALS, $products_id, $dup_products_id), 'success');
             }
         }
 

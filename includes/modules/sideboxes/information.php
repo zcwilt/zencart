@@ -2,10 +2,10 @@
 /**
  * information sidebox - displays list of general info links, as defined in this file
  *
- * @copyright Copyright 2003-2022 Zen Cart Development Team
+ * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: lat9 2022 May 06 Modified in v1.5.8-alpha $
+ * @version $Id: Scott C Wilson 2024 Mar 01 Modified in v2.0.0-rc1 $
  */
 
 $information = [];
@@ -34,6 +34,13 @@ if (DEFINE_PRIVACY_STATUS <= 1) {
 }
 if (DEFINE_CONDITIONS_STATUS <= 1) {
     $information[] = '<a href="' . zen_href_link(FILENAME_CONDITIONS) . '">' . BOX_INFORMATION_CONDITIONS . '</a>';
+}
+// -----
+// The following flag is set by /includes/init_includes/init_common_elements.php; refer to that module's
+// comments for the way to override this setting.
+//
+if ($flag_show_accessibility_sidebox_link === true) {
+    $information[] = '<a href="' . zen_href_link(FILENAME_ACCESSIBILITY) . '">' . BOX_INFORMATION_ACCESSIBILITY . '</a>';
 }
 if (DEFINE_CONTACT_US_STATUS <= 1) {
     $information[] = '<a href="' . zen_href_link(FILENAME_CONTACT_US, '', 'SSL') . '">' . BOX_INFORMATION_CONTACT . '</a>';

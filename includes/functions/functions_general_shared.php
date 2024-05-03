@@ -3,7 +3,7 @@
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2024 Jan 31 Modified in v2.0.0-beta1 $
+ * @version $Id: DrByte 2024 Mar 07 Modified in v2.0.0-rc1 $
  */
 
 function zen_get_zcversion()
@@ -60,6 +60,21 @@ function fmod_round($x, $y)
     return $results;
 }
 
+/**
+ * Cast an input to a desired type.
+ * (Note: does not operate recursively on arrays)
+ */
+function zen_cast($input, ?string $cast_to): mixed
+{
+    return match ($cast_to) {
+        'string' => (string)$input,
+        'boolean', 'bool' => (bool)$input,
+        'int', 'integer' => (int)$input,
+        'double', 'float' => (float)$input,
+        'array' => (is_array($input)) ? $input : [$input],
+        default => $input,
+    };
+}
 
 /**
  * Convert value to a float/int -- mainly used for sanitizing and returning non-empty strings or nulls
