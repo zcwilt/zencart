@@ -24,7 +24,7 @@ trait GeneralModuleConcerns
      */
     protected function buildDefine(string $defineTemplate): string
     {
-        return str_replace('%%', $this->MODULE_ID, $defineTemplate);
+        return str_replace('%%', strtoupper($this->code), $defineTemplate);
     }
 
 }

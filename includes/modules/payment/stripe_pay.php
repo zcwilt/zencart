@@ -10,32 +10,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
     use PaymentModuleConcerns;
 
-    public string $MODULE_ID = 'stripe_pay';
     public string $code = 'stripe_pay';
-
-//    function update_status()
-//    {
-//        global $order, $db;
-//
-//        if ($this->enabled && (int)MODULE_PAYMENT_STRIPE_PAY_ZONE > 0 && isset($order->billing['country']['id'])) {
-//            $check_flag = false;
-//            $check = $db->Execute("select zone_id from " . TABLE_ZONES_TO_GEO_ZONES . " where geo_zone_id = '" . MODULE_PAYMENT_STRIPE_PAY_ZONE . "' and zone_country_id = '" . (int)$order->billing['country']['id'] . "' order by zone_id");
-//            while (!$check->EOF) {
-//                if ($check->fields['zone_id'] < 1) {
-//                    $check_flag = true;
-//                    break;
-//                } elseif ($check->fields['zone_id'] == $order->billing['zone_id']) {
-//                    $check_flag = true;
-//                    break;
-//                }
-//                $check->MoveNext();
-//            }
-//
-//            if ($check_flag == false) {
-//                $this->enabled = false;
-//            }
-//        }
-//    }
 
     public function selection(): array
     {

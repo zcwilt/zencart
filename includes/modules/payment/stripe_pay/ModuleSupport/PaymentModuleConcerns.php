@@ -100,7 +100,7 @@ trait PaymentModuleConcerns
         if (isset($this->_check)) {
             return $this->_check;
         }
-        $_check = Configuration::where('configuration_key', 'MODULE_PAYMENT_' . $this->MODULE_ID . '_STATUS')->first();
+        $_check = Configuration::where('configuration_key', 'MODULE_PAYMENT_' . strtouppeer($this->code) . '_STATUS')->first();
         $this->_check = $_check ? 1 : 0;
         return $this->_check;
     }
@@ -124,7 +124,7 @@ trait PaymentModuleConcerns
     }
     public function remove()
     {
-        $define = 'MODULE_PAYMENT_' . $this->MODULE_ID . '_%';
+        $define = 'MODULE_PAYMENT_' . strtoupper($this->code) . '_%';
         Configuration::where('configuration_key', 'LIKE', $define)->delete();
     }
 

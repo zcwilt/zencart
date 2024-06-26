@@ -35,17 +35,6 @@ abstract class PaymentModuleAbstract
      */
     public ?int $sort_order;
     /**
-     * $title is the displayed name for this payment method
-     *
-     * @var string
-     */
-    public string $title;
-    /**
-     * $MODULE_ID is used to build configuration setting keys
-     * @var string
-     */
-    public string $MODULE_ID = '';
-    /**
      * $code determines the internal 'code' name used to designate "this" payment module
      * @var string
      */
@@ -72,17 +61,14 @@ abstract class PaymentModuleAbstract
     {
         global $order, $psr4Autoloader;
 
-        if ($this->MODULE_ID === '') {
-            throw new \Exception('parameter no set - MODULE_ID');
-        }
         if ($this->code === '') {
             throw new \Exception('parameter no set - code');
         }
+        $this->autoloadSupportClasses($psr4Autoloader);
         $this->logger = new PaymentModuleLogger($this->code, $this->getDebugMode());
         $this->logger->getLogger()->info('Constructor called');
         $this->configurationKeys = $this->setCommonConfigurationKeys();
         $this->configurationKeys = array_merge($this->configurationKeys, $this->addCustomConfigurationKeys());
-        $this->autoloadSupportClasses($psr4Autoloader);
         $this->description = $this->getDescription();
         $this->sort_order = $this->getSortOrder();
         $this->zone = $this->getZone();
