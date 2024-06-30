@@ -4,19 +4,20 @@ namespace Zencart\Logger\Handlers;
 
 use Zencart\Logger\LoggerHandler;
 use Zencart\Logger\LoggerHandlerContract;
+use Monolog\Logger;
 
 class FileLoggerHandler extends LoggerHandler implements LoggerHandlerContract
 {
 
     public function setup(): void
     {
-        // TODO: Implement setup() method.
+        $logger = new Logger($this->options['channel'].'-logger');
+        $debugLogFile = $this->getDebugLogFile();
+        $logger->pushHandler(new StreamHandler($debugLogFile));
     }
 
-    public function log($severity, $message, $context = [])
+    protected function getDebugLogFile(): string
     {
-        // TODO: Implement log() method.
+
     }
-
-
 }
