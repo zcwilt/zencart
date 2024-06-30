@@ -68,7 +68,8 @@ abstract class PaymentModuleAbstract
             throw new \Exception('parameter no set - code');
         }
         $psr4Autoloader = $this->autoloadSupportClasses($psr4Autoloader);
-        $this->logger = (new Logger(['streams' => $this->getStreamList()]));
+        $loggerOptions = ['channel' => 'payment', 'prefix' => $this->code];
+        $this->logger = (new Logger(['streams' => $this->getStreamList($loggerOptions)]));
         $this->configurationKeys = $this->setCommonConfigurationKeys();
         $this->configurationKeys = array_merge($this->configurationKeys, $this->addCustomConfigurationKeys());
         $this->description = $this->getDescription();
@@ -261,11 +262,10 @@ abstract class PaymentModuleAbstract
         return $psr4Autoloader;
     }
 
-    protected function getStreamList($commonOptions = []): array
+    protected function getStreamList(array $commonOptions): array
     {
         global $psr4Autoloader;
 
-        //dd($psr4Autoloader->getPrefixes());
         $defineValue = $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE');
         if ($defineValue == 'No') {
             return [];
@@ -274,7 +274,7 @@ abstract class PaymentModuleAbstract
         $logTypes = array_map('trim', explode(',', $defineValue));
         foreach ($logTypes as $logType) {
             $className = 'Zencart\Logger\Handlers\\' . $logType . 'LoggerHandler';
-            $handlers[$logType] = new $className($commonOptions);
+            $handlers[$logType] = (new $className($commonOptions))->setup();
         }
         return $handlers;
     }

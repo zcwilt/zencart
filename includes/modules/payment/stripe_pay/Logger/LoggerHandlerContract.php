@@ -1,4 +1,5 @@
 <?php
+namespace Zencart\Logger;
 
 interface LoggerHandlerContract
 {
