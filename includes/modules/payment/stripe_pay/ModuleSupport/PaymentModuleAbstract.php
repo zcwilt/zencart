@@ -2,10 +2,12 @@
 
 namespace Zencart\ModuleSupport;
 
+require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger.php';
+require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger.php';
+
+use Aura\Autoload\Loader;
 use Carbon\Carbon;
-use Monolog\Handler\BrowserConsoleHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
+use Zencart\Logger\Logger;
 
 abstract class PaymentModuleAbstract
 {
@@ -52,6 +54,7 @@ abstract class PaymentModuleAbstract
      */
     protected array $configureErrors = [];
 
+    protected Logger $logger;
 
     /**
      * @throws \Exception
@@ -64,9 +67,8 @@ abstract class PaymentModuleAbstract
         if ($this->code === '') {
             throw new \Exception('parameter no set - code');
         }
-        $this->autoloadSupportClasses($psr4Autoloader);
-        $this->logger = new PaymentModuleLogger($this->code, $this->getDebugMode());
-        $this->logger->getLogger()->info('Constructor called');
+        $psr4Autoloader = $this->autoloadSupportClasses($psr4Autoloader);
+        $this->logger = (new Logger(['streams' => $this->getStreamList()]));
         $this->configurationKeys = $this->setCommonConfigurationKeys();
         $this->configurationKeys = array_merge($this->configurationKeys, $this->addCustomConfigurationKeys());
         $this->description = $this->getDescription();
@@ -74,7 +76,9 @@ abstract class PaymentModuleAbstract
         $this->zone = $this->getZone();
         $this->enabled = $this->isEnabled();
         $this->title = $this->getTitle();
-        $this->getActualLogger()->info('Constructor module enabled: ' . $this->enabled);
+        if ((int)$this->getDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID', 0) > 0) {
+            $this->order_status = (int)$this->getDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID');
+        }
         if (is_object($order)) $this->update_status();
     }
 
@@ -134,8 +138,18 @@ abstract class PaymentModuleAbstract
             'configuration_group_id' => 6,
             'sort_order' => 1,
             'date_added' => Carbon::now(),
-            'set_function' => "zen_cfg_select_option(array('Yes', 'No'), ",
+            'set_function' => "zen_cfg_select_option(array('No', 'Logging', 'Logging & Email'), ",
         ];
+        $configKeys[$key] = [
+            'configuration_value' => 'No',
+            'configuration_title' => 'Use debug mode',
+            'configuration_description' => 'Debug Mode adds extra logging and console output',
+            'configuration_group_id' => 6,
+            'sort_order' => 1,
+            'date_added' => Carbon::now(),
+            'set_function' => "zen_cfg_select_multioption(array('File', 'Email'), ",
+        ];
+
         return $configKeys;
     }
 
@@ -236,7 +250,32 @@ abstract class PaymentModuleAbstract
      *
      * @return void
      */
-    protected function autoloadSupportClasses($psr4Autoloader): void
+    protected function autoloadSupportClasses($psr4Autoloader): Loader
     {
+        $psr4Autoloader->addPrefix('Zencart\ModuleSupport', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/');
+        $psr4Autoloader->addPrefix('Monolog', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/monolog/src/Monolog/');
+        $psr4Autoloader->addPrefix('Zencart\Logger', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/Logger/');
+        if (method_exists($this, 'moduleAutoloadSupportClasses')) {
+            $this->moduleAutoloadSupportClasses($psr4Autoloader);
+        }
+        return $psr4Autoloader;
+    }
+
+    protected function getStreamList($commonOptions = []): array
+    {
+        global $psr4Autoloader;
+
+        //dd($psr4Autoloader->getPrefixes());
+        $defineValue = $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE');
+        if ($defineValue == 'No') {
+            return [];
+        }
+        $handlers = [];
+        $logTypes = array_map('trim', explode(',', $defineValue));
+        foreach ($logTypes as $logType) {
+            $className = 'Zencart\Logger\Handlers\\' . $logType . 'LoggerHandler';
+            $handlers[$logType] = new $className($commonOptions);
+        }
+        return $handlers;
     }
 }

@@ -1,13 +1,18 @@
 <?php
 
+require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleAbstract.php';
+require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleContract.php';
+require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleConcerns.php';
+require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/GeneralModuleConcerns.php';
+
 use Carbon\Carbon;
 use Zencart\ModuleSupport\PaymentModuleAbstract;
 use Zencart\ModuleSupport\PaymentModuleContract;
 use Zencart\ModuleSupport\PaymentModuleConcerns;
 
+
 class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 {
-
     use PaymentModuleConcerns;
 
     public string $code = 'stripe_pay';
@@ -158,12 +163,26 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
 
 
-    protected function autoloadSupportClasses($psr4Autoloader): void
+    protected function moduleAutoloadSupportClasses($psr4Autoloader): void
     {
         $psr4Autoloader->addPrefix('Stripe', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/stripe-php-13.15.0/lib/');
     }
 
 
+
+    protected function checkConfigureStatus(): bool
+    {
+        $configureStatus = true;
+        $toCheck = 'LIVE';
+        if ($this->getDefine('MODULE_PAYMENT_%%_MODE') == 'Test') {
+            $toCheck = 'TEST';
+        }
+        if ($this->getDefine('MODULE_PAYMENT_%%_' . $toCheck . '_PUB_KEY') == '' || $this->getDefine('MODULE_PAYMENT_%%_' . $toCheck . '_SECRET_KEY') == '') {
+            $this->configureErrors[] = sprintf('(not configured - needs %s publishable and secret key)', $toCheck);
+            $configureStatus = false;
+        }
+        return $configureStatus;
+    }
 
 
 

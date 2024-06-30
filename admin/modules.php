@@ -197,6 +197,7 @@ if (!empty($action)) {
                             $keys_extra[$module_keys[$j]]['use_function'] = $key_value->fields['use_function'];
                             $keys_extra[$module_keys[$j]]['set_function'] = $key_value->fields['set_function'];
                           }
+                          //dump($key_value->fields['configuration_key'] . ' with value ' . $keys_extra[$module_keys[$j]]['value'] . ' and uses ' . $keys_extra[$module_keys[$j]]['use_function']);
                         }
                         $module_info['keys'] = $keys_extra;
                         if (method_exists($module, 'get_configuration_errors')) {
@@ -235,6 +236,7 @@ if (!empty($action)) {
                   </td>
                   <?php
                   if ($set == 'payment') {
+
                     if (!isset($module->order_status)) {
                         $module->order_status = 0;
                     }

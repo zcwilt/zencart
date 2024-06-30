@@ -7,11 +7,11 @@ use App\Models\ZonesToGeoZone;
 use Monolog\Logger;
 use Zencart\Traits\ObserverManager;
 
+require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/GeneralModuleConcerns.php';
+
 trait PaymentModuleConcerns
 {
     use ObserverManager, GeneralModuleConcerns;
-
-    protected PaymentModuleLogger $logger;
 
     public function update_status(): void
     {
@@ -100,7 +100,7 @@ trait PaymentModuleConcerns
         if (isset($this->_check)) {
             return $this->_check;
         }
-        $_check = Configuration::where('configuration_key', 'MODULE_PAYMENT_' . strtouppeer($this->code) . '_STATUS')->first();
+        $_check = Configuration::where('configuration_key', 'MODULE_PAYMENT_' . strtoupper($this->code) . '_STATUS')->first();
         $this->_check = $_check ? 1 : 0;
         return $this->_check;
     }
