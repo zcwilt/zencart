@@ -2,20 +2,15 @@
 
 namespace Zencart\Logger\Handlers;
 
+use Monolog\Handler\NativeMailerHandler;
 use Zencart\Logger\LoggerHandler;
 use Zencart\Logger\LoggerHandlerContract;
+use Monolog\Logger;
 
 class EmailLoggerHandler extends LoggerHandler implements LoggerHandlerContract
 {
-
-    public function setup(): void
+    public function setup($logger): void
     {
-        // TODO: Implement setup() method.
+        $logger->getMonologLogger()->pushHandler(new NativeMailerHandler('foo@bar.com', 'Zencart Debug Log', 'Zencart Debug'));
     }
-
-    public function log($severity, $message, $context = [])
-    {
-        // TODO: Implement log() method.
-    }
-
 }

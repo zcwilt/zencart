@@ -11,16 +11,16 @@ class LoggerHandler
     public function __construct(array $commonOptions)
     {
         if (empty($commonOptions)) {
-            throw new InvalidArgumentException('Common options for LoggerHandler not set');
+            throw new \Exception('Common options for LoggerHandler not set');
         }
         if (!is_array($commonOptions)) {
-            throw new InvalidArgumentException('Common options for LoggerHandler must be an array');
+            throw new \Exception('Common options for LoggerHandler must be an array');
         }
         if (!isset($commonOptions['channel'])) {
-            throw new InvalidArgumentException('Common options for LoggerHandler must contain a channel');
+            throw new \Exception('Common options for LoggerHandler must contain a channel');
         }
         if (!isset($commonOptions['prefix'])) {
-            throw new InvalidArgumentException('Common options for LoggerHandler must contain a prefix');
+            throw new \Exception('Common options for LoggerHandler must contain a prefix');
         }
         $this->options = $commonOptions;
     }

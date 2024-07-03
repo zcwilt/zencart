@@ -3,5 +3,5 @@ namespace Zencart\Logger;
 
 interface LoggerHandlerContract
 {
-    public  function setup();
+    public  function setup($logger): void;
 }

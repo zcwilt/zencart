@@ -8,6 +8,7 @@ require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger
 use Aura\Autoload\Loader;
 use Carbon\Carbon;
 use Zencart\Logger\Logger;
+use Monolog\Logger as MonologLogger;
 
 abstract class PaymentModuleAbstract
 {
@@ -67,9 +68,13 @@ abstract class PaymentModuleAbstract
         if ($this->code === '') {
             throw new \Exception('parameter no set - code');
         }
+        //mail('zencart@localhost', 'PaymentModuleAbstract:__construct', 'code: ' . $this->code);
         $psr4Autoloader = $this->autoloadSupportClasses($psr4Autoloader);
         $loggerOptions = ['channel' => 'payment', 'prefix' => $this->code];
-        $this->logger = (new Logger(['streams' => $this->getStreamList($loggerOptions)]));
+        $this->logger = new \Zencart\Logger\Loggers\PaymentModuleLogger($loggerOptions);
+        $this->logger->pushHandlers(['handlers' => $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE')]);
+        $this->logger->log('info', 'Called tripe Pay Constructor');
+        $this->logger->log('debug', 'Called tripe Pay Constructor');
         $this->configurationKeys = $this->setCommonConfigurationKeys();
         $this->configurationKeys = array_merge($this->configurationKeys, $this->addCustomConfigurationKeys());
         $this->description = $this->getDescription();
@@ -135,22 +140,12 @@ abstract class PaymentModuleAbstract
         $configKeys[$key] = [
             'configuration_value' => 'No',
             'configuration_title' => 'Use debug mode',
-            'configuration_description' => 'Debug Mode adds extra logging and console output',
+            'configuration_description' => 'Debug Mode adds extra logging to file, email and console output',
             'configuration_group_id' => 6,
             'sort_order' => 1,
             'date_added' => Carbon::now(),
-            'set_function' => "zen_cfg_select_option(array('No', 'Logging', 'Logging & Email'), ",
+            'set_function' => "zen_cfg_select_multioption(array('File', 'Email', 'BrowserConsole'), ",
         ];
-        $configKeys[$key] = [
-            'configuration_value' => 'No',
-            'configuration_title' => 'Use debug mode',
-            'configuration_description' => 'Debug Mode adds extra logging and console output',
-            'configuration_group_id' => 6,
-            'sort_order' => 1,
-            'date_added' => Carbon::now(),
-            'set_function' => "zen_cfg_select_multioption(array('File', 'Email'), ",
-        ];
-
         return $configKeys;
     }
 
@@ -262,20 +257,4 @@ abstract class PaymentModuleAbstract
         return $psr4Autoloader;
     }
 
-    protected function getStreamList(array $commonOptions): array
-    {
-        global $psr4Autoloader;
-
-        $defineValue = $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE');
-        if ($defineValue == 'No') {
-            return [];
-        }
-        $handlers = [];
-        $logTypes = array_map('trim', explode(',', $defineValue));
-        foreach ($logTypes as $logType) {
-            $className = 'Zencart\Logger\Handlers\\' . $logType . 'LoggerHandler';
-            $handlers[$logType] = (new $className($commonOptions))->setup();
-        }
-        return $handlers;
-    }
 }
