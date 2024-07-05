@@ -3,7 +3,6 @@
 namespace Zencart\ModuleSupport;
 
 require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger.php';
-require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger.php';
 
 use Aura\Autoload\Loader;
 use Carbon\Carbon;
@@ -68,20 +67,18 @@ abstract class PaymentModuleAbstract
         if ($this->code === '') {
             throw new \Exception('parameter no set - code');
         }
-        //mail('zencart@localhost', 'PaymentModuleAbstract:__construct', 'code: ' . $this->code);
         $psr4Autoloader = $this->autoloadSupportClasses($psr4Autoloader);
         $loggerOptions = ['channel' => 'payment', 'prefix' => $this->code];
+        $this->title = $this->getTitle();
         $this->logger = new \Zencart\Logger\Loggers\PaymentModuleLogger($loggerOptions);
         $this->logger->pushHandlers(['handlers' => $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE')]);
-        $this->logger->log('info', 'Called tripe Pay Constructor');
-        $this->logger->log('debug', 'Called tripe Pay Constructor');
+        $this->logger->log('info', $this->messagePrefix('Called Constructor'));
         $this->configurationKeys = $this->setCommonConfigurationKeys();
         $this->configurationKeys = array_merge($this->configurationKeys, $this->addCustomConfigurationKeys());
         $this->description = $this->getDescription();
         $this->sort_order = $this->getSortOrder();
         $this->zone = $this->getZone();
         $this->enabled = $this->isEnabled();
-        $this->title = $this->getTitle();
         if ((int)$this->getDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID', 0) > 0) {
             $this->order_status = (int)$this->getDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID');
         }
@@ -230,17 +227,6 @@ abstract class PaymentModuleAbstract
         return isset($defineValue) && $defineValue === 'True';
     }
 
-
-
-    /**
-     * @param $logger
-     * @return Logger
-     */
-    protected function getActualLogger($logger = 'default')
-    {
-        return $this->logger->getLogger($logger);
-    }
-
     /**
      * Note: This is a stub method as it might not be used in all payment modules
      *
@@ -257,4 +243,8 @@ abstract class PaymentModuleAbstract
         return $psr4Autoloader;
     }
 
+    protected function messagePrefix(string $message): string
+    {
+        return $this->title . ': ' . $message;
+    }
 }

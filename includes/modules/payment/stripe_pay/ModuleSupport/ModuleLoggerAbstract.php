@@ -40,18 +40,4 @@ abstract class ModuleLoggerAbstract
          return $debugLogFile;
      }
 
-     public function getLogger(string $logger = 'default'): Logger
-     {
-         if (!$this->debugMode) {
-             return (new Logger('null'))->pushHandler(new NullHandler());
-         }
-         if ($logger === 'default') {
-             $logger = $this->defaultLogger;
-         }
-
-         if (!isset($this->loggers[$logger])) {
-             return (new Logger('null'))->pushHandler(new NullHandler());
-         }
-         return $this->loggers[$logger];
-     }
 }

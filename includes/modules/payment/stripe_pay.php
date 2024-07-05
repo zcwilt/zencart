@@ -27,7 +27,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         $publishableKey = $this->getPublishableKey();
         $secretKey = $this->getSecretKey();
         Stripe\Stripe::setApiKey($secretKey);
-        $stripeAlwaysShowForm = true;
+        $stripeAlwaysShowForm = false;
         $setupIntent = Stripe\SetupIntent::create([
             'payment_method_types' => ['card'],
         ]);
@@ -38,6 +38,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         $selection['fields'] = [
             [
                 'title' =>
+                    '<script>const stripeAlwaysShowForm = false;</script>' .
                     '<script>const stripePublishableKey = "' . $publishableKey . '";</script>' .
                     '<script>const stripeSecretKey = "' . $clientSecret . '";</script>' .
                     '<script>const stripeAlwaysShowForm  = "' . $stripeAlwaysShowForm . '"</script>' .
@@ -184,16 +185,6 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         return $configureStatus;
     }
 
-
-
-
-
-
-
-
-
-
-
     protected function addCustomConfigurationKeys(): array
     {
 
@@ -256,6 +247,24 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             'set_function' => "zen_cfg_select_option(array('Test', 'Live'), ",
         ];
         return $configKeys;
+    }
+
+    protected function getPublishableKey(): string
+    {
+        $toCheck = 'LIVE';
+        if ($this->getDefine('MODULE_PAYMENT_%%_MODE') == 'Test') {
+            $toCheck = 'TEST';
+        }
+        return $this->getDefine('MODULE_PAYMENT_%%_' . $toCheck . '_PUB_KEY');
+    }
+
+    protected function getSecretKey(): string
+    {
+        $toCheck = 'LIVE';
+        if ($this->getDefine('MODULE_PAYMENT_%%_MODE') == 'Test') {
+            $toCheck = 'TEST';
+        }
+        return $this->getDefine('MODULE_PAYMENT_%%_' . $toCheck . '_SECRET_KEY');
     }
 
 }

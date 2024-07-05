@@ -16,37 +16,38 @@ trait PaymentModuleConcerns
     public function update_status(): void
     {
         global $order;
-        $this->getActualLogger()->info('updating status');
+        $this->logger->log('info', $this->messagePrefix('updating status'));
 
         if ($this->enabled === false) {
-            $this->logger->getLogger()->warning('update status - disabled');
+            $this->logger->log('warning', $this->messagePrefix('update status - disabled'));
             return;
         }
         if ($this->getDefine('MODULE_PAYMENT_%%_ZONE', 0) == 0) {
-            $this->getActualLogger()->warning('update status - zone = 0');
+            $this->logger->log('warning', $this->messagePrefix('update status - zone = 0'));
+
             return;
         }
         if (!isset($order->billing['country']['id'])) {
-            $this->getActualLogger()->warning('update status - no country');
+            $this->logger->log('warning', $this->messagePrefix('update status - no country'));
             return;
         }
 
         $checkFlag = false;
-        $this->logger->getLogger()->info('setting status - ' . ($checkFlag === true ? 'enabled' : 'disabled'));
+        $this->logger->log('info', $this->messagePrefix('setting status - ' . ($checkFlag === true ? 'enabled' : 'disabled')));
         $checkZone = ZonesToGeoZone::where('geo_zone_id', $this->getDefine('MODULE_PAYMENT_%%_ZONE', 0))->where('zone_country_id', $order->billing['country']['id'])->orderBy('zone_id')->get();
         foreach ($checkZone as $zone) {
             if ($zone->zone_id < 1) {
                 $checkFlag = true;
-                $this->getActualLogger()->info('update status enabled - zone id < 1');
+                $this->logger->log('info', $this->messagePrefix('update status enabled - zone id < 1'));
                 break;
             }
             if ($zone->zone_id == $order->billing['zone_id']) {
                 $checkFlag = true;
-                $this->getActualLogger()->info('update status disabled - zone id matches billing zone id');
+                $this->logger->log('info', $this->messagePrefix('update status disabled - zone id matches billing zone id'));
                 break;
             }
         }
-        $this->getActualLogger()->info('updated status - ' . ($checkFlag ? 'enabled' : 'disabled'));
+        $this->logger->log('info', $this->messagePrefix('updated status - ' . ($checkFlag ? 'enabled' : 'disabled')));
         $this->enabled = $checkFlag;
     }
     public function javascript_validation(): string
@@ -126,10 +127,5 @@ trait PaymentModuleConcerns
     {
         $define = 'MODULE_PAYMENT_' . strtoupper($this->code) . '_%';
         Configuration::where('configuration_key', 'LIKE', $define)->delete();
-    }
-
-    public function getLogger(): PaymentModuleLogger
-    {
-        return $this->logger;
     }
 }

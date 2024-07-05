@@ -6,11 +6,11 @@ StripeScript.addEventListener("load", () => {
     if (stripeAlwaysShowForm) {
         $('#stripepay-intent-payment-element').show();
     }
-    if ($('#pmt-stripepay').is(':checked')) {
+    if ($('#pmt-stripe_pay').is(':checked')) {
         $('#stripepay-intent-payment-element').show();
     }
     $('input[name="payment"]').on('change', function () {
-        if ($('#pmt-stripepay').is(':checked')) {
+        if ($('#pmt-stripe_pay').is(':checked')) {
             $('#stripepay-intent-payment-element').show();
         } else {
             $('#stripepay-intent-payment-element').hide();
