@@ -1,5 +1,4 @@
 <?php
-
 namespace Zencart\Logger\Loggers;
 
 use Zencart\Logger\Logger;
@@ -10,10 +9,8 @@ class PaymentModuleLogger extends Logger implements LoggerContract
 
     public function pushHandlers($handlerOptions): void
     {
-        global $psr4Autoloader;
-
         if (!isset($handlerOptions['handlers'])) {
-            die('here');
+            return;
         }
         if ($handlerOptions['handlers'] == 'No') {
             return;

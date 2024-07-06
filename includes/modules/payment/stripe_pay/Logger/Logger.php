@@ -9,10 +9,11 @@ abstract class Logger
     protected array $options;
     protected MonologLogger $logger;
 
-    public function __construct ($options)
+    public function __construct (array $options)
     {
         $this->options = $options;
-        $this->logger = new MonologLogger($this->options['channel'] . '-logger');
+        $loggerChannel = isset($this->options['channel']) ? $this->options['channel'] . '-logger' : 'default-logger';
+        $this->logger = new MonologLogger($loggerChannel);
     }
 
     public function log($level, string|\Stringable $message, array $context = [])

@@ -9,7 +9,8 @@ use Carbon\Carbon;
 use Zencart\ModuleSupport\PaymentModuleAbstract;
 use Zencart\ModuleSupport\PaymentModuleContract;
 use Zencart\ModuleSupport\PaymentModuleConcerns;
-
+use Stripe\SetupIntent;
+use Stripe\PaymentIntent;
 
 class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 {
@@ -38,7 +39,6 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         $selection['fields'] = [
             [
                 'title' =>
-                    '<script>const stripeAlwaysShowForm = false;</script>' .
                     '<script>const stripePublishableKey = "' . $publishableKey . '";</script>' .
                     '<script>const stripeSecretKey = "' . $clientSecret . '";</script>' .
                     '<script>const stripeAlwaysShowForm  = "' . $stripeAlwaysShowForm . '"</script>' .
@@ -63,7 +63,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
     public function pre_confirmation_check()
     {
         if (!isset($_POST['stripepay-setup-intent-id'])) {
-            zen_redirect(zen_href_link('checkout_payment', '', 'SSL'));
+            zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
         }
     }
 
@@ -85,7 +85,6 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             // Retrieve the PaymentIntent from Stripe
             $setupIntent = Stripe\SetupIntent::retrieve($setupIntentId);
 
-            //dd($setupIntent);
             // Check the status of the PaymentIntent
             if ($setupIntent->status === 'succeeded') {
                 $this->handleSetupSuccess($setupIntent);
@@ -93,28 +92,22 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
                 $this->handleSetupFailure($setupIntent);
             }
         } catch (\Stripe\Exception\ApiErrorException $e) {
-            dd($e);
+            dd($e); //@todo stripe
             // Handle error from Stripe API
             echo "<h1>Error</h1>";
             echo "<p>" . $e->getMessage() . "</p>";
         }
     }
 
-    protected function handleSetupSuccess($setupIntent)
+    protected function handleSetupSuccess(SetupIntent $setupIntent): void
     {
         global $order;
-
-        //dd($order);
 
         $customer = Stripe\Customer::create([
             'email' => $order->customer['email_address'],
         ]);
 
-        //dd($customer);
-
         $paymentMethod = Stripe\PaymentMethod::retrieve($setupIntent->payment_method);
-
-        //dd($paymentMethod);
 
         if ($paymentMethod->customer) {
             // If the payment method is already attached to a customer, use that customer
@@ -126,10 +119,8 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             ]);
             $customer_id = $customer->id;
         }
-        //dd($customer->id);
-
         $paymentIntent = Stripe\PaymentIntent::create([
-            'amount' => $order->info['total'] * 100,
+            'amount' => $order->info['total'] * 100, //@todo stripe
             'currency' => $order->info['currency'],
             'payment_method' => $setupIntent->payment_method,
             'customer' => $customer_id,
@@ -144,22 +135,23 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         }
     }
 
-    protected function handleSetupFailure($setupIntent)
+    protected function handleSetupFailure(SetupIntent $setupIntent)//@todo stripe
     {
-        dump('handleSetupFailure');
+        dump('handleSetupFailure');//@todo stripe
         dd($setupIntent);
     }
 
-    protected function handlePaymentSuccess($paymentIntent)
+    protected function handlePaymentSuccess(PaymentIntent $paymentIntent): void
     {
         //dump('handlePaymentSuccess');
+        //@todo stripe
         //dd($paymentIntent);
     }
 
-    protected function handlePaymentFailure($paymentIntent)
+    protected function handlePaymentFailure(PaymentIntent $paymentIntent): void
     {
         dump('handlePaymentFailure');
-        dd($paymentIntent);
+        dd($paymentIntent); //@todo stripe
     }
 
 
@@ -168,8 +160,6 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
     {
         $psr4Autoloader->addPrefix('Stripe', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/stripe-php-13.15.0/lib/');
     }
-
-
 
     protected function checkConfigureStatus(): bool
     {
@@ -187,7 +177,6 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
     protected function addCustomConfigurationKeys(): array
     {
-
         $configKeys = [];
         $key = $this->buildDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID');
         $configKeys[$key] = [
@@ -266,5 +255,4 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         }
         return $this->getDefine('MODULE_PAYMENT_%%_' . $toCheck . '_SECRET_KEY');
     }
-
 }

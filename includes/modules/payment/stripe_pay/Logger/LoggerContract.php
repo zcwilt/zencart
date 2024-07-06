@@ -4,5 +4,5 @@ namespace Zencart\Logger;
 
 interface LoggerContract
 {
-    public function pushHandlers(?array $handlerOptions);
+    public function pushHandlers(array $handlerOptions);
 }
