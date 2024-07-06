@@ -232,7 +232,7 @@ abstract class PaymentModuleAbstract
      *
      * @return void
      */
-    protected function autoloadSupportClasses($psr4Autoloader): Loader
+    protected function autoloadSupportClasses(Loader $psr4Autoloader): Loader
     {
         $psr4Autoloader->addPrefix('Zencart\ModuleSupport', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/');
         $psr4Autoloader->addPrefix('Monolog', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/monolog/src/Monolog/');

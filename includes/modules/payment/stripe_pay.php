@@ -11,6 +11,7 @@ use Zencart\ModuleSupport\PaymentModuleContract;
 use Zencart\ModuleSupport\PaymentModuleConcerns;
 use Stripe\SetupIntent;
 use Stripe\PaymentIntent;
+use Aura\Autoload\Loader;
 
 class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 {
@@ -75,6 +76,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
     public function before_process()
     {
+        global $messageStack;
         $secretKey = $this->getSecretKey();
         Stripe\Stripe::setApiKey($secretKey);
         $setupIntentId = $_POST['stripepay-setup-intent-id'] ?? null;
@@ -82,7 +84,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT));
         }
         try {
-            // Retrieve the PaymentIntent from Stripe
+            // Retrieve the SetupIntent from Stripe
             $setupIntent = Stripe\SetupIntent::retrieve($setupIntentId);
 
             // Check the status of the PaymentIntent
@@ -92,10 +94,9 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
                 $this->handleSetupFailure($setupIntent);
             }
         } catch (\Stripe\Exception\ApiErrorException $e) {
-            dd($e); //@todo stripe
-            // Handle error from Stripe API
-            echo "<h1>Error</h1>";
-            echo "<p>" . $e->getMessage() . "</p>";
+            $this->logger->log('critical', $e->getMessage());
+            $messageStack->add_session('checkout_payment', $e->getMessage(), 'error');
+            zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
         }
     }
 
@@ -143,9 +144,6 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
     protected function handlePaymentSuccess(PaymentIntent $paymentIntent): void
     {
-        //dump('handlePaymentSuccess');
-        //@todo stripe
-        //dd($paymentIntent);
     }
 
     protected function handlePaymentFailure(PaymentIntent $paymentIntent): void
@@ -155,8 +153,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
     }
 
 
-
-    protected function moduleAutoloadSupportClasses($psr4Autoloader): void
+    protected function moduleAutoloadSupportClasses(Loader $psr4Autoloader): void
     {
         $psr4Autoloader->addPrefix('Stripe', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/stripe-php-13.15.0/lib/');
     }
