@@ -7,7 +7,6 @@ require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger
 use Aura\Autoload\Loader;
 use Carbon\Carbon;
 use Zencart\Logger\Logger;
-use Monolog\Logger as MonologLogger;
 
 abstract class PaymentModuleAbstract
 {

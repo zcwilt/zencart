@@ -76,7 +76,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
     public function before_process()
     {
-        global $messageStack;
+        global $messageStack, $order;
         $secretKey = $this->getSecretKey();
         Stripe\Stripe::setApiKey($secretKey);
         $setupIntentId = $_POST['stripepay-setup-intent-id'] ?? null;
@@ -91,10 +91,11 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             if ($setupIntent->status === 'succeeded') {
                 $this->handleSetupSuccess($setupIntent);
             } else {
-                $this->handleSetupFailure($setupIntent);
+                $this->handleSetupFailure($setupIntent, $order);
             }
         } catch (\Stripe\Exception\ApiErrorException $e) {
-            $this->logger->log('critical', $e->getMessage());
+            $context = $this->buildErrorContextFromException($e, $order);
+            $this->logger->log('critical', $e->getMessage(), $context);
             $messageStack->add_session('checkout_payment', $e->getMessage(), 'error');
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
         }
@@ -132,11 +133,11 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         if ($paymentIntent->status === 'succeeded') {
             $this->handlePaymentSuccess($paymentIntent);
         } else {
-            $this->handlePaymentFailure($paymentIntent);
+            $this->handlePaymentFailure($paymentIntent, $order);
         }
     }
 
-    protected function handleSetupFailure(SetupIntent $setupIntent)//@todo stripe
+    protected function handleSetupFailure(SetupIntent $setupIntent): void
     {
         dump('handleSetupFailure');//@todo stripe
         dd($setupIntent);
@@ -146,10 +147,15 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
     {
     }
 
-    protected function handlePaymentFailure(PaymentIntent $paymentIntent): void
+    protected function handlePaymentFailure(PaymentIntent $paymentIntent, Order $order): void
     {
-        dump('handlePaymentFailure');
-        dd($paymentIntent); //@todo stripe
+        $context = [];
+        $context['paymentIntent'] = $paymentIntent;
+        $context['customer'] = ['email' => $order->customer['email_address'], 'first_name' => $order->customer['firstname'], 'last_name' => $order->customer['lastname']];
+        $this->logger->log('critical', 'PaymentIntent failed', $context);
+        $messageStack->add_session('checkout_payment', 'FOO', 'error');
+        zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
+
     }
 
 
@@ -251,5 +257,17 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             $toCheck = 'TEST';
         }
         return $this->getDefine('MODULE_PAYMENT_%%_' . $toCheck . '_SECRET_KEY');
+    }
+
+    protected function buildErrorContextFromException(Exception $exception, Order $order): array
+    {
+        $errorContext = [];
+        $errorContext['error'] = $exception->getMessage();
+        $errorContext['error_code'] = $exception->getCode();
+        $errorBody = $exception->getJsonBody();
+        unset($errorBody['payment_intent']);
+        $errorContext['customer'] = ['email' => $order->customer['email_address'], 'first_name' => $order->customer['firstname'], 'last_name' => $order->customer['lastname']];
+        $errorContext['body'] = $errorBody;
+        return $errorContext;
     }
 }
