@@ -7,6 +7,7 @@ require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger
 use Aura\Autoload\Loader;
 use Carbon\Carbon;
 use Zencart\Logger\Logger;
+use Zencart\Logger\Loggers\PaymentModuleLogger;
 
 abstract class PaymentModuleAbstract
 {
@@ -69,7 +70,7 @@ abstract class PaymentModuleAbstract
         $psr4Autoloader = $this->autoloadSupportClasses($psr4Autoloader);
         $loggerOptions = ['channel' => 'payment', 'prefix' => $this->code];
         $this->title = $this->getTitle();
-        $this->logger = new \Zencart\Logger\Loggers\PaymentModuleLogger($loggerOptions);
+        $this->logger = new PaymentModuleLogger($loggerOptions);
         $this->logger->pushHandlers(['handlers' => $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE')]);
         $this->logger->log('info', $this->messagePrefix('Called Constructor'));
         $this->configurationKeys = $this->setCommonConfigurationKeys();

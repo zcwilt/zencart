@@ -202,6 +202,16 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             'set_function' => 'zen_cfg_pull_down_order_statuses(',
             'use_function' => 'zen_get_order_status_name',
         ];
+        $key = $this->buildDefine('MODULE_PAYMENT_%%_ALWAYS_SHOW_FORM');
+        $configKeys[$key] = [
+            'configuration_value' => 'False',
+            'configuration_title' => 'Always show the Stripe payment form',
+            'configuration_description' => 'Normally the form for collecting Credit card information will only be shown if the user selects the payment method. This option will force the form to always be displayed.',
+            'configuration_group_id' => 6,
+            'sort_order' => 1,
+            'date_added' => Carbon::now(),
+            'set_function' => "zen_cfg_select_option(array('True', 'False'), ",
+        ];
         $key = $this->buildDefine('MODULE_PAYMENT_%%_LIVE_PUB_KEY');
         $configKeys[$key] = [
             'configuration_value' => '',
