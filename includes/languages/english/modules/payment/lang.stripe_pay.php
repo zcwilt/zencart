@@ -14,5 +14,6 @@ $define = [
     'MODULE_PAYMENT_STRIPE_PAY_ERROR_TEXT_MISSING_LIVE_PUBLISHABLE_KEY' => 'Missing Live Publishable Key',
     'MODULE_PAYMENT_STRIPE_PAY_ERROR_TEXT_MISSING_LIVE_SECRET_KEY' => 'Missing Live Secret Key',
     'MODULE_PAYMENT_STRIPE_PAY_ERROR_TEXT_ALREADY_INSTALLED' => 'Stripe Pay module already installed.',
+    'MODULE_PAYMENT_STRIPE_PAY_ERROR_TEXT_PROCESSING' => 'There was an error processing your payment.',
 ];
 return $define;

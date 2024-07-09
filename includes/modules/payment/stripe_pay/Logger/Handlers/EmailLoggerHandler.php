@@ -5,7 +5,6 @@ namespace Zencart\Logger\Handlers;
 use Monolog\Handler\NativeMailerHandler;
 use Zencart\Logger\LoggerHandler;
 use Zencart\Logger\LoggerHandlerContract;
-use Monolog\Logger;
 
 class EmailLoggerHandler extends LoggerHandler implements LoggerHandlerContract
 {

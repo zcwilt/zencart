@@ -23,7 +23,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
     {
         global $order;
         $paymentCurrency = $order->info['currency'];
-        $orderTotal = $order->info['total'] * 100;
+        $orderTotal = $order->info['total'] * 100; //@todo stripe
         $postcode = $order->billing['postcode'];
         $country = $order->billing['country']['iso_code_2'];
         $publishableKey = $this->getPublishableKey();
@@ -70,7 +70,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
     public function process_button()
     {
-        $process_button_string = zen_draw_hidden_field('stripepay-setup-intent-id', $_POST['stripepay-setup-intent-id']) ;
+        $process_button_string = zen_draw_hidden_field('stripepay-setup-intent-id', htmlspecialchars($_POST['stripepay-setup-intent-id'])) ;
         return $process_button_string;
     }
 
@@ -79,14 +79,13 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         global $messageStack, $order;
         $secretKey = $this->getSecretKey();
         Stripe\Stripe::setApiKey($secretKey);
-        $setupIntentId = $_POST['stripepay-setup-intent-id'] ?? null;
+        $setupIntentId = htmlspecialchars($_POST['stripepay-setup-intent-id']) ?? null;
         if (!$setupIntentId) {
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT));
         }
         try {
             // Retrieve the SetupIntent from Stripe
             $setupIntent = Stripe\SetupIntent::retrieve($setupIntentId);
-
             // Check the status of the PaymentIntent
             if ($setupIntent->status === 'succeeded') {
                 $this->handleSetupSuccess($setupIntent);
@@ -131,31 +130,42 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         ]);
 
         if ($paymentIntent->status === 'succeeded') {
-            $this->handlePaymentSuccess($paymentIntent);
+            $this->handlePaymentSuccess($paymentIntent, $order);
         } else {
             $this->handlePaymentFailure($paymentIntent, $order);
         }
     }
 
-    protected function handleSetupFailure(SetupIntent $setupIntent): void
+    protected function handleSetupFailure(SetupIntent $setupIntent, $order): void
     {
-        dump('handleSetupFailure');//@todo stripe
-        dd($setupIntent);
+        global $messageStack;
+        $context = [];
+        $context['setupIntent'] = $setupIntent;
+        $context['customer'] = ['email' => $order->customer['email_address'], 'first_name' => $order->customer['firstname'], 'last_name' => $order->customer['lastname']];
+        $this->logger->log('critical', 'SetupIntent failed', $context);
+        $messageStack->add_session('checkout_payment', $this->getDefine('MODULE_PAYMENT_%%_ERROR_TEXT_PROCESSING'), 'error');
+        zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
+
     }
 
-    protected function handlePaymentSuccess(PaymentIntent $paymentIntent): void
-    {
-    }
-
-    protected function handlePaymentFailure(PaymentIntent $paymentIntent, Order $order): void
+    protected function handlePaymentSuccess(PaymentIntent $paymentIntent, Order $order): void
     {
         $context = [];
         $context['paymentIntent'] = $paymentIntent;
         $context['customer'] = ['email' => $order->customer['email_address'], 'first_name' => $order->customer['firstname'], 'last_name' => $order->customer['lastname']];
-        $this->logger->log('critical', 'PaymentIntent failed', $context);
-        $messageStack->add_session('checkout_payment', 'FOO', 'error');
-        zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
+        $this->logger->log('critical', 'PaymentIntent succeeded', $context);
 
+    }
+
+    protected function handlePaymentFailure(PaymentIntent $paymentIntent, Order $order): void
+    {
+        global $messageStack;
+        $context = [];
+        $context['paymentIntent'] = $paymentIntent;
+        $context['customer'] = ['email' => $order->customer['email_address'], 'first_name' => $order->customer['firstname'], 'last_name' => $order->customer['lastname']];
+        $this->logger->log('critical', 'PaymentIntent failed', $context);
+        $messageStack->add_session('checkout_payment', $this->getDefine('MODULE_PAYMENT_%%_ERROR_TEXT_PROCESSING'), 'error');
+        zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
     }
 
 

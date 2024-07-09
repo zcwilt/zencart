@@ -16,7 +16,7 @@ abstract class Logger
         $this->logger = new MonologLogger($loggerChannel);
     }
 
-    public function log($level, string|\Stringable $message, array $context = [])
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         $this->logger->log($level, $message, $context);
     }

@@ -109,7 +109,7 @@ trait PaymentModuleConcerns
     {
         global $messageStack;
         if ($this->getDefine('MODULE_PAYMENT_%%_STATUS', null)) {
-            $messageStack->add_session($this->title . ' module already installed.', 'error');
+            $messageStack->add_session($this->getDefine('MODULE_PAYMENT_%%_ERROR_TEXT_ALREADY_INSTALLED'), 'error');
             zen_redirect(zen_href_link(FILENAME_MODULES, 'set=payment&module=' . $this->code, 'NONSSL'));
             return;
         }
