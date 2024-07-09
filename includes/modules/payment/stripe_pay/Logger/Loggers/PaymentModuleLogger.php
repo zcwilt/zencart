@@ -7,12 +7,14 @@ use Zencart\Logger\LoggerContract;
 class PaymentModuleLogger extends Logger implements LoggerContract
 {
 
+    const NULL_CHANNEL = '--none--';
+
     public function pushHandlers($handlerOptions): void
     {
         if (!isset($handlerOptions['handlers'])) {
             return;
         }
-        if ($handlerOptions['handlers'] == 'No') {
+        if ($handlerOptions['handlers'] == self::NULL_CHANNEL) {
             return;
         }
         $logTypes = array_map('trim', explode(',', $handlerOptions['handlers']));

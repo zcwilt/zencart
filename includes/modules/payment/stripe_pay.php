@@ -19,6 +19,8 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
 
     public string $code = 'stripe_pay';
 
+    public string $version = '1.0.0';
+
     public function selection(): array
     {
         global $order;

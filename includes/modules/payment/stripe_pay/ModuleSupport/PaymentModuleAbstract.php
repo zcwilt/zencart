@@ -64,9 +64,13 @@ abstract class PaymentModuleAbstract
     {
         global $order, $psr4Autoloader;
 
-        if ($this->code === '') {
-            throw new \Exception('parameter no set - code');
+        if (empty($this->code)) {
+            throw new \Exception('payment module parameter not set - code');
         }
+        if (empty($this->version)) {
+            throw new \Exception('payment module parameter not set - version');
+        }
+
         $psr4Autoloader = $this->autoloadSupportClasses($psr4Autoloader);
         $loggerOptions = ['channel' => 'payment', 'prefix' => $this->code];
         $this->title = $this->getTitle();
@@ -165,6 +169,7 @@ abstract class PaymentModuleAbstract
     {
         $title = $this->getDefine('MODULE_PAYMENT_%%_TEXT_TITLE_ADMIN');
         $title = $title ?? $this->getDefine('MODULE_PAYMENT_%%_TEXT_TITLE');
+        $title = $title . '['. $this->getDefine('MODULE_PAYMENT_%%_VERSION') . ']';
         if (empty($this->configureErrors)) {
             return $title;
         }
