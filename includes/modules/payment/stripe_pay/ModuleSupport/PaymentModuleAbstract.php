@@ -169,7 +169,7 @@ abstract class PaymentModuleAbstract
     {
         $title = $this->getDefine('MODULE_PAYMENT_%%_TEXT_TITLE_ADMIN');
         $title = $title ?? $this->getDefine('MODULE_PAYMENT_%%_TEXT_TITLE');
-        $title = $title . '['. $this->getDefine('MODULE_PAYMENT_%%_VERSION') . ']';
+        $title = $title . '['. $this->version . ']';
         if (empty($this->configureErrors)) {
             return $title;
         }
