@@ -25,7 +25,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
     {
         global $order;
         $paymentCurrency = $order->info['currency'];
-        $orderTotal = $order->info['total'] * 100; //@todo stripe
+        $orderTotal = $this->convertCurrencyValue($order->info['total']);
         $postcode = $order->billing['postcode'];
         $country = $order->billing['country']['iso_code_2'];
         $publishableKey = $this->getPublishableKey();
@@ -123,7 +123,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             $customer_id = $customer->id;
         }
         $paymentIntent = Stripe\PaymentIntent::create([
-            'amount' => $order->info['total'] * 100, //@todo stripe
+            'amount' => $this->convertCurrencyValue($order->info['total']),
             'currency' => $order->info['currency'],
             'payment_method' => $setupIntent->payment_method,
             'customer' => $customer_id,
@@ -291,5 +291,23 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         $errorContext['customer'] = ['email' => $order->customer['email_address'], 'first_name' => $order->customer['firstname'], 'last_name' => $order->customer['lastname']];
         $errorContext['body'] = $errorBody;
         return $errorContext;
+    }
+
+    protected function convertCurrencyValue($value): int
+    {
+        $asIs = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
+        $by1000 = ['BHD','JOD','KWD','OMR','TND'];
+
+        switch (true) {
+            case in_array($this->order->info['currency'], $asIs):
+                $value = $value;
+                break;
+            case in_array($this->order->info['currency'], $by1000):
+                $value = $value * 1000;
+                break;
+            default:
+                $value = $value * 100;
+        }
+        return (int)$value;
     }
 }
