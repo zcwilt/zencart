@@ -4,7 +4,7 @@ namespace Zencart\Logger\Loggers;
 use Zencart\Logger\Logger;
 use Zencart\Logger\LoggerContract;
 
-class PaymentModuleLogger extends Logger implements LoggerContract
+class ModuleLogger extends Logger implements LoggerContract
 {
 
     const NULL_CHANNEL = '--none--';
