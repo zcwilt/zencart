@@ -73,20 +73,20 @@ abstract class PaymentModuleAbstract
 
         $psr4Autoloader = $this->autoloadSupportClasses($psr4Autoloader);
         $loggerOptions = ['channel' => 'payment', 'prefix' => $this->code];
-        $this->title = $this->getTitle();
         $this->logger = new PaymentModuleLogger($loggerOptions);
         $this->logger->pushHandlers(['handlers' => $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE')]);
-        $this->logger->log('info', $this->messagePrefix('Called Constructor'));
         $this->configurationKeys = $this->setCommonConfigurationKeys();
         $this->configurationKeys = array_merge($this->configurationKeys, $this->addCustomConfigurationKeys());
         $this->description = $this->getDescription();
         $this->sort_order = $this->getSortOrder();
         $this->zone = $this->getZone();
         $this->enabled = $this->isEnabled();
+        $this->title = $this->getTitle();
         if ((int)$this->getDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID', 0) > 0) {
             $this->order_status = (int)$this->getDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID');
         }
         if (is_object($order)) $this->update_status();
+        $this->logger->log('info', $this->messagePrefix('Called Constructor'));
     }
 
     /**
@@ -139,7 +139,7 @@ abstract class PaymentModuleAbstract
         ];
         $key = $this->buildDefine('MODULE_PAYMENT_%%_DEBUG_MODE');
         $configKeys[$key] = [
-            'configuration_value' => 'No',
+            'configuration_value' => '--none--',
             'configuration_title' => 'Use debug mode',
             'configuration_description' => 'Debug Mode adds extra logging to file, email and console output',
             'configuration_group_id' => 6,
@@ -170,7 +170,8 @@ abstract class PaymentModuleAbstract
         $title = $this->getDefine('MODULE_PAYMENT_%%_TEXT_TITLE_ADMIN');
         $title = $title ?? $this->getDefine('MODULE_PAYMENT_%%_TEXT_TITLE');
         $title = $title . '['. $this->version . ']';
-        if (empty($this->configureErrors)) {
+        $status = $this->getDefine('MODULE_PAYMENT_%%_STATUS');
+        if (empty($this->configureErrors) || !isset($status)) {
             return $title;
         }
         foreach ($this->configureErrors as $configureError) {
