@@ -2,11 +2,13 @@ const StripeScript = document.createElement('script');
 StripeScript.src = "https://js.stripe.com/v3/";
 document.head.appendChild(StripeScript);
 StripeScript.addEventListener("load", () => {
-    console.log("stripe loaded");
     if (stripeAlwaysShowForm) {
         $('#stripepay-intent-payment-element').show();
     }
     if ($('#pmt-stripe_pay').is(':checked')) {
+        $('#stripepay-intent-payment-element').show();
+    }
+    if ($('#pmt-stripe_pay').is(':hidden')) {
         $('#stripepay-intent-payment-element').show();
     }
     $('input[name="payment"]').on('change', function () {

@@ -25,13 +25,14 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
     {
         global $order;
         $paymentCurrency = $order->info['currency'];
-        $orderTotal = $this->convertCurrencyValue($order->info['total']);
+        $orderTotal = $this->convertCurrencyValue($order->info['total'], $paymentCurrency);
         $postcode = $order->billing['postcode'];
         $country = $order->billing['country']['iso_code_2'];
         $publishableKey = $this->getPublishableKey();
         $secretKey = $this->getSecretKey();
         Stripe\Stripe::setApiKey($secretKey);
-        $stripeAlwaysShowForm = false;
+        $stripeAlwaysShowForm = ($this->getDefine('MODULE_PAYMENT_%%_ALWAYS_SHOW_FORM') === 'True')  ? true : false;
+
         $setupIntent = Stripe\SetupIntent::create([
             'payment_method_types' => ['card'],
         ]);
@@ -52,7 +53,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
                     '',
                 'field' =>
                     '<input type="hidden" name="stripepay-setup-intent-id" id="stripepay-setup-intent-id" value="' . $setupIntent->id . '">' .
-                    '<script>' . file_get_contents(DIR_WS_MODULES . 'payment/stripe_pay/stripepay.paymentform.js') . '</script>' .
+                    '<script>' . file_get_contents(DIR_WS_MODULES . 'payment/stripe_pay/stripepay-paymentform.js') . '</script>' .
                     '<div id="stripepay-intent-payment-element" style="display: none">' .
                     '</div>' .
                     '<div id="stripepay-intent-error-message" class="alert"' .
@@ -123,7 +124,7 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
             $customer_id = $customer->id;
         }
         $paymentIntent = Stripe\PaymentIntent::create([
-            'amount' => $this->convertCurrencyValue($order->info['total']),
+            'amount' => $this->convertCurrencyValue($order->info['total'], $order->info['currency']),
             'currency' => $order->info['currency'],
             'payment_method' => $setupIntent->payment_method,
             'customer' => $customer_id,
@@ -293,16 +294,18 @@ class stripe_pay extends PaymentModuleAbstract implements PaymentModuleContract
         return $errorContext;
     }
 
-    protected function convertCurrencyValue($value): int
+    protected function convertCurrencyValue($value, $currency): int
     {
+        global $order;
+
         $asIs = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
         $by1000 = ['BHD','JOD','KWD','OMR','TND'];
 
         switch (true) {
-            case in_array($this->order->info['currency'], $asIs):
+            case in_array($currency, $asIs):
                 $value = $value;
                 break;
-            case in_array($this->order->info['currency'], $by1000):
+            case in_array($currency, $by1000):
                 $value = $value * 1000;
                 break;
             default:
