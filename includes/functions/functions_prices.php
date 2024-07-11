@@ -242,7 +242,7 @@ function zen_get_products_display_price($product_id)
                     '<span class="productPriceDiscount">' .
                         '<br>' .
                         PRODUCT_PRICE_DISCOUNT_PREFIX .
-                        number_format(100 - (($display_special_price / $display_normal_price) * 100), SHOW_SALE_DISCOUNT_DECIMALS) .
+                        number_format(100 - (($display_special_price / $display_normal_price) * 100), (int)SHOW_SALE_DISCOUNT_DECIMALS) .
                         PRODUCT_PRICE_DISCOUNT_PERCENTAGE .
                     '</span>';
             } else {
@@ -1288,6 +1288,9 @@ function zen_get_attributes_price_final($attribute_id, $qty = 1, $pre_selected =
         $attributes_price_final += zen_get_attributes_price_final_onetime($products_attributes_id, 1, $pre_selected);
     }
 
+    if ($include_products_price_in === false) {
+        return $attributes_price_final - $products_price_without_attributes;
+    }
     return $attributes_price_final;
 }
 
