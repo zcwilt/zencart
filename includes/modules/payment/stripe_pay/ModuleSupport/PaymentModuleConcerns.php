@@ -4,10 +4,11 @@ namespace Zencart\ModuleSupport;
 
 use App\Models\Configuration;
 use App\Models\ZonesToGeoZone;
-use Monolog\Logger;
 use Zencart\Traits\ObserverManager;
 
-require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/GeneralModuleConcerns.php';
+if (!class_exists('Zencart\ModuleSupport\GeneralModuleConcerns')) {
+    require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/GeneralModuleConcerns.php';
+}
 
 trait PaymentModuleConcerns
 {

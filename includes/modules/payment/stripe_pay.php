@@ -1,9 +1,11 @@
 <?php
 
-require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleAbstract.php';
-require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleContract.php';
-require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleConcerns.php';
-require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/GeneralModuleConcerns.php';
+if (!class_exists('Zencart\ModuleSupport\PaymentModuleAbstract')) {
+    require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleAbstract.php';
+    require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleContract.php';
+    require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/PaymentModuleConcerns.php';
+    require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/GeneralModuleConcerns.php';
+}
 
 use Carbon\Carbon;
 use Zencart\ModuleSupport\PaymentModuleAbstract;

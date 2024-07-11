@@ -2,7 +2,9 @@
 
 namespace Zencart\ModuleSupport;
 
-require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger.php';
+if (!class_exists('Zencart\Logger\Logger')) {
+    require_once DIR_FS_CATALOG . 'includes/modules/payment/stripe_pay/Logger/Logger.php';
+}
 
 use Aura\Autoload\Loader;
 use Carbon\Carbon;
@@ -240,9 +242,9 @@ abstract class PaymentModuleAbstract
      */
     protected function autoloadSupportClasses(Loader $psr4Autoloader): Loader
     {
-        $psr4Autoloader->addPrefix('Zencart\ModuleSupport', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/');
-        $psr4Autoloader->addPrefix('Monolog', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/monolog/src/Monolog/');
-        $psr4Autoloader->addPrefix('Zencart\Logger', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/Logger/');
+//        $psr4Autoloader->addPrefix('Zencart\ModuleSupport', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/ModuleSupport/');
+//        $psr4Autoloader->addPrefix('Monolog', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/monolog/src/Monolog/');
+//        $psr4Autoloader->addPrefix('Zencart\Logger', DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/stripe_pay/Logger/');
         if (method_exists($this, 'moduleAutoloadSupportClasses')) {
             $this->moduleAutoloadSupportClasses($psr4Autoloader);
         }
