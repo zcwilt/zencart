@@ -9,15 +9,8 @@ class moneyorder extends PaymentModuleAbstract implements PaymentModuleContract
 {
     use PaymentModuleConcerns;
 
-    public string $email_footer = "";
     public string $version = '1.0.0';
     public string $code = 'moneyorder';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->email_footer = $this->getDefine('MODULE_PAYMENT_%%_TEXT_EMAIL_FOOTER', '');
-    }
 
     protected function checkNonFatalConfigureStatus(): void
     {

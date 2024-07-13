@@ -58,6 +58,8 @@ abstract class PaymentModuleAbstract
 
     protected Logger $logger;
 
+    public string $email_footer = "";
+
     /**
      * @throws \Exception
      * @todo add a better exception
@@ -81,8 +83,7 @@ abstract class PaymentModuleAbstract
         $loggerOptions = ['channel' => 'payment', 'prefix' => $this->code];
         $this->logger = new ModuleLogger($loggerOptions);
         $this->logger->pushHandlers(['handlers' => $this->getDefine('MODULE_PAYMENT_%%_DEBUG_MODE')]);
-        $this->configurationKeys = $this->setCommonConfigurationKeys();
-        $this->configurationKeys = array_merge($this->configurationKeys, $this->addCustomConfigurationKeys());
+        $this->configurationKeys = $this->setConfigurationKeys();
         $this->description = $this->getDescription();
         $this->sort_order = $this->getSortOrder();
         $this->zone = $this->getZone();
@@ -93,19 +94,17 @@ abstract class PaymentModuleAbstract
             $this->order_status = (int)$this->getDefine('MODULE_PAYMENT_%%_ORDER_STATUS_ID');
         }
         if (is_object($order)) $this->update_status();
+        $this->email_footer = $this->getDefine('MODULE_PAYMENT_%%_TEXT_EMAIL_FOOTER', '');
     }
 
-    /**
-     * @return array
-     */
-    abstract protected function addCustomConfigurationKeys(): array;
-
-    /**
-     * @return array
-     */
-    public function getConfigurationKeys(): array
+    protected function setConfigurationKeys(): array
     {
-        return $this->configurationKeys;
+        $local = [];
+        $common = $this->setCommonConfigurationKeys();
+        if (method_exists($this, 'addCustomConfigurationKeys')) {
+            $local = $this->addCustomConfigurationKeys();
+        }
+        return array_merge($common, $local);
     }
 
     /**
