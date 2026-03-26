@@ -465,6 +465,60 @@ Parallelization is probably worth keeping only if it achieves all of the followi
 - reruns of the same commit produce stable results
 - local developer setup remains understandable and does not require fragile manual DB prep
 
+## Non-Framework Integration Changes
+
+Most of the work lives under `not_for_release/testFramework`, but a small number of files outside that tree were changed intentionally to let the test framework run in-process, run in parallel, or expose consistent CI entrypoints.
+
+### CI and command wiring
+
+- `.github/workflows/zc_unit_test_suite.yml`
+- `.github/workflows/zc_feature_test_store_suite.yml`
+- `.github/workflows/zc_feature_test_admin_suite.yml`
+- `composer.json`
+- `.gitignore`
+
+These were changed to:
+
+- move GitHub Actions from direct `phpunit` calls to the named CI wrapper commands
+- pass worker-database environment settings into the feature CI lanes
+- expose the local/CI parallel runner entrypoints through Composer
+- ignore local test-runner env files used by the shell wrappers
+
+### Core runtime hooks for the in-process harness
+
+- `includes/functions/functions_urls.php`
+
+This was changed so `zen_redirect()` can throw an in-process redirect exception when the test harness is explicitly capturing redirects, instead of terminating the PHP process.
+
+### Core compatibility shims needed by unit and in-process tests
+
+- `includes/classes/message_stack.php`
+- `includes/classes/split_page_results.php`
+- `includes/functions/html_output.php`
+- `admin/includes/functions/html_output.php`
+
+These were changed to:
+
+- let the harness exercise legacy `messageStack` behavior such as session import and the old `size` property access pattern
+- make `messageStack` work safely in reduced unit-test/in-process environments where full template constants are not bootstrapped
+- let `splitPageResults` tolerate legacy call signatures still used by admin/store code under test
+- make `splitPageResults` handle more complex counting cases used by the feature coverage
+- guard `zen_image()` redefinition so mixed admin/store bootstrap paths can coexist in one PHP process during tests
+
+### Admin-page compatibility fixes surfaced by feature coverage
+
+- `admin/countries.php`
+- `admin/coupon_admin.php`
+- `admin/currencies.php`
+- `admin/customer_groups.php`
+- `admin/customers.php`
+- `admin/orders.php`
+- `admin/tax_rates.php`
+
+These changes are small defensive initializations of `*_query_numrows` variables before passing them to `splitPageResults`.
+
+They were needed because the newer in-process coverage exercises these pages more directly and exposed undefined-variable assumptions that were previously easy to miss in the older test setup.
+
 ## Current Compatibility Shims
 
 The in-process feature harness now carries a small number of explicit compatibility shims.
