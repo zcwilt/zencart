@@ -156,6 +156,7 @@ require DIR_WS_INCLUDES . 'header.php'; ?>
                 $currencies_query_raw = "SELECT currencies_id, title, code, symbol_left, symbol_right, decimal_point, thousands_point, decimal_places, last_updated, value
                                          FROM " . TABLE_CURRENCIES . "
                                          ORDER BY title";
+                $currency_query_numrows = $currency_query_numrows ?? 0;
                 $currency_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $currencies_query_raw, $currency_query_numrows);
                 $currencies_all = $db->Execute($currencies_query_raw);
                 foreach ($currencies_all as $currency) {

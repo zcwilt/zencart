@@ -2,9 +2,10 @@
 
 namespace Seeders;
 
+use Tests\Services\Contracts\TestSeederInterface;
 use Tests\Support\Database\TestDb;
 
-class CompoundTaxesSeeder
+class CompoundTaxesSeeder implements TestSeederInterface
 {
 
     /**
@@ -12,7 +13,7 @@ class CompoundTaxesSeeder
      *
      * @return void
      */
-    public function run()
+    public function run(array $parameters = []): void
     {
         $now = date('Y-m-d H:i:s');
         $geoZoneId = TestDb::insert('geo_zones', ['geo_zone_name' => 'Canada', 'geo_zone_description' => 'Canada Compound']);

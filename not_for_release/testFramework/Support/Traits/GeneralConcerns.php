@@ -3,39 +3,28 @@
 namespace Tests\Support\Traits;
 
 use Symfony\Component\BrowserKit\HttpBrowser;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\HttpClient;
+use Tests\Support\TestConfigResolver;
+use Tests\Support\TestFrameworkFilesystem;
 
 
 trait GeneralConcerns
 {
     protected HttpBrowser $browser;
+    private ?TestFrameworkFilesystem $testFrameworkFilesystem = null;
 
     public static function detectUser()
     {
-        if (isset($_SERVER['IS_DDEV_PROJECT'])) {
-            return 'ddev';
-        }
-        $user = $_SERVER['USER'] ?? $_SERVER['MY_USER'];
-
-        return $user;
+        return TestConfigResolver::detectUser();
     }
 
     public static function loadConfigureFile($context)
     {
-        if (defined('HTTP_SERVER')) {
+        if ($context !== 'main' && defined('HTTP_SERVER') && defined('DB_TYPE')) {
             return;
         }
-        $user = self::detectUser();
-        echo 'This user = ' . $user . PHP_EOL;
-        $basePath = $configFile = TESTCWD . 'Support/configs/';
-        $configFile =  $basePath . $user . '.' . $context . '.configure.php';
-        if (!file_exists($configFile)) {
-            die('could not find config file ' .$configFile);
-        }
-        echo $configFile . PHP_EOL;
-        $file = require($configFile);
-        return $file;
+
+        return TestConfigResolver::loadConfig($context, TESTCWD . 'Support/configs/');
     }
 
 
@@ -45,7 +34,7 @@ trait GeneralConcerns
         self::runDatabaseLoader($mainConfigs);
     }
 
-    public function createHttpBrowser()
+    public function createHttpBrowser(): void
     {
         $this->browser = new HttpBrowser(HttpClient::create());
     }
@@ -88,32 +77,22 @@ trait GeneralConcerns
 
     // PLUGIN STUFF
 
-    protected function installPluginToFilesystem($pluginName, $version)
+    protected function installPluginToFilesystem(string $pluginName, string $version): void
     {
-        $this->addPluginToFileSystem($pluginName, $version);
+        $this->filesystemHelper()->installPlugin($pluginName, DIR_FS_CATALOG, ROOTCWD);
     }
 
-    protected function removePlugin($pluginName, $version)
+    protected function removePlugin(string $pluginName, string $version): void
     {
-        $this->removePluginFromFileSystem($pluginName, $version);
+        $this->filesystemHelper()->removePlugin($pluginName, $version, DIR_FS_CATALOG);
     }
 
-    protected function removePluginFromFileSystem($pluginName, $version)
+    protected function filesystemHelper(): TestFrameworkFilesystem
     {
-        $filesystem = new Filesystem();
-        if (is_dir(DIR_FS_CATALOG . 'zc_plugins/' . $pluginName . '/' . $version)) {
-            $filesystem->remove(DIR_FS_CATALOG . 'zc_plugins/' . $pluginName . '/' . $version);
+        if (!$this->testFrameworkFilesystem instanceof TestFrameworkFilesystem) {
+            $this->testFrameworkFilesystem = new TestFrameworkFilesystem();
         }
-    }
 
-    protected function addPluginToFileSystem($pluginName, $version)
-    {
-        $srcDirectory = DIR_FS_CATALOG . 'not_for_release/testFramework/Support/plugins/' . $pluginName;
-        $destinationDirectory = DIR_FS_CATALOG . 'zc_plugins/' . $pluginName . '/';
-        $filesystem = new Filesystem();
-        if (!is_dir(DIR_FS_CATALOG . 'zc_plugins/' . $pluginName)) {
-            $filesystem->mkdir($destinationDirectory);
-        }
-        $filesystem->mirror($srcDirectory, $destinationDirectory);
+        return $this->testFrameworkFilesystem;
     }
 }

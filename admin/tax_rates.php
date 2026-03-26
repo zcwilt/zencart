@@ -113,6 +113,7 @@ if (!empty($action)) {
                                     LEFT JOIN " . TABLE_TAX_RATES . " r ON (r.tax_rates_id = rd.tax_rates_id)
                                     LEFT JOIN " . TABLE_GEO_ZONES . " z ON (r.tax_zone_id = z.geo_zone_id)
                                     WHERE r.tax_class_id = tc.tax_class_id AND rd.language_id = " . (int)$_SESSION['languages_id'];
+                $rates_query_numrows = $rates_query_numrows ?? 0;
                 $rates_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $rates_query_raw, $rates_query_numrows);
                 $rates = $db->Execute($rates_query_raw);
                 foreach ($rates as $rate) {

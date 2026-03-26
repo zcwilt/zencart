@@ -2,9 +2,10 @@
 
 namespace Seeders;
 
+use Tests\Services\Contracts\TestSeederInterface;
 use Tests\Support\Database\TestDb;
 
-class StoreWizardSeeder
+class StoreWizardSeeder implements TestSeederInterface
 {
 
     /**
@@ -12,7 +13,7 @@ class StoreWizardSeeder
      *
      * @return void
      */
-    public function run()
+    public function run(array $parameters = []): void
     {
         TestDb::update(
             'configuration',

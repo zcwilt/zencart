@@ -21,6 +21,17 @@ class messageStack extends base
     /** array of messages to be displayed */
     public array $messages = [];
 
+    public function __get(string $name)
+    {
+        if ($name === 'size') {
+            return $this->size('default');
+        }
+
+        trigger_error('Undefined property: ' . static::class . '::$' . $name, E_USER_WARNING);
+
+        return null;
+    }
+
     public function __construct()
     {
         $this->messages = [];
@@ -80,6 +91,21 @@ class messageStack extends base
         ];
         $_SESSION['messageToStack'] = $messageToStack;
         $this->add($class, $message, $type);
+    }
+
+    public function add_from_session(): void
+    {
+        if (!isset($_SESSION['messageToStack']) || !is_array($_SESSION['messageToStack'])) {
+            return;
+        }
+
+        foreach ($_SESSION['messageToStack'] as $message) {
+            $this->add(
+                $message['class'] ?? 'default',
+                $message['text'] ?? '',
+                $message['type'] ?? 'error'
+            );
+        }
     }
 
     public function reset(): void
@@ -163,6 +189,39 @@ class messageStack extends base
     public function getDefaultFormats(): array
     {
         global $template, $current_page_base;
+
+        if (
+            !is_object($template)
+            || !defined('ICON_IMAGE_ERROR')
+            || !defined('ICON_IMAGE_SUCCESS')
+            || !defined('ICON_IMAGE_WARNING')
+            || !defined('ICON_ERROR_ALT')
+            || !defined('ICON_SUCCESS_ALT')
+            || !defined('ICON_WARNING_ALT')
+            || !defined('DIR_WS_TEMPLATE')
+        ) {
+            return [
+                'error' => [
+                    'params' => 'class="messageStackError larger"',
+                    'icon' => '',
+                ],
+                'success' => [
+                    'params' => 'class="messageStackSuccess larger"',
+                    'icon' => '',
+                ],
+                'warning' => [
+                    'params' => 'class="messageStackWarning larger"',
+                    'icon' => '',
+                ],
+                'caution' => [
+                    'params' => 'class="messageStackCaution larger"',
+                    'icon' => '',
+                ],
+                'default' => [
+                    'params' => 'class="messageStackError larger"',
+                ],
+            ];
+        }
 
         return [
             'error' => [

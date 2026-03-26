@@ -34,6 +34,10 @@ function zen_redirect($url, $httpResponseCode = null)
 
     $url = zen_cleanup_url_params($url, $for_redirect = true);
 
+    if (defined('ZENCART_INPROCESS_REDIRECT_CAPTURE') && ZENCART_INPROCESS_REDIRECT_CAPTURE === true) {
+        throw new \Tests\Support\InProcess\InProcessRedirectException($url, empty($httpResponseCode) ? 302 : (int) $httpResponseCode);
+    }
+
     zen_set_redirect_http_headers($url, $httpResponseCode);
 
     exit();

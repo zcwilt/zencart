@@ -11,6 +11,10 @@ Thumbs.db
 clover.xml
 .DS_Store
 .phpunit.result.cache
+not_for_release/testFramework/Support/configs/test-runner.env
+not_for_release/testFramework/Support/configs/test-runner.local.env
+not_for_release/testFramework/test-framework.env
+not_for_release/testFramework/test-framework.local.env
 
 dev-*.*
 

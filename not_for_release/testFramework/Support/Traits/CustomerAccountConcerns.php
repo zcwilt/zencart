@@ -7,8 +7,6 @@ use Tests\Support\helpers\ProfileManager;
 
 trait CustomerAccountConcerns
 {
-
-
     public function createCustomerAccountOrLogin($profileName)
     {
         $profile = ProfileManager::getProfile($profileName);
@@ -16,6 +14,18 @@ trait CustomerAccountConcerns
             $this->loginCustomer($profileName);
             return $profile;
         }
+
+        if (method_exists($this, 'submitCreateAccountForm')) {
+            $response = $this->submitCreateAccountForm($profile)
+                ->assertRedirect('main_page=create_account_success');
+
+            $this->followRedirect($response)
+                ->assertOk()
+                ->assertSee('Your Account Has Been Created!');
+
+            return $profile;
+        }
+
         $this->browser->request('GET', HTTP_SERVER . '/index.php?main_page=create_account');
         $response = $this->browser->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
@@ -27,7 +37,13 @@ trait CustomerAccountConcerns
 
     public function logoutCustomer()
     {
-        //echo 'Logging out customer' . PHP_EOL;
+        if (method_exists($this, 'visitLogoff')) {
+            $this->visitLogoff()
+                ->assertOk()
+                ->assertSee('Log Off');
+            return;
+        }
+
         $this->browser->request('GET', HTTP_SERVER . '/index.php?main_page=logoff');
         $response = $this->browser->getResponse();
         $this->assertStringContainsString('Log Off', (string)$response->getContent());
@@ -35,14 +51,24 @@ trait CustomerAccountConcerns
 
     public function loginCustomer($profileName)
     {
-        //echo 'Logging in customer ' . $profileName . PHP_EOL;
         $this->logoutCustomer();
+
+        $profile = ProfileManager::getProfileForLogin($profileName);
+
+        if (method_exists($this, 'submitLoginForm')) {
+            $response = $this->submitLoginForm($profile)
+                ->assertRedirect();
+
+            $this->followRedirect($response)
+                ->assertOk();
+
+            return $profile;
+        }
+
         $this->browser->request('GET', HTTP_SERVER . '/index.php?main_page=login');
         $response = $this->browser->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString('Welcome, Please Sign In', (string)$response->getContent());
-
-        $profile = ProfileManager::getProfileForLogin($profileName);
         $this->browser->submitForm('Sign In', $profile);
         return $profile;
     }

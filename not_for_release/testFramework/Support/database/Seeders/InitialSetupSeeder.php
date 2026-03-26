@@ -2,9 +2,10 @@
 
 namespace Seeders;
 
+use Tests\Services\Contracts\TestSeederInterface;
 use Tests\Support\Database\TestDb;
 
-class InitialSetupSeeder
+class InitialSetupSeeder implements TestSeederInterface
 {
 
     /**
@@ -12,7 +13,7 @@ class InitialSetupSeeder
      *
      * @return void
      */
-    public function run($mainConfigs)
+    public function run(array $mainConfigs = []): void
     {
         $now = date('Y-m-d H:i:s');
 

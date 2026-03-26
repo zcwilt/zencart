@@ -2,9 +2,10 @@
 
 namespace Seeders;
 
+use Tests\Services\Contracts\TestSeederInterface;
 use Tests\Support\Database\TestDb;
 
-class CouponTableSeeder
+class CouponTableSeeder implements TestSeederInterface
 {
 
     /**
@@ -12,7 +13,7 @@ class CouponTableSeeder
      *
      * @return void
      */
-    public function run()
+    public function run(array $parameters = []): void
     {
         TestDb::truncate('coupons');
         TestDb::truncate('coupons_description');

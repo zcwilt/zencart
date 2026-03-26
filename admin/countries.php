@@ -154,6 +154,7 @@ if (!empty($action)) {
               $countries_query_raw = "SELECT countries_id, countries_name, countries_iso_code_2, countries_iso_code_3, address_format_id, status
                                       FROM " . TABLE_COUNTRIES . "
                                       ORDER BY countries_name";
+              $countries_query_numrows = $countries_query_numrows ?? 0;
               $countries_split = new splitPageResults($currentPage, MAX_DISPLAY_SEARCH_RESULTS, $countries_query_raw, $countries_query_numrows, 'countries_name', 1);
               $countries = $db->Execute($countries_query_raw);
               foreach ($countries as $country) {
