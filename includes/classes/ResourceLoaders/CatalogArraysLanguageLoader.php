@@ -77,8 +77,10 @@ class CatalogArraysLanguageLoader extends ArraysLanguageLoader
         // Finally, if there are additional per-page files in the current language's active template's
         // directory, those overwrite any definitions previously loaded.
         //
-        $definesListTemplate = $this->loadCurrentPageExtraFilesFromDir(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . $this->templateDir);
-        $definesList = array_merge($definesList, $definesListTemplate);
+        foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
+            $definesListTemplate = $this->loadCurrentPageExtraFilesFromDir(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . $templateKey);
+            $definesList = array_merge($definesList, $definesListTemplate);
+        }
 
         // -----
         // Create language constants from the definitions loaded here.
@@ -127,9 +129,9 @@ class CatalogArraysLanguageLoader extends ArraysLanguageLoader
         // Any definitions found in this file overwrite all previously-loaded definitions for
         // the page-specific base language file.
         //
-        $template_dir = '/' . $this->templateDir;
-        $templateMainFile = DIR_WS_LANGUAGES . $_SESSION['language'] . $template_dir . $currentPageBaseFile;
-        $defineList = array_merge($defineList, $this->loadArrayDefineFile($templateMainFile));
+        foreach ($this->getTemplateLanguageOverrideFiles(DIR_WS_LANGUAGES, $_SESSION['language'], ltrim($currentPageBaseFile, '/')) as $templateMainFile) {
+            $defineList = array_merge($defineList, $this->loadArrayDefineFile($templateMainFile));
+        }
 
         // -----
         // Make constants from the list of array-based language definitions for the
@@ -214,11 +216,16 @@ class CatalogArraysLanguageLoader extends ArraysLanguageLoader
         //
         // Any definitions found here overwrite **all** previous-found definitions.
         //
-        $defineListTemplate = $this->loadArraysFromDirectory(DIR_WS_LANGUAGES, $_SESSION['language'], '/extra_definitions/' . $this->templateDir);
+        $defineListTemplate = [];
+        foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
+            $defineListTemplate = array_merge(
+                $defineListTemplate,
+                $this->loadArraysFromDirectory(DIR_WS_LANGUAGES, $_SESSION['language'], '/extra_definitions/' . $templateKey)
+            );
+        }
 
         // -----
-        // Add these extra definitions to the array of definitions to be created, if not further overridden
-        // by any 'legacy' language files to be loaded.
+        // Add these extra definitions to the array of definitions to be created.
         //
         $this->addLanguageDefines(array_merge($defineList, $defineListTemplate));
     }
@@ -246,9 +253,10 @@ class CatalogArraysLanguageLoader extends ArraysLanguageLoader
         //
         // Any definitions found in this file overwrite the 'base' main language files.
         //
-        $templateMainFile = DIR_WS_LANGUAGES . $this->templateDir . '/lang.' . $_SESSION['language'] . '.php';
-        $defineList = $this->loadArrayDefineFile($templateMainFile);
-        $this->addLanguageDefines($defineList);
+        foreach ($this->getTemplateFirstLanguageFiles(DIR_WS_LANGUAGES, 'lang.' . $_SESSION['language'] . '.php') as $templateMainFile) {
+            $defineList = $this->loadArrayDefineFile($templateMainFile);
+            $this->addLanguageDefines($defineList);
+        }
 
         // -----
         // Finally, load the various 'other' language files that have definitions used
@@ -274,8 +282,10 @@ class CatalogArraysLanguageLoader extends ArraysLanguageLoader
             $file = basename($file, '.php') . '.php';
             $this->loadDefinesFromDirFileWithFallback(DIR_WS_LANGUAGES, $file);
 
-            $defineList = $this->loadArrayDefineFile(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . $this->templateDir . '/lang.' . $file);
-            $this->addLanguageDefines($defineList);
+            foreach ($this->getTemplateLanguageOverrideFiles(DIR_WS_LANGUAGES, $_SESSION['language'], 'lang.' . $file) as $templateExtraFile) {
+                $defineList = $this->loadArrayDefineFile($templateExtraFile);
+                $this->addLanguageDefines($defineList);
+            }
         }
     }
 }

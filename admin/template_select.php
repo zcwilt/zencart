@@ -22,8 +22,8 @@ if (!empty($action)) {
 
         case 'save':
             zen_update_template_name_for_id($selected_template, $_POST['ln']);
-            $init_file = DIR_FS_CATALOG . 'includes/templates/' . $_POST['ln'] . '/template_init.php';
-            if (file_exists($init_file)) {
+            $init_file = zen_get_template_init_file_path($_POST['ln']);
+            if ($init_file !== null && file_exists($init_file)) {
                 require $init_file;
             }
             zen_redirect(zen_href_link(FILENAME_TEMPLATE_SELECT, zen_get_all_get_params(['action'])));
@@ -246,7 +246,7 @@ switch ($action) {
             '<button type="button" class="btn btn-info" data-toggle="modal" data-target="#view-settings">' .
                 TEXT_VIEW_TEMPLATE_SETTINGS .
             '</button> ';
-            $template_settings = file_get_contents($template_info[$tInfo->template_dir]['template_path'] . '/template_settings.php');
+            $template_settings = file_get_contents($template_info[$tInfo->template_dir]['template_settings_path']);
             if ($template_settings === false) {
                 $template_settings = ERROR_COULD_NOT_READ_FILE;
             }
@@ -285,11 +285,14 @@ switch ($action) {
         $contents[] = ['text' => '<hr>'];
         $contents[] = ['text' => TEXT_INFO_TEMPLATE_INSTALLED];
         foreach($template_info as $key => $value) {
+            $screenshotPath = zen_get_template_screenshot_web_path($key);
             $contents[] = [
                 'text' =>
-                    '<a href="' . DIR_WS_CATALOG_TEMPLATE . $key . '/images/' . $value['screenshot'] . '" rel="noreferrer noopener" target = "_blank" class="btn btn-info" role="button">' .
-                        IMAGE_PREVIEW .
-                    '</a>&nbsp;&nbsp;' .
+                    ($screenshotPath === null
+                        ? ''
+                        : '<a href="' . $screenshotPath . '" rel="noreferrer noopener" target = "_blank" class="btn btn-info" role="button">' .
+                            IMAGE_PREVIEW .
+                        '</a>&nbsp;&nbsp;') .
                     $value['name']
             ];
         }

@@ -7,10 +7,6 @@
  * @version $Id: DrByte 2025 Oct 17 Modified in v2.2.0 $
  */
 
-if (PHP_VERSION_ID < 80200 && !class_exists('AllowDynamicProperties')) {
-    #[\Attribute(\Attribute::TARGET_CLASS)]
-    final class AllowDynamicProperties {}
-}
 /**
  * Class objectInfo
  * @since ZC v1.0.3

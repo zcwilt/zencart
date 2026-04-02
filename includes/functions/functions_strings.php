@@ -353,24 +353,6 @@ function htmlentities_recurse(array|string $mixed_value, int $flags = ENT_QUOTES
 }
 
 /**
- * Recursively apply utf8_encode on the passed string or array.
- * But was only relevant when not passing UTF8 data. It was used in ajax context.
- * Now that UTF8 is standard, this function is deprecated and does nothing.
- *
- * @param mixed $mixed_value
- * @return array|false|string
- *
- * @deprecated after Zen Cart 1.5.8a
- * @since ZC v1.5.5
- * @deleting in ZC v3.0.0
- */
-function utf8_encode_recurse($mixed_value)
-{
-    trigger_error('Function utf8_encode_recurse is deprecated for Zen Cart versions after 1.5.8a.', E_USER_DEPRECATED);
-    return $mixed_value;
-}
-
-/**
  * Remove common HTML from text for display as paragraph
  *
  * @param  string  $clean_it
@@ -423,35 +405,6 @@ function fixup_url(?string $url): string
         $url = '//' . $url;
     }
     return $url;
-}
-
-/**
- * Alias to strtr().
- * Parse the data used in html tags to ensure the tags will not break.
- * Basically just an extension to the php strtr function
- *
- * @param string  $data  The string to be parsed
- * @param string  $parse  The needle to find
- * @return string
- * @deprecated in v1.5.8: Use strtr() instead
- * @since ZC v1.0.3
- * @deleting in ZC v3.0.0
- */
-function zen_parse_input_field_data(string $data, $parse): string
-{
-    trigger_error('Call to deprecated function zen_parse_input_field_data. Use strtr() instead', E_USER_DEPRECATED);
-    return strtr(trim($data), $parse);
-}
-
-/**
- * Convert a string to an integer
- * @since ZC v1.0.3
- * @deprecated in v1.5.8: Just cast to int directly.
- * @deleting in ZC v3.0.0
- */
-function zen_string_to_int($string) {
-    trigger_error('Call to deprecated function zen_string_to_int. Use a closure instead', E_USER_DEPRECATED);
-    return (int)$string;
 }
 
 /**

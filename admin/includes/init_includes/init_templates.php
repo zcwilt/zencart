@@ -9,16 +9,23 @@ if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
 
-require DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_templates.php';
+use Zencart\TemplateResolver\TemplateResolver;
+
+require_once DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_templates.php';
 
 // Set theme related directories
 if (!isset($template_dir) || $template_dir == '') {
   $template_query = $db->Execute("SELECT template_dir FROM " . TABLE_TEMPLATE_SELECT . " WHERE template_language in (" . (int)$_SESSION['languages_id'] . ', 0' . ") order by template_language DESC");
   $template_dir = $template_query->fields['template_dir'];
 }
-  define('DIR_WS_TEMPLATE', DIR_WS_TEMPLATES . $template_dir . '/');
-  //  define('DIR_WS_TEMPLATE_IMAGES', DIR_WS_CATALOG_TEMPLATE . $template_dir . '/images/');
-  define('DIR_WS_TEMPLATE_IMAGES', DIR_WS_CATALOG_TEMPLATE . 'template_default' . '/images/');
+$templateResolver = new TemplateResolver();
+$templateRecord = $templateResolver->getTemplateRecord($template_dir) ?? $templateResolver->getTemplateRecord('template_default');
+if ($templateRecord === null) {
+  die('Fatal error: template_default could not be resolved.');
+}
+$template_dir = $templateRecord['template_key'];
+  define('DIR_WS_TEMPLATE', $templateRecord['template_catalog_path']);
+  define('DIR_WS_TEMPLATE_IMAGES', $templateRecord['template_web_path'] . 'images/');
   define('DIR_WS_TEMPLATE_ICONS', DIR_WS_TEMPLATE_IMAGES . 'icons/');
 
   require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'template_func.php');

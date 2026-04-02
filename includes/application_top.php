@@ -173,7 +173,7 @@ if (!empty($_SERVER['QUERY_STRING'])) {
 
     // count occurrences of each key
     $counts = array_count_values($keys);
-    foreach ($counts as $name => $count) {
+    foreach ($counts as $key => $count) {
         // allow one duplication (possibly accidental), more than 2 is not accidental
         if ($count > 2) {
             $contaminated = true;
@@ -230,7 +230,7 @@ define('PAGE_PARSE_START_TIME', microtime());
  * This is intended to run before any dependencies are required
  * See https://www.zen-cart.com/requirements or run zc_install to see actual requirements!
  */
-if (PHP_VERSION_ID < 80200) {
+if (PHP_VERSION_ID < 80300) {
     require 'includes/templates/template_default/templates/tpl_zc_phpupgrade_default.php';
     exit(0);
 }

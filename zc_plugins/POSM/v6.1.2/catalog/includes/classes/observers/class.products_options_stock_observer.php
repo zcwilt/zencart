@@ -1,9 +1,9 @@
 <?php
 // -----
 // Part of the "Product Options Stock Manager" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
-// Copyright (c) 2014-2025 Vinos de Frutas Tropicales
+// Copyright (c) 2014-2026 Vinos de Frutas Tropicales
 //
-// Last updated: POSM 6.1.1
+// Last updated: POSM 6.1.2
 //
 use Zencart\DbRepositories\PluginControlRepository;
 use Zencart\DbRepositories\PluginControlVersionRepository;
@@ -273,6 +273,8 @@ class products_options_stock_observer extends base
             $decrement_managed_stock
         );
 
+        $products_status_update = (SHOW_PRODUCTS_SOLD_OUT === '0') ? ', products_status = 0' : '';
+
         // -----
         // If the stock-adjustment is to be totally overridden, note the condition in the log only.
         //
@@ -288,10 +290,11 @@ class products_options_stock_observer extends base
                   WHERE products_id = " . (int)$prid . "
                   LIMIT 1"
             );
-            if ($quantity_record->fields['products_quantity'] < 0) {
+            if ($quantity_record->fields['products_quantity'] <= 0) {
                 $db->Execute(
                     "UPDATE " . TABLE_PRODUCTS . "
                         SET products_quantity = 0
+                            $products_status_update
                       WHERE products_id = " . (int)$prid . "
                       LIMIT 1"
                 );
@@ -307,9 +310,13 @@ class products_options_stock_observer extends base
                   WHERE products_id = " . (int)$prid
             );
             $products_quantity = $quantity_info->fields['quantity'] ?? 0;
+            if ($products_quantity != 0) {
+                $products_status_update = '';
+            }
             $db->Execute(
                 "UPDATE " . TABLE_PRODUCTS . "
                     SET products_quantity = $products_quantity
+                        $products_status_update
                   WHERE products_id = " . (int)$prid . "
                   LIMIT 1"
             );
@@ -335,9 +342,13 @@ class products_options_stock_observer extends base
                   WHERE products_id = " . (int)$prid
             );
             if ($quantity_info->fields['quantity'] !== null) {
+                if ($quantity_info->fields['quantity'] > 0) {
+                    $products_status_update = '';
+                }
                 $db->Execute(
                     "UPDATE " . TABLE_PRODUCTS . "
                         SET products_quantity = " . $quantity_info->fields['quantity'] . "
+                            $products_status_update
                       WHERE products_id = " . (int)$prid . "
                       LIMIT 1"
                 );

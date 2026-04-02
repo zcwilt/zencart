@@ -13,6 +13,7 @@
  */
 
 use Zencart\LanguageLoader\LanguageLoaderFactory;
+use Zencart\TemplateResolver\TemplateResolver;
 
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -23,6 +24,7 @@ if (!defined('IS_ADMIN_FLAG')) {
  * The 'choice' aliases help with weighting for fallback to default selection
  */
 $template_dir = 'template_default';
+$templateResolver = new TemplateResolver();
 $sql = "SELECT *, template_language=" . (int)$_SESSION['languages_id'] . " AS choice1, template_language=0 AS choice2
         FROM " . TABLE_TEMPLATE_SELECT . "
         ORDER BY choice1 DESC, choice2 DESC, template_language";
@@ -33,8 +35,8 @@ $template_dir = $result->fields['template_dir'];
  * Allow admins to switch templates using &t= URL parameter
  */
 if (zen_is_whitelisted_admin_ip()) {
-    // check if a template override was requested and that the template exists on the filesystem
-    if (isset($_GET['t']) && file_exists(DIR_WS_TEMPLATES . $_GET['t'])) {
+    // check if a template override was requested and that the template is available
+    if (isset($_GET['t']) && $templateResolver->getTemplateRecord($_GET['t']) !== null) {
         $_SESSION['tpl_override'] = $_GET['t'];
     }
     if (isset($_GET['t']) && $_GET['t'] === 'off') {
@@ -45,6 +47,12 @@ if (zen_is_whitelisted_admin_ip()) {
     }
 }
 
+$templateRecord = $templateResolver->getTemplateRecord($template_dir) ?? $templateResolver->getTemplateRecord('template_default');
+if ($templateRecord === null) {
+    die('Fatal error: template_default could not be resolved.');
+}
+$template_dir = $templateRecord['template_key'];
+
 /**
  * Now that we've established which template to use, initialize all its components
  */
@@ -52,7 +60,7 @@ if (zen_is_whitelisted_admin_ip()) {
 /**
  * The actual template directory to use
  */
-define('DIR_WS_TEMPLATE', DIR_WS_TEMPLATES . $template_dir . '/');
+define('DIR_WS_TEMPLATE', $templateRecord['template_catalog_path']);
 
 /**
  * The actual template images directory to use
@@ -76,8 +84,8 @@ $tplSetting = new TemplateSettings($tpl_settings);
 /**
  * Load template-specific configuration settings, if they exist.
  */
-if (file_exists(DIR_WS_TEMPLATE . 'template_settings.php')) {
-    require_once DIR_WS_TEMPLATE . 'template_settings.php';
+if (file_exists($templateRecord['template_settings_path'])) {
+    require_once $templateRecord['template_settings_path'];
 }
 
 // check again in case overrides went wrong

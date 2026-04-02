@@ -20,8 +20,7 @@ class LanguageLoaderFactory
     public function make(string $context, array $installedPlugins, string $currentPage, string $templateDirectory, string $fallback = 'english'): \Zencart\LanguageLoader\LanguageLoader
     {
         $arraysLoader = $this->makeArraysLoader($context, $installedPlugins, $currentPage, $templateDirectory, $fallback);
-        $filesLoader = $this->makeFilesLoader($context, $installedPlugins, $currentPage, $templateDirectory, $fallback);
-        $mainLoader = new LanguageLoader($arraysLoader, $filesLoader);
+        $mainLoader = new LanguageLoader($arraysLoader);
         return $mainLoader;
     }
 
@@ -31,16 +30,6 @@ class LanguageLoaderFactory
     protected function makeArraysLoader(string $context, array $installedPlugins, string $currentPage, string $templateDirectory, string $fallback)
     {
         $className = 'Zencart\\LanguageLoader\\' . ucfirst(strtolower($context)) . 'ArraysLanguageLoader';
-        $loader = new $className($installedPlugins, $currentPage, $templateDirectory, $fallback);
-        return $loader;
-    }
-
-    /**
-     * @since ZC v1.5.8
-     */
-    protected function makeFilesLoader(string $context, array $installedPlugins, string $currentPage, string $templateDirectory, string $fallback)
-    {
-        $className = 'Zencart\\LanguageLoader\\' . ucfirst(strtolower($context)) . 'FilesLanguageLoader';
         $loader = new $className($installedPlugins, $currentPage, $templateDirectory, $fallback);
         return $loader;
     }

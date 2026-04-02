@@ -16,41 +16,183 @@ if (!defined('IS_ADMIN_FLAG')) {
  */
 function zen_get_catalog_template_directories($include_template_default = false)
 {
-    if (!defined('DIR_FS_CATALOG_TEMPLATES')) {
-        die('Fatal error: DIR_FS_CATALOG_TEMPLATES not defined.');
+    $resolver = new \Zencart\TemplateResolver\TemplateResolver();
+    return $resolver->getSelectableTemplates((bool)$include_template_default);
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_get_template_search_directories(
+    string $templateKey,
+    array $subdirectories = [],
+    bool $includeTemplateDefault = true,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): array
+{
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $chain = $resolver->getTemplateInheritanceChain($templateKey);
+    if ($includeTemplateDefault !== true) {
+        $chain = array_values(array_filter($chain, static fn(string $item): bool => $item !== 'template_default'));
     }
-    $dir = @dir(DIR_FS_CATALOG_TEMPLATES);
-    if (!$dir) {
-        die('Fatal error: DIR_FS_CATALOG_TEMPLATES not defined.');
-    }
-    $template_info = [];
-    while ($tpl_dir_name = $dir->read()) {
-        $path = DIR_FS_CATALOG_TEMPLATES . $tpl_dir_name;
-        if (!is_dir($path)) {
+
+    $directories = [];
+    foreach ($chain as $chainTemplateKey) {
+        $templatePath = $resolver->getTemplateFilesystemPath($chainTemplateKey);
+        if ($templatePath === null) {
             continue;
         }
-        if ($include_template_default !== true && $tpl_dir_name == 'template_default') {
+
+        if ($subdirectories === []) {
+            $directories[] = rtrim($templatePath, '/') . '/';
             continue;
         }
-        if (file_exists($path . '/template_info.php')) {
-            unset($uses_single_column_layout_settings);
-            require $path . '/template_info.php';
-            // expects the following variables to be set inside each respective template_info.php file
-            $template_info[$tpl_dir_name] = [
-                'name' => $template_name,
-                'version' => $template_version,
-                'author' => $template_author,
-                'description' => $template_description,
-                'screenshot' => $template_screenshot,
-                'uses_single_column_layout_settings' => !empty($uses_single_column_layout_settings),
-                'uses_mobile_sidebox_settings' => !isset($uses_mobile_sidebox_settings) || !empty($uses_mobile_sidebox_settings),
-                'template_path' => $path,
-                'has_template_settings' => file_exists($path . '/template_settings.php'),
-            ];
+
+        foreach ($subdirectories as $subdirectory) {
+            $directories[] = rtrim($templatePath, '/') . '/' . trim($subdirectory, '/') . '/';
         }
     }
-    $dir->close();
-    return $template_info;
+
+    return array_values(array_unique($directories));
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_get_template_inheritance_chain(
+    string $templateKey,
+    bool $includeTemplateDefault = true,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): array {
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $chain = $resolver->getTemplateInheritanceChain($templateKey);
+    if ($includeTemplateDefault !== true) {
+        $chain = array_values(array_filter($chain, static fn(string $item): bool => $item !== 'template_default'));
+    }
+
+    return array_values(array_unique($chain));
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_get_template_catalog_override_directories(
+    string $templateKey,
+    string $catalogBasePath,
+    bool $includeTemplateDefault = true,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): array {
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $catalogBasePath = trim($catalogBasePath, '/');
+    $directories = [];
+
+    foreach (zen_get_template_inheritance_chain($templateKey, $includeTemplateDefault, $resolver) as $chainTemplateKey) {
+        $record = $resolver->getTemplateRecord($chainTemplateKey);
+        if ($record === null) {
+            continue;
+        }
+
+        if (!empty($record['is_plugin_template'])) {
+            $directories[] = 'zc_plugins/' . $record['plugin_key'] . '/' . $record['plugin_version'] . '/catalog/' . $catalogBasePath . '/' . $chainTemplateKey . '/';
+            continue;
+        }
+
+        $directories[] = $catalogBasePath . '/' . $chainTemplateKey . '/';
+    }
+
+    return array_values(array_unique($directories));
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_get_template_language_override_directories(
+    string $templateKey,
+    string $languageRootPath,
+    string $language,
+    string $extraPath = '',
+    bool $includeTemplateDefault = true,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): array {
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $languageRootPath = rtrim($languageRootPath, '/') . '/';
+    $extraPath = trim($extraPath, '/');
+    $directories = [];
+
+    foreach (zen_get_template_inheritance_chain($templateKey, $includeTemplateDefault, $resolver) as $chainTemplateKey) {
+        $directory = $languageRootPath . $language . '/';
+        if ($extraPath !== '') {
+            $directory .= $extraPath . '/';
+        }
+        $directory .= $chainTemplateKey . '/';
+        $directories[] = $directory;
+    }
+
+    return array_values(array_unique($directories));
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_get_template_first_language_directories(
+    string $templateKey,
+    string $languageRootPath,
+    bool $includeTemplateDefault = true,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): array {
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $languageRootPath = rtrim($languageRootPath, '/') . '/';
+    $directories = [];
+
+    foreach (zen_get_template_inheritance_chain($templateKey, $includeTemplateDefault, $resolver) as $chainTemplateKey) {
+        $directories[] = $languageRootPath . $chainTemplateKey . '/';
+    }
+
+    return array_values(array_unique($directories));
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_get_template_init_file_path(
+    string $templateKey,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): ?string {
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $templatePath = $resolver->getTemplateFilesystemPath($templateKey);
+    if ($templatePath === null) {
+        return null;
+    }
+
+    return rtrim($templatePath, '/') . '/template_init.php';
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_get_template_screenshot_web_path(
+    string $templateKey,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): ?string {
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $record = $resolver->getTemplateRecord($templateKey);
+    if ($record === null || empty($record['screenshot']) || empty($record['template_web_path'])) {
+        return null;
+    }
+
+    return rtrim($record['template_web_path'], '/') . '/images/' . ltrim($record['screenshot'], '/');
+}
+
+/**
+ * @since ZC v2.2.1
+ */
+function zen_resolve_template_key(
+    string $templateKey,
+    ?\Zencart\TemplateResolver\TemplateResolver $resolver = null
+): string {
+    $resolver = $resolver ?? new \Zencart\TemplateResolver\TemplateResolver();
+    $record = $resolver->getTemplateRecord($templateKey) ?? $resolver->getTemplateRecord('template_default');
+    return $record['template_key'] ?? 'template_default';
 }
 
 /**

@@ -14,14 +14,12 @@ class LanguageLoader
 {
     private array $languageFilesLoaded;
     private $arrayLoader;
-    private $fileLoader;
 
-    public function __construct($arraysLoader, $filesLoader)
+    public function __construct($arraysLoader)
     {
-        $this->languageFilesLoaded = ['arrays' => [], 'legacy' => []];
+        $this->languageFilesLoaded = ['arrays' => [],];
         $this->arrayLoader = $arraysLoader;
-        $this->fileLoader = $filesLoader;
-        $this->languageFilesLoaded = ['arrays' => [], 'legacy' => []];
+        $this->languageFilesLoaded = ['arrays' => [],];
     }
 
     /**
@@ -30,7 +28,6 @@ class LanguageLoader
     public function loadInitialLanguageDefines(): void
     {
         $this->arrayLoader->loadInitialLanguageDefines($this);
-        $this->fileLoader->loadInitialLanguageDefines($this);
     }
 
     /**
@@ -52,9 +49,9 @@ class LanguageLoader
     /**
      * @since ZC v1.5.8
      */
-    public function addLanguageFilesLoaded(string $type, string $defineFile): void
+    public function addLanguageFilesLoaded(string $defineFile): void
     {
-        $this->languageFilesLoaded[$type][] = $defineFile;
+        $this->languageFilesLoaded['arrays'][] = $defineFile;
     }
 
     /**
@@ -63,7 +60,6 @@ class LanguageLoader
     public function loadDefinesFromFile(string $baseDirectory, string $language, string $languageFile): bool
     {
         $this->arrayLoader->loadDefinesFromArrayFile($baseDirectory, $language, $languageFile);
-        $this->fileLoader->loadFileDefineFile(DIR_FS_CATALOG . DIR_WS_LANGUAGES . $language . $baseDirectory . '/' . $languageFile);
         return true;
     }
 
@@ -75,10 +71,6 @@ class LanguageLoader
         $defs = $this->arrayLoader->loadModuleDefinesFromArrayFile(DIR_FS_CATALOG . 'includes/languages/', $language, $module_type, $languageFile);
 
         $this->arrayLoader->makeConstants($defs);
-        if ($module_type !== '') {
-            $module_type .= '/';
-        }
-        $this->fileLoader->loadFileDefineFile(DIR_FS_CATALOG . DIR_WS_LANGUAGES . $language . $baseDirectory . $module_type . $languageFile);
         return true;
     }
 
@@ -101,7 +93,6 @@ class LanguageLoader
     public function setCurrentPage(string $currentPage): void
     {
         $this->arrayLoader->currentPage = $currentPage;
-        $this->fileLoader->currentPage = $currentPage;
     }
 
     /**
@@ -110,7 +101,6 @@ class LanguageLoader
     public function loadLanguageForView(): void
     {
         $this->arrayLoader->loadLanguageForView();
-        $this->fileLoader->loadLanguageForView();
     }
 
     /**
@@ -119,7 +109,6 @@ class LanguageLoader
     public function loadExtraLanguageFiles(string $rootPath, string $language, string $fileName, string $extraPath = ''): void
     {
         $this->arrayLoader->loadExtraLanguageFiles($rootPath, $language, $fileName, $extraPath);
-        $this->fileLoader->loadExtraLanguageFiles($rootPath, $language, $fileName, $extraPath);
     }
 
     /**
@@ -127,9 +116,6 @@ class LanguageLoader
      */
     public function hasLanguageFile(string $rootPath, string $language, string $fileName, string $extraPath = ''): bool
     {
-        if (is_file($rootPath . $language . $extraPath . '/' . $fileName)) {
-            return true;
-        }
         if (is_file($rootPath . $language . $extraPath . '/lang.' . $fileName)) {
             return true;
         }
@@ -142,17 +128,16 @@ class LanguageLoader
     public function loadModuleLanguageFile(string $fileName, string $moduleType): bool
     {
         $this->arrayLoader->loadModuleLanguageFile($fileName, $moduleType);
-        $this->fileLoader->loadModuleLanguageFile($fileName, $moduleType);
 
-        $language_files_loaded = array_merge($this->languageFilesLoaded['arrays'], $this->languageFilesLoaded['legacy']);
+        $language_files_loaded = $this->languageFilesLoaded['arrays'];
 
         if ($moduleType !== '') {
             $moduleType .= '/';
         }
-        $match_string = '~modules/' . $moduleType . '(lang\.)?' . $fileName . '$~';
-        $match_string_template = '~modules/' . $moduleType . $this->arrayLoader->getTemplateDir() . '/(lang\.)?' . $fileName . '$~';
+        $match_string = 'modules/' . $moduleType . 'lang.' . $fileName;
+        $match_string_template = 'modules/' . $moduleType . $this->arrayLoader->getTemplateDir() . 'lang.' . $fileName;
         foreach ($language_files_loaded as $next_file) {
-            if (preg_match($match_string, $next_file) || preg_match($match_string_template, $next_file)) {
+            if (str_contains($next_file, $match_string) || str_contains($next_file, $match_string_template)) {
                 return true;
             }
         }
@@ -166,14 +151,11 @@ class LanguageLoader
     {
         $fileInfo = pathinfo($defineFile);
         $searchFile = $fileInfo['basename'];
-        if (strpos($searchFile, 'lang.') !== 0) {
-            $searchFile = 'lang.' . $searchFile;
+        if (!str_starts_with($searchFile, 'lang.')) {
+             $searchFile = 'lang.' . $searchFile;
         }
         $searchFile = $fileInfo['dirname'] . '/' . $searchFile;
         if (in_array($searchFile, $this->languageFilesLoaded['arrays'])) {
-            return true;
-        }
-        if (in_array($defineFile, $this->languageFilesLoaded['legacy'])) {
             return true;
         }
         return false;

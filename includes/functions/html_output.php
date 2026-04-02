@@ -118,6 +118,62 @@ function zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONS
  * used when "proportional images" is turned off or if calling from a template directory
  * @since ZC v1.2.4
  */
+function zen_resolve_template_fallback_asset_path(string $src, string $template_dir): string
+{
+    if (is_file($src) || !class_exists(\Zencart\TemplateResolver\TemplateResolver::class)) {
+        return $src;
+    }
+
+    $resolver = new \Zencart\TemplateResolver\TemplateResolver();
+    $chain = $resolver->getTemplateInheritanceChain($template_dir);
+    if ($chain === []) {
+        return $src;
+    }
+
+    $normalizedSrc = str_replace('\\', '/', $src);
+
+    if (preg_match('~^(.*includes/templates/)([^/]+)(/(.*))$~', $normalizedSrc, $matches)) {
+        $assetSuffix = $matches[3];
+        foreach ($chain as $chainTemplateKey) {
+            $record = $resolver->getTemplateRecord($chainTemplateKey);
+            if ($record === null) {
+                continue;
+            }
+            $candidate = $record['template_catalog_path'] . ltrim($assetSuffix, '/');
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+        return $src;
+    }
+
+    if (preg_match('~^(.*includes/languages/)([^/]+)/([^/]+)(/(.*))$~', $normalizedSrc, $matches)) {
+        $basePath = $matches[1];
+        $language = $matches[2];
+        $assetSuffix = $matches[4];
+        foreach ($chain as $chainTemplateKey) {
+            $candidate = $basePath . $language . '/' . $chainTemplateKey . $assetSuffix;
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+        return $src;
+    }
+
+    if (preg_match('~^(.*includes/languages/)([^/]+)(/(.*))$~', $normalizedSrc, $matches)) {
+        $basePath = $matches[1];
+        $assetSuffix = $matches[3];
+        foreach ($chain as $chainTemplateKey) {
+            $candidate = $basePath . $chainTemplateKey . $assetSuffix;
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+    }
+
+    return $src;
+}
+
 function zen_image_OLD($src, $title = '', $width = '', $height = '', $parameters = '')
 {
     global $template_dir;
@@ -134,7 +190,7 @@ function zen_image_OLD($src, $title = '', $width = '', $height = '', $parameters
     // if not in current template switch to template_default
     $file_exists = is_file($src);
     if ($file_exists === false) {
-        $src = str_replace(DIR_WS_TEMPLATES . $template_dir, DIR_WS_TEMPLATES . 'template_default', $src);
+        $src = zen_resolve_template_fallback_asset_path($src, $template_dir);
         $file_exists = is_file($src);
     }
     if ($file_exists === false && IMAGE_REQUIRED === 'false') {
@@ -213,7 +269,7 @@ function zen_image($src, $title = '', $width = '', $height = '', $parameters = '
 
     // if not in current template switch to template_default
     if (!is_file($src)) {
-        $src = str_replace(DIR_WS_TEMPLATES . $template_dir, DIR_WS_TEMPLATES . 'template_default', $src);
+        $src = zen_resolve_template_fallback_asset_path($src, $template_dir);
     }
 
     // hook for handle_image() function such as Image Handler etc

@@ -1,4 +1,4 @@
-![](https://github.com/zencart/zencart/workflows/Zen%20Cart%20Unit%20Tests/badge.svg?branch=master)
+[![Zen Cart Unit Tests](https://github.com/zencart/zencart/actions/workflows/zc_unit_test_suite.yml/badge.svg)](https://github.com/zencart/zencart/actions/workflows/zc_unit_test_suite.yml)
 
 
 Zen Cart&reg; - The Art of E-Commerce
@@ -13,13 +13,17 @@ Zen Cart is free and open source software, with free community-driven support av
 --------------------
 
 
-Zen Cart&reg; v2.2.1
+Zen Cart&reg; v3.0.0-dev
 ---------------------
+
+YOU ARE CURRENTLY VIEWING CODE FOR THE UNRELEASED IN-DEVELOPMENT "NEXT VERSION", which will be tagged as 3.0
+
+> If you want an officially-released version, see the [Releases](https://github.com/zencart/zencart/releases) page, or go to the `2.2` branch.
 
 Compatibility
 -------------
-Zen Cart v2.2.1 is designed for:
- * PHP 8.2 to PHP 8.5
+Zen Cart v3.0.0 is being designed for:
+ * PHP 8.3 to PHP 8.5
  * MySQL 5.7.8+ or MariaDB 10.2.7+
  * Apache 2.4
  

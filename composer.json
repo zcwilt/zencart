@@ -20,9 +20,9 @@
         "source": "https://zen-cart.com/getit",
         "docs": "https://docs.zen-cart.com"
     },
-    "_comment": "compatible with PHP 8.2-8.5",
+    "_comment": "compatible with PHP 8.3-8.5",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-curl": "*",
         "ext-ctype": "*",
         "ext-fileinfo": "*",
@@ -59,7 +59,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2.x-dev"
+            "dev-master": "3.0.x-dev"
         }
     },
     "config": {

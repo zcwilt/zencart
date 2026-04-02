@@ -107,8 +107,13 @@ class ArraysLanguageLoader extends BaseLanguageLoader
 
         $defineListMain = $this->loadDefinesFromArrayFile($rootPath, $language, $fileName, $extraPath);
 
-        $extraPath .= '/' . $this->templateDir;
-        $defineListTemplate = $this->loadDefinesFromArrayFile($rootPath, $language, $fileName, $extraPath);
+        $defineListTemplate = [];
+        foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
+            $defineListTemplate = array_merge(
+                $defineListTemplate,
+                $this->loadDefinesFromArrayFile($rootPath, $language, $fileName, $extraPath . '/' . $templateKey)
+            );
+        }
 
         $defineList = array_merge($defineListMain, $defineListTemplate);
         $this->makeConstants($defineList);
@@ -161,8 +166,10 @@ class ArraysLanguageLoader extends BaseLanguageLoader
         // Finally, gather any template-override definitions **for the current session language**. Any language
         // definitions found here overwrite any previously-loaded ones.
         //
-        $defineListTemplate = $this->loadModuleDefinesFromArrayFile($_SESSION['language'], $fileName, $module_type, $this->templateDir . '/');
-        $defineList = array_merge($defineList, $defineListTemplate);
+        foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
+            $defineListTemplate = $this->loadModuleDefinesFromArrayFile($_SESSION['language'], $fileName, $module_type, $templateKey . '/');
+            $defineList = array_merge($defineList, $defineListTemplate);
+        }
 
         // -----
         // Create the language constants from the definitions found and return an indication of whether/not
@@ -250,7 +257,7 @@ class ArraysLanguageLoader extends BaseLanguageLoader
             return [];
         }
 
-        $this->mainLoader->addLanguageFilesLoaded('arrays', $definesFile);
+        $this->mainLoader->addLanguageFilesLoaded($definesFile);
         // file should return a variable 
         $definesList = require $definesFile;
         return $definesList; 
@@ -313,8 +320,9 @@ class ArraysLanguageLoader extends BaseLanguageLoader
             $defineList = array_merge($defineList, $pluginDefineList);
         }
 
-        $templateFile = $rootDir . $_SESSION['language'] . $extraDir . '/' . $this->templateDir . '/' . $fileName;
-        $defineList = array_merge($defineList, $this->loadArrayDefineFile($templateFile));
+        foreach ($this->getTemplateLanguageOverrideFiles($rootDir, $_SESSION['language'], $fileName, $extraDir) as $templateFile) {
+            $defineList = array_merge($defineList, $this->loadArrayDefineFile($templateFile));
+        }
 
         $this->makeConstants($defineList);
     }

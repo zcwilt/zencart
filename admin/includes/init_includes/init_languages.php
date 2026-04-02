@@ -12,6 +12,8 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
+require_once DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_templates.php';
+
 // set the language
 if (!isset($_SESSION['language']) || isset($_GET['language'])) {
     $lng = new language();
@@ -45,7 +47,7 @@ $template_query = $db->Execute(
        WHERE template_language in (" . (int)$_SESSION['languages_id'] . ', 0' . ")
        ORDER BY template_language DESC"
 );
-$template_dir = $template_query->fields['template_dir'];
+$template_dir = zen_resolve_template_key($template_query->fields['template_dir']);
 
 // include the language translations
 $current_page = ($PHP_SELF === 'home.php') ? 'index.php' : $PHP_SELF;
