@@ -12,9 +12,10 @@ use Zencart\PageLoader\PageLoader;
 
 class PageLoaderTemplateResolutionTest extends zcUnitTestCase
 {
+    private string $baseThemePluginPath;
     private string $childThemePluginPath;
     private string $overlayPluginPath;
-    private string $responsiveClassicDogfoodPluginCssFixture;
+    private string $baseThemeCssFixture;
 
     public function setUp(): void
     {
@@ -24,15 +25,50 @@ class PageLoaderTemplateResolutionTest extends zcUnitTestCase
         require_once DIR_FS_CATALOG . 'includes/classes/traits/Singleton.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/PageLoader.php';
 
+        $this->baseThemePluginPath = DIR_FS_CATALOG . 'zc_plugins/UnitTestBaseTheme/v1.0.0/';
         $this->childThemePluginPath = DIR_FS_CATALOG . 'zc_plugins/UnitTestChildTheme/v1.0.0/';
         $this->overlayPluginPath = DIR_FS_CATALOG . 'zc_plugins/UnitTestTemplateOverlay/v1.0.0/';
-        $this->responsiveClassicDogfoodPluginCssFixture = DIR_FS_CATALOG . 'zc_plugins/ResponsiveClassic/v1.0.0/catalog/includes/templates/responsive_classic_dogfood/css/zz_test_base.css';
+        $this->baseThemeCssFixture = $this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/css/zz_test_base.css';
 
+        mkdir($this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/css', 0777, true);
+        mkdir($this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/common', 0777, true);
         mkdir($this->childThemePluginPath . 'catalog/includes/templates/child_theme/css', 0777, true);
         mkdir($this->childThemePluginPath . 'catalog/includes/templates/child_theme/common', 0777, true);
-        mkdir($this->overlayPluginPath . 'catalog/includes/templates/responsive_classic_dogfood/common', 0777, true);
+        mkdir($this->overlayPluginPath . 'catalog/includes/templates/unit_test_base_theme/common', 0777, true);
         mkdir($this->overlayPluginPath . 'catalog/includes/templates/default/css', 0777, true);
 
+        file_put_contents(
+            $this->baseThemePluginPath . 'manifest.php',
+            <<<'PHP'
+<?php
+return [
+    'pluginVersion' => 'v1.0.0',
+    'pluginName' => 'Unit Test Base Theme',
+    'pluginCapabilities' => ['template'],
+    'template' => [
+        'key' => 'unit_test_base_theme',
+        'type' => 'selectable',
+        'baseTemplate' => 'template_default',
+        'infoFile' => 'catalog/includes/templates/unit_test_base_theme/template_info.php',
+    ],
+];
+PHP
+        );
+        file_put_contents(
+            $this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/template_info.php',
+            <<<'PHP'
+<?php
+$template_name = 'Unit Test Base Theme';
+$template_version = '1.0.0';
+$template_author = 'Zen Cart';
+$template_description = 'Unit test plugin-backed base theme';
+$template_screenshot = 'screenshot.png';
+PHP
+        );
+        file_put_contents(
+            $this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/common/html_header.php',
+            "<?php\n"
+        );
         file_put_contents(
             $this->childThemePluginPath . 'manifest.php',
             <<<'PHP'
@@ -44,7 +80,7 @@ return [
     'template' => [
         'key' => 'child_theme',
         'type' => 'selectable',
-        'baseTemplate' => 'responsive_classic_dogfood',
+        'baseTemplate' => 'unit_test_base_theme',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
     ],
 ];
@@ -73,25 +109,25 @@ return [
     'pluginCapabilities' => ['template-overlay'],
     'template' => [
         'type' => 'overlay',
-        'targets' => ['responsive_classic_dogfood', 'default'],
+        'targets' => ['unit_test_base_theme', 'default'],
     ],
 ];
 PHP
         );
         file_put_contents(
-            $this->overlayPluginPath . 'catalog/includes/templates/responsive_classic_dogfood/common/tpl_overlay_unit_test.php',
+            $this->overlayPluginPath . 'catalog/includes/templates/unit_test_base_theme/common/tpl_overlay_unit_test.php',
             "<?php\n"
         );
         file_put_contents(
             $this->overlayPluginPath . 'catalog/includes/templates/default/css/zz_test_overlay.css',
             '/* overlay */'
         );
-        file_put_contents($this->responsiveClassicDogfoodPluginCssFixture, '/* base */');
+        file_put_contents($this->baseThemeCssFixture, '/* base */');
     }
 
     public function tearDown(): void
     {
-        @unlink($this->responsiveClassicDogfoodPluginCssFixture);
+        $this->removeDirectory($this->baseThemePluginPath);
         $this->removeDirectory($this->childThemePluginPath);
         $this->removeDirectory($this->overlayPluginPath);
         parent::tearDown();
@@ -104,7 +140,7 @@ PHP
 
         $directory = $pageLoader->getTemplateDirectory('html_header.php', 'child_theme', 'index', 'common');
 
-        $this->assertSame('zc_plugins/ResponsiveClassic/v1.0.0/catalog/includes/templates/responsive_classic_dogfood/common', $directory);
+        $this->assertSame('zc_plugins/UnitTestBaseTheme/v1.0.0/catalog/includes/templates/unit_test_base_theme/common', $directory);
     }
 
     public function testGetTemplateDirectoryFindsNamedOverlayBeforeDefaultFallback(): void
@@ -112,9 +148,9 @@ PHP
         $pageLoader = PageLoader::getInstance();
         $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem());
 
-        $directory = $pageLoader->getTemplateDirectory('tpl_overlay_unit_test.php', DIR_WS_TEMPLATES . 'responsive_classic_dogfood/', 'index', 'common');
+        $directory = $pageLoader->getTemplateDirectory('tpl_overlay_unit_test.php', DIR_WS_TEMPLATES . 'unit_test_base_theme/', 'index', 'common');
 
-        $this->assertSame('zc_plugins/UnitTestTemplateOverlay/v1.0.0/catalog/includes/templates/responsive_classic_dogfood/common', $directory);
+        $this->assertSame('zc_plugins/UnitTestTemplateOverlay/v1.0.0/catalog/includes/templates/unit_test_base_theme/common', $directory);
     }
 
     public function testGetTemplatePartMergesChildBaseAndOverlayAssets(): void
@@ -133,6 +169,7 @@ PHP
     private function getInstalledPlugins(): array
     {
         return [
+            ['unique_key' => 'UnitTestBaseTheme', 'version' => 'v1.0.0'],
             ['unique_key' => 'UnitTestChildTheme', 'version' => 'v1.0.0'],
             ['unique_key' => 'UnitTestTemplateOverlay', 'version' => 'v1.0.0'],
         ];
