@@ -51,7 +51,6 @@
     },
     "include-path": ["includes/"],
     "autoload-dev": {
-        "classmap": ["not_for_release/testFramework"],
         "psr-4": {
             "Tests\\": "not_for_release/testFramework/",
             "Seeders\\": "not_for_release/testFramework/Support/database/Seeders/"

@@ -4,13 +4,46 @@
 
 Support plugin tests that live inside the plugin itself under `zc_plugins`, while still reusing Zen Cart's existing `not_for_release/testFramework` support code, runners, and base test cases.
 
+## Current State
+
+The test framework already has meaningful plugin-testing support, but it is not yet plugin-local.
+
+### Achieved
+
+- plugin feature tests exist and run through the shared framework
+  - example: `not_for_release/testFramework/FeatureAdmin/PluginTests/BasicPluginInstallTest.php`
+- plugin filesystem tests have their own runner bucket
+  - `run-parallel-feature-tests.sh` dispatches a serial `plugin-filesystem` admin bucket
+- plugin tests can already reuse the shared base classes
+  - `Tests\Support\zcInProcessFeatureTestCaseAdmin`
+  - `Tests\Support\zcInProcessFeatureTestCaseStore`
+  - `Tests\Support\zcUnitTestCase`
+- worker-scoped plugin install paths exist in runtime config
+  - `zc_test_config_plugin_directory(...)` supports worker-specific plugin directories
+- the framework can install and remove plugin test fixtures in those worker-scoped paths
+  - via `Tests\Support\TestFrameworkFilesystem`
+- runner behavior and plugin buckets already have unit-test coverage
+  - see `not_for_release/testFramework/Unit/testsSundry/TestFrameworkRunnersTest.php`
+
+### Not Yet Achieved
+
+- test discovery does not yet scan `zc_plugins/*/*/tests`
+- plugin tests are not yet versioned beside the plugin as the primary source of truth
+- plugin installation still copies from framework-owned fixtures under:
+  - `not_for_release/testFramework/Support/plugins/<PluginName>`
+- there is no plugin-local `tests/bootstrap.php` loading path
+- there is no plugin-local fixture or seeder discovery convention
+- there is no plugin-local metadata file such as `tests/plugin-test.php`
+- there is no filtering model aimed at “all plugin-local tests” or “one plugin only” under `zc_plugins`
+- the GDPR / DSAR plugin has not yet been implemented as the first plugin-local reference example
+
 ## Core Direction
 
 Plugin tests should be versioned with the plugin they validate.
 
-Instead of treating `not_for_release/testFramework/Support/plugins/...` as the primary home for plugin tests, the framework should discover and run tests that live directly inside plugin directories.
+Instead of treating `not_for_release/testFramework/Support/plugins/...` and `FeatureAdmin/PluginTests/...` as the long-term primary home for plugin tests, the framework should discover and run tests that live directly inside plugin directories.
 
-## Proposed Plugin Test Layout
+## Target Plugin Test Layout
 
 For a plugin stored at:
 
@@ -27,55 +60,68 @@ use a test structure like:
 
 This keeps the tests tied to the plugin version they belong to.
 
-## Framework Changes Needed
+## Gap Analysis
 
 ### 1. Test Discovery
 
-Update the framework runners so they can discover plugin-local tests under paths such as:
+Needed:
 
-- `zc_plugins/*/*/tests/FeatureAdmin/*Test.php`
-- `zc_plugins/*/*/tests/FeatureStore/*Test.php`
-- `zc_plugins/*/*/tests/Unit/*Test.php`
+- discover plugin-local tests under paths such as:
+  - `zc_plugins/*/*/tests/FeatureAdmin/*Test.php`
+  - `zc_plugins/*/*/tests/FeatureStore/*Test.php`
+  - `zc_plugins/*/*/tests/Unit/*Test.php`
 
-The runners should continue supporting the existing core test directories under `not_for_release/testFramework`.
+Current state:
+
+- runners still discover core tests under `not_for_release/testFramework`
+- plugin-oriented feature coverage currently lives under:
+  - `not_for_release/testFramework/FeatureAdmin/PluginTests`
 
 ### 2. Shared Base Classes
 
-Plugin-local tests should reuse the core framework base classes, for example:
+Needed:
 
-- `Tests\Support\zcInProcessFeatureTestCaseAdmin`
-- `Tests\Support\zcInProcessFeatureTestCaseStore`
-- `Tests\Support\zcUnitTestCase`
+- plugin-local tests should extend the same shared framework base classes
 
-That keeps the framework centralized while allowing test files to live with the plugin.
+Current state:
+
+- this is already in place at the framework level
+- the missing piece is wiring plugin-local discovery and bootstrap around those existing base classes
 
 ### 3. Plugin-Local Bootstrap Support
 
-Allow a plugin to provide optional test-local assets such as:
+Needed:
 
-- `tests/bootstrap.php`
-- `tests/Fixtures/`
-- `tests/Seeders/`
+- optional per-plugin assets such as:
+  - `tests/bootstrap.php`
+  - `tests/Fixtures/`
+  - `tests/Seeders/`
 
-These should only be loaded when that plugin's tests are running.
+Current state:
+
+- custom seeding exists in the framework
+- plugin-local bootstrap, fixture, and seeder loading does not yet exist
 
 ### 4. Installation Strategy
 
-When testing a plugin, the framework should use the plugin's real source from its `zc_plugins/<PluginName>/<version>` directory.
+Needed:
 
-Possible strategies:
+- when testing a plugin, use the plugin's real source from:
+  - `zc_plugins/<PluginName>/<version>`
 
-- run against the plugin already present in the catalog under test
-- copy/install the plugin into a worker-local plugin directory when filesystem isolation is required
+Current state:
 
-The framework should prefer worker-local plugin paths for tests that mutate plugin files or require isolated install/uninstall behavior.
+- worker-local destination paths already exist
+- source plugin files still come from framework-owned fixtures under:
+  - `not_for_release/testFramework/Support/plugins/<PluginName>`
 
 ### 5. Plugin Test Metadata
 
-Each plugin may optionally declare testing metadata, either in:
+Needed:
 
-- `tests/plugin-test.php`
-- or a small extension to `manifest.php`
+- optional metadata in:
+  - `tests/plugin-test.php`
+  - or a small extension to `manifest.php`
 
 Useful metadata could include:
 
@@ -85,11 +131,15 @@ Useful metadata could include:
 - custom bootstrap path
 - custom seeder path
 
-## Runner Behavior
+Current state:
+
+- not yet implemented
+
+## Runner Behavior Target
 
 ### Filtering
 
-The runners should support filters for:
+The runners should eventually support filters for:
 
 - all plugin-local tests
 - one plugin only
@@ -103,19 +153,13 @@ Examples of intended use:
 
 ### Parallelism and Isolation
 
-Plugin tests that install, uninstall, enable, disable, or otherwise modify plugin files should be tagged so they run serially or in isolated worker-local plugin directories.
+Tests that install, uninstall, enable, disable, or otherwise modify plugin files should be tagged so they run serially or in isolated worker-local plugin directories.
 
-Tests that only exercise read-only behavior should remain eligible for parallel execution.
+Current state:
 
-## Authoring Conventions
-
-Document a plugin-testing convention covering:
-
-- where plugin tests live
-- which base classes to extend
-- how to provide fixtures or seeders
-- when to mark tests as serial
-- how to classify tests as FeatureAdmin, FeatureStore, or Unit
+- the framework already has a serial `plugin-filesystem` feature bucket
+- worker-local plugin destination paths already exist
+- this isolation model should be reused for plugin-local discovery, not redesigned from scratch
 
 ## Suggested First Reference Implementation
 
@@ -134,26 +178,46 @@ Use the GDPR / DSAR plugin as the first plugin-local example.
 
 ## Recommended Implementation Order
 
-1. Define and document the plugin-local `tests/` directory convention.
+### Completed Foundations
+
+1. Keep framework support centralized under `not_for_release/testFramework`.
+2. Reuse the existing feature and unit base test cases for plugin tests.
+3. Support worker-scoped plugin install paths and a plugin-filesystem runner bucket.
+
+### Remaining Work
+
+1. Define and document the plugin-local `tests/` directory convention as the primary path.
 2. Update the test runners to discover tests under `zc_plugins/*/*/tests`.
-3. Ensure plugin-local tests can extend the existing framework base classes cleanly.
+3. Teach plugin install helpers to source plugin files from `zc_plugins/<PluginName>/<version>` instead of framework fixture copies.
 4. Add support for plugin-local bootstrap, fixtures, and seeders.
-5. Implement GDPR plugin tests as the first end-to-end example.
-6. Add filtering and runner options for plugin-local test execution.
-7. Add serial or isolation tagging guidance for plugin filesystem mutation tests.
+5. Add filtering and runner options for plugin-local test execution by plugin and layer.
+6. Add optional plugin-local metadata for serial/isolation/bootstrap needs.
+7. Implement GDPR / DSAR as the first end-to-end plugin-local example.
+8. Retire or demote `Support/plugins/...` and `FeatureAdmin/PluginTests/...` from primary-source status once plugin-local coverage is in place.
 
 ## What Not To Do
 
 - Do not force each plugin to invent its own separate test runner.
 - Do not duplicate the whole framework inside each plugin.
-- Do not make `Support/plugins/...` the primary source of truth for plugin tests if the goal is plugin-local ownership.
+- Do not keep `Support/plugins/...` as the long-term primary source of truth if the goal is plugin-local ownership.
+- Do not introduce a second isolation model when worker-scoped plugin directories already exist.
 
 ## Summary
 
-The best direction is:
+The direction is still sound, but the repo is only partway there.
 
-- keep the framework support centralized under `not_for_release/testFramework`
-- keep plugin test files local to the plugin under `zc_plugins/<PluginName>/<version>/tests`
-- teach the framework runners to discover and execute those plugin-local tests
+What exists now:
 
-This gives plugin authors ownership of their own tests without fragmenting the underlying test infrastructure.
+- centralized framework support
+- reusable base classes
+- plugin-filesystem feature testing
+- worker-local plugin destination paths
+
+What still needs to happen:
+
+- move test ownership to `zc_plugins/<PluginName>/<version>/tests`
+- discover and run those tests directly
+- load plugin-local bootstrap/fixtures/seeders
+- use the real plugin source tree as the test source
+
+That is the work required to turn today's plugin-testing support into true plugin-local testing.

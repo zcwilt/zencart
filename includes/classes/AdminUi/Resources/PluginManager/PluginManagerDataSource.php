@@ -5,10 +5,12 @@
  * @version $Id: DrByte 2026 Feb 26 Modified in v2.2.1 $
  */
 
-namespace Zencart\ViewBuilders;
+namespace Zencart\AdminUi\Resources\PluginManager;
 
 use Zencart\DbRepositories\PluginControlRepository;
 use Zencart\PluginSupport\PluginStatus;
+use Zencart\Request\Request;
+use Zencart\ViewBuilders\DataTableDataSource;
 
 /**
  * @since ZC v1.5.8
@@ -18,7 +20,7 @@ class PluginManagerDataSource extends DataTableDataSource
     /**
      * @since ZC v1.5.8
      */
-    protected function buildInitialQuery(): array
+    protected function buildInitialQuery(Request $request): array
     {
         global $db;
         $statusSort = [

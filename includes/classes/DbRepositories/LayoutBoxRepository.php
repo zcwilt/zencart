@@ -11,12 +11,8 @@ use queryFactory;
 /**
  * @since ZC v2.2.0
  */
-class LayoutBoxRepository
+class LayoutBoxRepository extends AbstractQueryFactoryRepository
 {
-    public function __construct(private queryFactory $db)
-    {
-    }
-
     /**
      * @since ZC v2.2.0
      */
@@ -36,18 +32,12 @@ class LayoutBoxRepository
      */
     public function findFirstByTemplateAndBoxName(string $template, string $boxName): ?array
     {
-        $result = $this->db->Execute(
+        return $this->fetchFirstRow(
             "SELECT * FROM " . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'" .
             " AND layout_box_name = '" . $this->db->prepare_input($boxName) . "'" .
             " LIMIT 1"
         );
-
-        if ($result->EOF) {
-            return null;
-        }
-
-        return $result->fields;
     }
 
     /**
@@ -89,7 +79,7 @@ class LayoutBoxRepository
      */
     public function getByTemplate(string $template): array
     {
-        return $this->fetchAll(
+        return $this->fetchAllRows(
             "SELECT * FROM " . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'"
         );
@@ -114,7 +104,7 @@ class LayoutBoxRepository
      */
     public function getNonHeaderFooterByTemplate(string $template): array
     {
-        return $this->fetchAll(
+        return $this->fetchAllRows(
             "SELECT * FROM " . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'" .
             " AND layout_box_name NOT LIKE '%ezpages_bar'" .
@@ -129,7 +119,7 @@ class LayoutBoxRepository
      */
     public function getByTemplateAndNameLike(string $template, string $pattern): array
     {
-        return $this->fetchAll(
+        return $this->fetchAllRows(
             "SELECT * FROM " . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'" .
             " AND layout_box_name LIKE '" . $this->db->prepare_input($pattern) . "'" .
@@ -158,19 +148,6 @@ class LayoutBoxRepository
             "DELETE FROM " . TABLE_LAYOUT_BOXES .
             " WHERE plugin_details LIKE '" . $this->db->prepare_input($pluginKey . '/%') . "'"
         );
-    }
-
-    /**
-     * @since ZC v2.2.0
-     */
-    protected function fetchAll(string $sql): array
-    {
-        $result = $this->db->Execute($sql);
-        $rows = [];
-        foreach ($result as $row) {
-            $rows[] = $row;
-        }
-        return $rows;
     }
 
     /**

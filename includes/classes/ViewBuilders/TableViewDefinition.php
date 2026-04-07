@@ -151,6 +151,98 @@ class TableViewDefinition
     }
 
     /**
+     * @since ZC v2.2.1
+     */
+    public function getColumnDefinition(string $field): ?array
+    {
+        return $this->definition['columns'][$field] ?? null;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function isColumnSortable(string $field): bool
+    {
+        $column = $this->getColumnDefinition($field);
+        return !empty($column['sortable']);
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function isColumnSearchable(string $field): bool
+    {
+        $column = $this->getColumnDefinition($field);
+        return !empty($column['searchable']);
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function hasSearchableColumns(): bool
+    {
+        foreach (array_keys($this->definition['columns']) as $field) {
+            if ($this->isColumnSearchable($field)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function getSearchableColumns(): array
+    {
+        $searchable = [];
+        foreach ($this->definition['columns'] as $field => $column) {
+            if ($this->isColumnSearchable($field)) {
+                $searchable[$field] = $column;
+            }
+        }
+
+        return $searchable;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function hasFilters(): bool
+    {
+        return !empty($this->definition['filters']);
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function getFilters(): array
+    {
+        return $this->definition['filters'];
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function getFilterDefinition(string $filterKey): ?array
+    {
+        return $this->definition['filters'][$filterKey] ?? null;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function getFilterParameters(): array
+    {
+        $parameters = [];
+        foreach ($this->getFilters() as $filterKey => $definition) {
+            $parameters[] = (string) ($definition['parameter'] ?? $filterKey);
+        }
+
+        return array_values(array_unique($parameters));
+    }
+
+    /**
      * @since ZC v1.5.8
      */
     protected function setDefaults()
@@ -163,6 +255,13 @@ class TableViewDefinition
         $this->definition['colKeyName'] = $this->definition['colKeyName'] ?? 'colKey';
         $this->definition['pagerVariable'] = $this->definition['pagerVariable'] ?? 'page';
         $this->definition['colKey'] = $this->definition['colKey'] ?? 'id';
+        $this->definition['sortParameter'] = $this->definition['sortParameter'] ?? 'sort';
+        $this->definition['sortDirectionParameter'] = $this->definition['sortDirectionParameter'] ?? 'direction';
+        $this->definition['defaultSort'] = $this->definition['defaultSort'] ?? null;
+        $this->definition['persistedParameters'] = $this->definition['persistedParameters'] ?? [];
+        $this->definition['searchParameter'] = $this->definition['searchParameter'] ?? 'search';
+        $this->definition['searchPlaceholder'] = $this->definition['searchPlaceholder'] ?? 'Search';
+        $this->definition['filters'] = $this->definition['filters'] ?? [];
     }
 
     /**

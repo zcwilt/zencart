@@ -34,9 +34,13 @@ class SimpleDataFormatter
     {
         $colHeaders = [];
         $columns = $this->tableDefinition->getParameter('columns');
-        foreach ($columns as $column) {
+        foreach ($columns as $field => $column) {
             $headerClass = $this->getColHeaderMainClass($column);
-            $colHeaders[] = ['headerClass' => $headerClass, 'title' => $column['title']];
+            $sortHeader = $this->buildSortHeader($field, $column);
+            $colHeaders[] = array_merge(
+                ['headerClass' => $headerClass, 'title' => $column['title'], 'href' => null],
+                $sortHeader
+            );
         }
         return $colHeaders;
     }
@@ -114,10 +118,13 @@ class SimpleDataFormatter
      */
     public function getSelectedRowLink(array $tableRow): string
     {
-        $pagerVar = $this->tableDefinition->getParameter('pagerVariable');
-        $params = $pagerVar . '=' . $this->request->input($pagerVar, 1);
-        $params .= "&" . $this->tableDefinition->colKeyName() . "=" . $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
-        return zen_href_link($this->request->input('cmd'), $params);
+        $params = $this->getPersistedRequestParameters();
+        $params[$this->tableDefinition->colKeyName()] = $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
+        $selectedRowAction = $this->tableDefinition->getParameter('selectedRowAction');
+        if (!empty($selectedRowAction)) {
+            $params['action'] = $selectedRowAction;
+        }
+        return zen_href_link($this->request->input('cmd'), $this->buildQueryString($params));
     }
 
     /**
@@ -125,11 +132,125 @@ class SimpleDataFormatter
      */
     public function getNotSelectedRowLink(array $tableRow): string
     {
-        $pagerVar = $this->tableDefinition->getParameter('pagerVariable');
-        $params = $pagerVar . '=' . $this->request->input($pagerVar, 1);
-        $params .= "&" . $this->tableDefinition->colKeyName() . "=" . $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
-        return zen_href_link($this->request->input('cmd'), $params);
+        $params = $this->getPersistedRequestParameters();
+        $params[$this->tableDefinition->colKeyName()] = $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
+        return zen_href_link($this->request->input('cmd'), $this->buildQueryString($params));
 
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function getPersistentLinkParameters(array $exclude = []): string
+    {
+        return $this->buildQueryString($this->getPersistedRequestParameters($exclude));
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function hasSearch(): bool
+    {
+        return $this->tableDefinition->hasSearchableColumns();
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function hasFilters(): bool
+    {
+        return $this->tableDefinition->hasFilters();
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function filters(): array
+    {
+        $filters = [];
+        foreach ($this->tableDefinition->getFilters() as $filterKey => $definition) {
+            $parameter = (string) ($definition['parameter'] ?? $filterKey);
+            $filters[] = [
+                'key' => $filterKey,
+                'parameter' => $parameter,
+                'label' => (string) ($definition['label'] ?? ucfirst($filterKey)),
+                'type' => (string) ($definition['type'] ?? 'select'),
+                'options' => $definition['options'] ?? [],
+                'value' => trim((string) $this->request->input($parameter, '')),
+            ];
+        }
+
+        return $filters;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function searchValue(): string
+    {
+        $searchParameter = $this->tableDefinition->getParameter('searchParameter');
+        return trim((string) $this->request->input($searchParameter, ''));
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function searchParameter(): string
+    {
+        return (string) $this->tableDefinition->getParameter('searchParameter');
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function searchPlaceholder(): string
+    {
+        return (string) $this->tableDefinition->getParameter('searchPlaceholder');
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function searchAction(): string
+    {
+        return (string) $this->request->input('cmd');
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function searchHiddenParameters(): array
+    {
+        return $this->getPersistedRequestParameters([
+            $this->tableDefinition->getParameter('pagerVariable'),
+            $this->tableDefinition->colKeyName(),
+            'action',
+            $this->tableDefinition->getParameter('searchParameter'),
+        ]);
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function toolbarHiddenParameters(): array
+    {
+        return $this->getPersistedRequestParameters(array_merge(
+            [
+                $this->tableDefinition->getParameter('pagerVariable'),
+                $this->tableDefinition->colKeyName(),
+                'action',
+                $this->tableDefinition->getParameter('searchParameter'),
+            ],
+            $this->tableDefinition->getFilterParameters()
+        ));
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    public function searchResetHref(): string
+    {
+        return zen_href_link($this->searchAction(), $this->buildQueryString($this->searchHiddenParameters()));
     }
 
     /**
@@ -158,6 +279,174 @@ class SimpleDataFormatter
         }
 
         return $default;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function getCurrentPagerValue()
+    {
+        return $this->request->input($this->tableDefinition->getParameter('pagerVariable'), 1);
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function getPersistedRequestParameters(array $exclude = []): array
+    {
+        $excludeLookup = array_fill_keys($exclude, true);
+        $params = [];
+        foreach ($this->getPersistedParameterNames() as $parameterName) {
+            if (isset($excludeLookup[$parameterName])) {
+                continue;
+            }
+
+            if ($parameterName === $this->tableDefinition->getParameter('pagerVariable')) {
+                $pageValue = $this->getCurrentPagerValue();
+                if ($pageValue !== null && $pageValue !== '') {
+                    $params[$parameterName] = $pageValue;
+                }
+                continue;
+            }
+
+            if ($this->request->has($parameterName)) {
+                $params[$parameterName] = $this->request->input($parameterName);
+            }
+        }
+        return $params;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function getPersistedParameterNames(): array
+    {
+        return array_values(array_unique(array_merge(
+            [
+                $this->tableDefinition->getParameter('pagerVariable'),
+                $this->tableDefinition->getParameter('sortParameter'),
+                $this->tableDefinition->getParameter('sortDirectionParameter'),
+                $this->tableDefinition->getParameter('searchParameter'),
+            ],
+            $this->tableDefinition->getFilterParameters(),
+            $this->tableDefinition->getParameter('persistedParameters')
+        )));
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function buildQueryString(array $params): string
+    {
+        $parts = [];
+        foreach ($params as $key => $value) {
+            if ($value === null || $value === '') {
+                continue;
+            }
+            $parts[] = rawurlencode((string) $key) . '=' . rawurlencode((string) $value);
+        }
+        return implode('&', $parts);
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function buildSortHeader(string $field, array $column): array
+    {
+        if (empty($column['sortable'])) {
+            return [
+                'isSortable' => false,
+                'isSorted' => false,
+                'sortField' => null,
+                'sortDirection' => null,
+                'nextSortDirection' => null,
+                'sortIndicator' => '',
+            ];
+        }
+
+        $activeSortColumn = $this->resolveSortColumn();
+        $activeDirection = $this->resolveSortDirection($activeSortColumn);
+        $isSorted = $activeSortColumn === $field;
+        $nextDirection = $isSorted
+            ? ($activeDirection === 'asc' ? 'desc' : 'asc')
+            : $this->initialSortDirection($column);
+
+        $params = $this->getPersistedRequestParameters([
+            $this->tableDefinition->getParameter('pagerVariable'),
+            $this->tableDefinition->getParameter('sortParameter'),
+            $this->tableDefinition->getParameter('sortDirectionParameter'),
+        ]);
+        $params[$this->tableDefinition->getParameter('sortParameter')] = $field;
+        $params[$this->tableDefinition->getParameter('sortDirectionParameter')] = $nextDirection;
+
+        return [
+            'href' => zen_href_link($this->request->input('cmd'), $this->buildQueryString($params)),
+            'isSortable' => true,
+            'isSorted' => $isSorted,
+            'sortField' => $field,
+            'sortDirection' => $isSorted ? $activeDirection : null,
+            'nextSortDirection' => $nextDirection,
+            'sortIndicator' => $isSorted ? ($activeDirection === 'asc' ? ' ↑' : ' ↓') : '',
+        ];
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function resolveSortColumn(): ?string
+    {
+        $sortParameter = $this->tableDefinition->getParameter('sortParameter');
+        $requestedColumn = (string) $this->request->input($sortParameter, '');
+        if ($requestedColumn !== '' && $this->tableDefinition->isColumnSortable($requestedColumn)) {
+            return $requestedColumn;
+        }
+
+        $defaultSort = $this->tableDefinition->getParameter('defaultSort');
+        if (is_array($defaultSort) && !empty($defaultSort['column']) && $this->tableDefinition->isColumnSortable($defaultSort['column'])) {
+            return $defaultSort['column'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function resolveSortDirection(?string $sortColumn): string
+    {
+        $directionParameter = $this->tableDefinition->getParameter('sortDirectionParameter');
+        $requestedDirection = strtolower((string) $this->request->input($directionParameter, ''));
+        if ($requestedDirection === 'asc' || $requestedDirection === 'desc') {
+            return $requestedDirection;
+        }
+
+        if ($sortColumn !== null) {
+            $columnDefinition = $this->tableDefinition->getColumnDefinition($sortColumn) ?? [];
+            return $this->initialSortDirection($columnDefinition, $sortColumn);
+        }
+
+        return 'asc';
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function initialSortDirection(array $column, ?string $field = null): string
+    {
+        if (!empty($column['defaultDirection'])) {
+            return strtolower((string) $column['defaultDirection']) === 'desc' ? 'desc' : 'asc';
+        }
+
+        $defaultSort = $this->tableDefinition->getParameter('defaultSort');
+        if (
+            is_array($defaultSort)
+            && !empty($defaultSort['direction'])
+            && ($field === null || ($defaultSort['column'] ?? null) === $field)
+        ) {
+            return strtolower((string) $defaultSort['direction']) === 'desc' ? 'desc' : 'asc';
+        }
+
+        return 'asc';
     }
 
     /**

@@ -13,29 +13,19 @@ use queryFactory;
  *
  * @since ZC v2.2.0
  */
-class ProjectVersionRepository
+class ProjectVersionRepository extends AbstractQueryFactoryRepository
 {
-    public function __construct(private queryFactory $db)
-    {
-    }
-
     /**
      * @since ZC v2.2.0
      */
     public function getByKey(string $projectVersionKey): ?array
     {
         $projectVersionKey = $this->db->prepare_input($projectVersionKey);
-        $result = $this->db->Execute(
+        return $this->fetchFirstRow(
             "SELECT project_version_major, project_version_minor, project_version_patch1, project_version_patch2," .
             " project_version_patch1_source, project_version_patch2_source" .
             " FROM " . TABLE_PROJECT_VERSION .
             " WHERE project_version_key = '" . $projectVersionKey . "' LIMIT 1"
         );
-
-        if ($result->EOF) {
-            return null;
-        }
-
-        return $result->fields;
     }
 }

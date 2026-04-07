@@ -12,22 +12,14 @@ use queryFactory;
 /**
  * @since ZC v2.2.0
  */
-class PluginControlRepository
+class PluginControlRepository extends AbstractQueryFactoryRepository
 {
-    public function __construct(private ?queryFactory $db = null)
-    {
-        if ($this->db === null) {
-            global $db;
-            $this->db = $db;
-        }
-    }
-
     /**
      * @since ZC v2.2.0
      */
     public function getInstalledPlugins(int $status): array
     {
-        $results = $this->db->Execute(
+        $results = $this->fetchAllRows(
             "SELECT * FROM " . TABLE_PLUGIN_CONTROL .
             " WHERE status = " . (int)$status .
             " ORDER BY name, unique_key"
@@ -47,7 +39,7 @@ class PluginControlRepository
      */
     public function getAll(): array
     {
-        $results = $this->db->Execute(
+        $results = $this->fetchAllRows(
             "SELECT * FROM " . TABLE_PLUGIN_CONTROL
         );
 

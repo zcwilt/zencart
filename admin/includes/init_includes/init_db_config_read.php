@@ -5,9 +5,9 @@
  * @version $Id: DrByte 2026 Feb 26 Modified in v2.2.1 $
  */
 
-use Zencart\DbRepositories\ConfigurationRepository;
+use Zencart\Config\DbLoaders\ConfigurationLoader;
+use Zencart\Config\DbLoaders\ProductTypeLayoutLoader;
 use Zencart\DbRepositories\ProjectVersionRepository;
-use Zencart\DbRepositories\ProductTypeLayoutRepository;
 
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -15,7 +15,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 global $db;
 
-$configurationRepository = new ConfigurationRepository($db);
+$configurationRepository = new \Zencart\DbRepositories\ConfigurationRepository($db);
 $authKey = $configurationRepository->getByKey('GLOBAL_AUTH_KEY');
 
 if (($authKey['configuration_value'] ?? '') === '') {
@@ -23,7 +23,8 @@ if (($authKey['configuration_value'] ?? '') === '') {
     $configurationRepository->updateValueByKey('GLOBAL_AUTH_KEY', $hashable);
 }
 
-$configurationRepository->loadConfigSettings();
+$configurationLoader = new ConfigurationLoader($db);
+$configurationLoader->loadConfigSettings();
 
 // Determine the DATABASE patch level
 $projectVersionRepository = new ProjectVersionRepository($db);
@@ -35,5 +36,5 @@ define('PROJECT_DB_VERSION_PATCH2', $versionInfo['project_version_patch2']);
 define('PROJECT_DB_VERSION_PATCH1_SOURCE', $versionInfo['project_version_patch1_source']);
 define('PROJECT_DB_VERSION_PATCH2_SOURCE', $versionInfo['project_version_patch2_source']);
 
-$productTypeLayoutRepository = new ProductTypeLayoutRepository($db);
-$productTypeLayoutRepository->loadConfigSettings();
+$productTypeLayoutLoader = new ProductTypeLayoutLoader($db);
+$productTypeLayoutLoader->loadConfigSettings();

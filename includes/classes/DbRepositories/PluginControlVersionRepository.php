@@ -12,32 +12,17 @@ use queryFactory;
 /**
  * @since ZC v2.2.0
  */
-class PluginControlVersionRepository
+class PluginControlVersionRepository extends AbstractQueryFactoryRepository
 {
-    public function __construct(private ?queryFactory $db = null)
-    {
-        if ($this->db === null) {
-            global $db;
-            $this->db = $db;
-        }
-    }
-
     /**
      * @since ZC v2.2.0
      */
     public function getByUniqueKey(string $uniqueKey): array
     {
-        $results = $this->db->Execute(
+        return $this->fetchAllRows(
             "SELECT * FROM " . TABLE_PLUGIN_CONTROL_VERSIONS .
             " WHERE unique_key = '" . $this->db->prepare_input($uniqueKey) . "'"
         );
-
-        $versions = [];
-        foreach ($results as $result) {
-            $versions[] = $result;
-        }
-
-        return $versions;
     }
 
     /**

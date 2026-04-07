@@ -132,20 +132,11 @@ run_test_file() {
     slug="$(printf "%s" "$relative" | tr "/:" "__")"
     local output_file="$WORK_DIR/$slug.log"
     local status_file="$WORK_DIR/$slug.status"
-    local class_name
-
-    class_name="$(sed -nE 's/^[[:space:]]*class[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]].*/\1/p' "$file" | head -n 1)"
 
     echo "START $relative"
 
     (
-        if [ -n "$class_name" ]; then
-            if "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --verbose --process-isolation --debug --testsuite Unit "${EXTRA_PHPUNIT_ARGS[@]}" --filter "${class_name}" >"$output_file" 2>&1; then
-                echo 0 >"$status_file"
-            else
-                echo $? >"$status_file"
-            fi
-        elif "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --verbose --process-isolation --debug "${EXTRA_PHPUNIT_ARGS[@]}" "$file" >"$output_file" 2>&1; then
+        if "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --verbose --process-isolation --debug "${EXTRA_PHPUNIT_ARGS[@]}" "$file" >"$output_file" 2>&1; then
             echo 0 >"$status_file"
         else
             echo $? >"$status_file"

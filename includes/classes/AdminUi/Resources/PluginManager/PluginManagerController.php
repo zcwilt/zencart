@@ -5,12 +5,13 @@
  * @version $Id: lat9 2026 Mar 17 Modified in v2.2.1 $
  */
 
-namespace Zencart\ViewBuilders;
+namespace Zencart\AdminUi\Resources\PluginManager;
 
 use Zencart\FileSystem\FileSystem;
 use Zencart\PluginManager\PluginManager;
 use Zencart\PluginSupport\InstallerFactory;
 use Zencart\PluginSupport\PluginStatus;
+use Zencart\ViewBuilders\BaseController;
 
 /**
  * @since ZC v1.5.8
@@ -28,6 +29,26 @@ class PluginManagerController extends BaseController
     {
         $this->pluginManager = $pluginManager;
         $this->installerFactory = $installerFactory;
+    }
+
+    protected function selectedVersion(): string
+    {
+        return $this->request->string('version', '');
+    }
+
+    protected function selectedVersions(): array
+    {
+        return $this->request->inputArray('version');
+    }
+
+    protected function hasSelectedVersion(): bool
+    {
+        return $this->request->filled('version');
+    }
+
+    protected function hasSelectedVersions(): bool
+    {
+        return $this->selectedVersions() !== [];
     }
 
     /**
@@ -193,7 +214,7 @@ class PluginManagerController extends BaseController
      */
     protected function processActionDoInstall(): void
     {
-        if (!$this->request->has('version')) {
+        if (!$this->hasSelectedVersion()) {
             zen_redirect(
                 zen_href_link(
                     FILENAME_PLUGIN_MANAGER,
@@ -201,8 +222,9 @@ class PluginManagerController extends BaseController
                 )
             );
         }
-        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $this->request->input('version'));
-        $installed = $installer->processInstall($this->currentFieldValue('unique_key'), $this->request->input('version'));
+        $version = $this->selectedVersion();
+        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $version);
+        $installed = $installer->processInstall($this->currentFieldValue('unique_key'), $version);
         if (!$installed) {
             $this->outputMessageList($installer->getErrorContainer()->getFriendlyErrors(), 'error');
             zen_redirect(
@@ -251,7 +273,7 @@ class PluginManagerController extends BaseController
      */
     protected function processActionDoUninstall(): void
     {
-        if (!$this->request->has('version')) {
+        if (!$this->hasSelectedVersion()) {
             zen_redirect(
                 zen_href_link(
                     FILENAME_PLUGIN_MANAGER,
@@ -259,8 +281,9 @@ class PluginManagerController extends BaseController
                 )
             );
         }
-        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $this->request->input('version'));
-        $uninstalled = $installer->processUninstall($this->currentFieldValue('unique_key'), $this->request->input('version'));
+        $version = $this->selectedVersion();
+        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $version);
+        $uninstalled = $installer->processUninstall($this->currentFieldValue('unique_key'), $version);
         if (!$uninstalled) {
             $this->outputMessageList($installer->getErrorContainer()->getFriendlyErrors(), 'error');
             zen_redirect(
@@ -270,7 +293,7 @@ class PluginManagerController extends BaseController
                 )
             );
         }
-        $this->notify('NOTIFY_PLUGINMANAGER_DO_UNINSTALL', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $this->request->input('version')]);
+        $this->notify('NOTIFY_PLUGINMANAGER_DO_UNINSTALL', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $version]);
 
         $this->messageStack->add_session(TEXT_UNINSTALL_SUCCESS, 'success');
         zen_redirect(
@@ -322,10 +345,11 @@ class PluginManagerController extends BaseController
         if (!$this->pluginManager->isUpgradeAvailable($this->currentFieldValue('unique_key'), $this->currentFieldValue('version'))) {
             $error = true;
         }
-        if (!$this->request->has('version')) {
+        if (!$this->hasSelectedVersion()) {
             $error = true;
         }
-        if (!in_array($this->request->input('version'), $versions)) {
+        $version = $this->selectedVersion();
+        if (!in_array($version, $versions)) {
             $error = true;
         }
         if ($error) {
@@ -345,7 +369,7 @@ class PluginManagerController extends BaseController
                 'class="form-horizontal"'
             ) . zen_draw_hidden_field('version', $this->request->input('version')));
         $this->setBoxContent(
-            '<br>' . TEXT_CONFIRM_UPGRADE . '<br>' . sprintf(TEXT_INFO_UPGRADE_CONFIRM, $this->request->input('version')) . '<br><br>' . TEXT_INFO_UPGRADE_WARNING
+            '<br>' . TEXT_CONFIRM_UPGRADE . '<br>' . sprintf(TEXT_INFO_UPGRADE_CONFIRM, $version) . '<br><br>' . TEXT_INFO_UPGRADE_WARNING
         );
         $this->setBoxContent(
             '<br><button type="submit" class="btn btn-primary">'
@@ -366,17 +390,18 @@ class PluginManagerController extends BaseController
         if (!$this->pluginManager->isUpgradeAvailable($this->currentFieldValue('unique_key'), $this->currentFieldValue('version'))) {
             $error = true;
         }
-        if ((!$this->request->has('version'))) {
+        if (!$this->hasSelectedVersion()) {
             $error = true;
         }
-        if (!in_array($this->request->input('version'), $versions)) {
+        $version = $this->selectedVersion();
+        if (!in_array($version, $versions)) {
             $error = true;
         }
         if ($error) {
             zen_redirect(zen_href_link(FILENAME_PLUGIN_MANAGER, $this->pageLink() . '&' . $this->colKeyLink()));
         }
-        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $this->request->input('version'));
-        $upgraded = $installer->processUpgrade($this->currentFieldValue('unique_key'), $this->request->input('version'), $this->currentFieldValue('version'));
+        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $version);
+        $upgraded = $installer->processUpgrade($this->currentFieldValue('unique_key'), $version, $this->currentFieldValue('version'));
         if (!$upgraded) {
             $this->outputMessageList($installer->getErrorContainer()->getFriendlyErrors(), 'error');
             zen_redirect(
@@ -386,7 +411,7 @@ class PluginManagerController extends BaseController
                 )
             );
         }
-        $this->notify('NOTIFY_PLUGINMANAGER_DO_UPGRADE', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $this->request->input('version'), 'old_version' => $this->currentFieldValue('version')]);
+        $this->notify('NOTIFY_PLUGINMANAGER_DO_UPGRADE', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $version, 'old_version' => $this->currentFieldValue('version')]);
 
         $this->messageStack->add_session(TEXT_UPGRADE_SUCCESS, 'success');
         zen_redirect(
@@ -431,7 +456,7 @@ class PluginManagerController extends BaseController
      */
     protected function processActionConfirmCleanUp(): void
     {
-        if (!$this->request->has('version') || !is_array($this->request->input('version'))) {
+        if (!$this->hasSelectedVersions()) {
             zen_redirect(
                 zen_href_link(
                     FILENAME_PLUGIN_MANAGER,
@@ -448,7 +473,7 @@ class PluginManagerController extends BaseController
             'class="form-horizontal"'
         ));
         $this->setBoxContent('<br>' . TEXT_INFO_CONFIRM_CLEAN . '<br>');
-        foreach ($this->request->input('version') as $version) {
+        foreach ($this->selectedVersions() as $version) {
             $this->setBoxContent('<br>' . $version . zen_draw_hidden_field('version[]', $version));
         }
         $this->setBoxContent(
@@ -465,7 +490,7 @@ class PluginManagerController extends BaseController
      */
     protected function processActionDoCleanup(): void
     {
-        if (!$this->request->has('version') || !is_array($this->request->input('version'))) {
+        if (!$this->hasSelectedVersions()) {
             zen_redirect(
                 zen_href_link(
                     FILENAME_PLUGIN_MANAGER,
@@ -474,7 +499,8 @@ class PluginManagerController extends BaseController
             );
         }
         $error = "";
-        foreach ($this->request->input('version') as $version) {
+        $versions = $this->selectedVersions();
+        foreach ($versions as $version) {
             $path = DIR_FS_CATALOG . 'zc_plugins/' . $this->currentFieldValue('unique_key') . '/' . $version;
             (new FileSystem())->deleteDirectory($path);
             if (is_dir($path)) {
@@ -486,7 +512,7 @@ class PluginManagerController extends BaseController
         } else {
             $this->messageStack->add_session(TEXT_CLEANUP_ERROR . $error, 'error');
         }
-        $this->notify('NOTIFY_PLUGINMANAGER_DO_CLEANUP', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $this->request->input('version')]);
+        $this->notify('NOTIFY_PLUGINMANAGER_DO_CLEANUP', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $versions]);
 
         zen_redirect(zen_href_link(FILENAME_PLUGIN_MANAGER, $this->pageLink()));
     }
@@ -519,7 +545,7 @@ class PluginManagerController extends BaseController
      */
     protected function processActionDoEnable(): void
     {
-        if (!$this->request->has('version')) {
+        if (!$this->hasSelectedVersion()) {
             zen_redirect(
                 zen_href_link(
                     FILENAME_PLUGIN_MANAGER,
@@ -527,9 +553,10 @@ class PluginManagerController extends BaseController
                 )
             );
         }
-        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $this->request->input('version'));
-        $installer->processEnable($this->currentFieldValue('unique_key'), $this->request->input('version'));
-        $this->notify('NOTIFY_PLUGINMANAGER_DO_ENABLE', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $this->request->input('version')]);
+        $version = $this->selectedVersion();
+        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $version);
+        $installer->processEnable($this->currentFieldValue('unique_key'), $version);
+        $this->notify('NOTIFY_PLUGINMANAGER_DO_ENABLE', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $version]);
 
         $this->messageStack->add_session(TEXT_ENABLE_SUCCESS, 'success');
         zen_redirect(
@@ -568,12 +595,13 @@ class PluginManagerController extends BaseController
      */
     protected function processActionDoDisable(): void
     {
-        if (!$this->request->has('version')) {
+        if (!$this->hasSelectedVersion()) {
             zen_redirect(zen_href_link(FILENAME_PLUGIN_MANAGER, $this->pageLink() . '&' . $this->colKeyLink()));
         }
-        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $this->request->input('version'));
-        $installer->processDisable($this->currentFieldValue('unique_key'), $this->request->input('version'));
-        $this->notify('NOTIFY_PLUGINMANAGER_DO_DISABLE', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $this->request->input('version')]);
+        $version = $this->selectedVersion();
+        $installer = $this->installerFactory->make($this->currentFieldValue('unique_key'), $version);
+        $installer->processDisable($this->currentFieldValue('unique_key'), $version);
+        $this->notify('NOTIFY_PLUGINMANAGER_DO_DISABLE', ['plugin_key' => $this->currentFieldValue('unique_key'), 'version' => $version]);
 
         $this->messageStack->add_session(TEXT_DISABLE_SUCCESS, 'success');
         zen_redirect(zen_href_link(FILENAME_PLUGIN_MANAGER, $this->pageLink() . '&' . $this->colKeyLink()));

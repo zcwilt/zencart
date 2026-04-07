@@ -40,7 +40,7 @@ class BaseController
     /**
      * @since ZC v1.5.8
      */
-    protected function getAction() : string
+    public function getAction() : string
     {
         $action = $this->request->input('action', '');
         return $action;
@@ -51,7 +51,11 @@ class BaseController
      */
     public function setBoxHeader(string $content, array $params = []): void
     {
-        $this->infoBox['header'][] = ['text' => $content, 'params' => $params];
+        $row = ['text' => $content];
+        foreach ($params as $key => $value) {
+            $row[$key] = $value;
+        }
+        $this->infoBox['header'][] = $row;
     }
 
     /**
@@ -75,7 +79,11 @@ class BaseController
      */
     public function setBoxContent(string $content, array $params = []): void
     {
-        $this->infoBox['content'][] = ['text' => $content, 'params' => $params];
+        $row = ['text' => $content];
+        foreach ($params as $key => $value) {
+            $row[$key] = $value;
+        }
+        $this->infoBox['content'][] = $row;
     }
 
     /**

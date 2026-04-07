@@ -6,69 +6,25 @@
 
 namespace Zencart\DbRepositories;
 
-use queryFactory;
+use Zencart\Config\DbLoaders\ConfigurationLoader;
 
 /**
- * Native queryFactory-backed accessor for TABLE_CONFIGURATION.
+ * @deprecated Use \Zencart\Config\DbLoaders\ConfigurationLoader for config-loading responsibilities.
  *
  * @since ZC v2.2.0
  */
-class ConfigurationRepository
+class ConfigurationRepository extends ConfigurationLoader
 {
-    protected array $configAsIntArray = ['SECURITY_CODE_LENGTH'];
-    protected array $keepAsStringArray = ['PRODUCTS_MANUFACTURERS_STATUS'];
-
-    public function __construct(private queryFactory $db)
-    {
-    }
-
-    /**
-     * @since ZC v2.2.0
-     */
-    public function loadConfigSettings(): void
-    {
-        $configs = $this->db->Execute(
-            'SELECT configuration_key, configuration_value, configuration_group_id FROM ' . TABLE_CONFIGURATION
-        );
-
-        foreach ($configs as $config) {
-            $key = strtoupper((string)$config['configuration_key']);
-            $value = $config['configuration_value'];
-            $groupId = (int)$config['configuration_group_id'];
-
-            $convertToInt = false;
-            if (in_array($key, $this->configAsIntArray, true)) {
-                $convertToInt = true;
-            } elseif (in_array($groupId, [2, 3], true) && !in_array($key, $this->keepAsStringArray, true)) {
-                $convertToInt = true;
-            }
-
-            if ($convertToInt) {
-                $value = (int)$value;
-            }
-
-            if (!defined($key)) {
-                define($key, $value);
-            }
-        }
-    }
-
     /**
      * @since ZC v2.2.0
      */
     public function getByKey(string $configurationKey): ?array
     {
         $configurationKey = $this->db->prepare_input($configurationKey);
-        $result = $this->db->Execute(
+        return $this->fetchFirstRow(
             "SELECT configuration_id, configuration_key, configuration_value FROM " . TABLE_CONFIGURATION .
             " WHERE configuration_key = '" . $configurationKey . "' LIMIT 1"
         );
-
-        if ($result->EOF) {
-            return null;
-        }
-
-        return $result->fields;
     }
 
     /**

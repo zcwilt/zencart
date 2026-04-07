@@ -10,18 +10,18 @@
 if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
-use Zencart\DbRepositories\ConfigurationRepository;
-use Zencart\DbRepositories\ProductTypeLayoutRepository;
+use Zencart\Config\DbLoaders\ConfigurationLoader;
+use Zencart\Config\DbLoaders\ProductTypeLayoutLoader;
 
 // need to enable caching in eloquent. for now, no caching @todo
 $use_cache = (isset($_GET['nocache']) ? false : true ) ;
 global $db;
 
-$configurationRepository = new ConfigurationRepository($db);
-$configurationRepository->loadConfigSettings();
+$configurationLoader = new ConfigurationLoader($db);
+$configurationLoader->loadConfigSettings();
 
-$productTypeLayoutRepository = new ProductTypeLayoutRepository($db);
-$productTypeLayoutRepository->loadConfigSettings();
+$productTypeLayoutLoader = new ProductTypeLayoutLoader($db);
+$productTypeLayoutLoader->loadConfigSettings();
 
 if (file_exists(DIR_WS_CLASSES . 'db/' . DB_TYPE . '/define_queries.php')) {
   /**

@@ -6,33 +6,13 @@
 
 namespace Zencart\DbRepositories;
 
-use queryFactory;
+use Zencart\Config\DbLoaders\ProductTypeLayoutLoader;
 
 /**
- * Native queryFactory-backed accessor for TABLE_PRODUCT_TYPE_LAYOUT.
+ * @deprecated Use \Zencart\Config\DbLoaders\ProductTypeLayoutLoader for config-loading responsibilities.
  *
  * @since ZC v2.2.0
  */
-class ProductTypeLayoutRepository
+class ProductTypeLayoutRepository extends ProductTypeLayoutLoader
 {
-    public function __construct(private queryFactory $db)
-    {
-    }
-
-    /**
-     * @since ZC v2.2.0
-     */
-    public function loadConfigSettings(): void
-    {
-        $configs = $this->db->Execute(
-            'SELECT configuration_key, configuration_value FROM ' . TABLE_PRODUCT_TYPE_LAYOUT
-        );
-
-        foreach ($configs as $config) {
-            $key = strtoupper((string)$config['configuration_key']);
-            if (!defined($key)) {
-                define($key, $config['configuration_value']);
-            }
-        }
-    }
 }

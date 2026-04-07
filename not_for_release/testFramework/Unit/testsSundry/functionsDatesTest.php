@@ -2,7 +2,7 @@
 
 use Tests\Support\zcUnitTestCase;
 
-class functionDatesTest extends zcUnitTestCase
+class functionsDatesTest extends zcUnitTestCase
 {
     public function setup(): void
     {

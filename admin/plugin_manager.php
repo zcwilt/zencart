@@ -6,19 +6,14 @@
  * @version $Id: DrByte 2025 Oct 25 Modified in v2.2.0 $
  */
 
-use Zencart\Filters\FilterFactory;
-use Zencart\Filters\FilterManager;
+use Zencart\AdminUi\Resources\PluginManagerResource;
+use Zencart\AdminUi\Resources\ResourceResolver;
 use Zencart\PluginManager\PluginManager;
 use Zencart\PluginSupport\Installer;
 use Zencart\PluginSupport\InstallerFactory;
 use Zencart\PluginSupport\PluginErrorContainer;
-use Zencart\PluginSupport\PluginStatus;
 use Zencart\PluginSupport\ScriptedInstallerFactory;
 use Zencart\PluginSupport\SqlPatchInstaller;
-use Zencart\ViewBuilders\DerivedItemsManager;
-use Zencart\ViewBuilders\PluginManagerController;
-use Zencart\ViewBuilders\PluginManagerDataSource;
-use Zencart\ViewBuilders\SimpleDataFormatter;
 
 /* @var PluginManager $pluginManager */
 /* @var queryFactory $db */
@@ -31,93 +26,9 @@ $pluginManager->inspectAndUpdate();
 $errorContainer = new PluginErrorContainer();
 $pluginInstaller = new Installer(new SqlPatchInstaller($db, $errorContainer), new ScriptedInstallerFactory($db, $errorContainer), $errorContainer);
 $installerFactory = new InstallerFactory($db, $pluginInstaller, $errorContainer);
-
-// define the table definition. Just using an array here, but could have used the fluent interface
-$tableDefinition = [
-    'colKey' => 'unique_key',
-    'maxRowCount' => 999,
-    'defaultRowAction' => '',
-    'columns' => [
-        'name' => [
-            'title' => TABLE_HEADING_NAME,
-            'derivedItem' => [
-                'type' => 'local',
-                'method' => 'getLanguageTranslationForName',
-            ],
-            'class' => '',
-        ],
-        'version' => ['title' => TABLE_HEADING_VERSION_INSTALLED],
-        'filespace' => [
-            'title' => TABLE_HEADING_FILE_SPACE,
-            'derivedItem' => [
-                'type' => 'local',
-                'method' => 'getPluginFileSize',
-            ],
-            'class' => '',
-        ],
-        'unique_key' => ['title' => TABLE_HEADING_KEY],
-        'status' => [
-            'title' => TABLE_HEADING_STATUS,
-            'derivedItem' => [
-                'type' => 'local',
-                'method' => 'arrayReplace',
-                'params' => [
-                    (string)PluginStatus::NOT_INSTALLED => zen_icon('status-red'),
-                    (string)PluginStatus::ENABLED => zen_icon('status-green'),
-                    (string)PluginStatus::DISABLED => zen_icon('status-yellow'),
-                ],
-            ],
-            'class' => static function($value) {
-                return match ($value) {
-                    PluginStatus::ENABLED => 'status-enabled',
-                    PluginStatus::DISABLED => 'status-disabled',
-                    default => 'status-not-installed',
-                };
-            }
-        ],
-    ],
-];
-
-// Instantiate the table definition DTO
-$table = new \Zencart\ViewBuilders\TableViewDefinition($tableDefinition);
-
-// the datasource for building the initial query
-$dataSource = new PluginManagerDataSource($table);
-$query = $dataSource->processRequest($sanitizedRequest);
-
-// Define filters for this view. If there were no filters we could skip this and the other calls to filterManager
-$filterDefinitions = [
-    [
-        'type' => 'selectWhere',
-        'field' => 'status',
-        'label' => TEXT_LABEL_STATUS,
-        'source' => 'options',
-        'selectName' => 'plugin_status',
-        'auto' => true,
-        'options' => [
-            '*' => TEXT_ALL_STATUSES,
-            (string)PluginStatus::NOT_INSTALLED => TEXT_NOT_INSTALLED,
-            (string)PluginStatus::ENABLED => TEXT_INSTALLED_ENABLED,
-            (string)PluginStatus::DISABLED => TEXT_INSTALLED_DISABLED,
-        ],
-    ],
-];
-
-// filter manager changes the query based on defined filters
-$filterManager = new FilterManager($filterDefinitions, new FilterFactory());
-$filterManager->build();
-$query = $filterManager->processRequest($sanitizedRequest, $query);
-
-// process the query now, and get the query results to pass to the formatter
-$queryResults = $dataSource->processQuery($query);
-
-//the simple formatter returns data that can be used for a simple html page
-$formatter = new SimpleDataFormatter($sanitizedRequest, $table, $queryResults, new DerivedItemsManager());
-
-// finally get a controller to respond to requests and build infoboxes etc
-$tableController = new PluginManagerController($sanitizedRequest, $messageStack, $table, $formatter);
-$tableController->init($pluginManager, $installerFactory);
-$tableController->processRequest();
+$resourceClass = ResourceResolver::getInstance()->resolve('plugin_manager', PluginManagerResource::class);
+$adminPage = (new $resourceClass($sanitizedRequest, $messageStack, $pluginManager, $installerFactory))->buildPage();
+extract($adminPage->viewData(), EXTR_SKIP);
 
 ?>
 <!doctype html>
@@ -137,7 +48,9 @@ $tableController->processRequest();
 <!-- header_eof //-->
 
 <!-- body //-->
-<?php require 'includes/templates/plugin_manager.php'; ?>
+<?php
+require $adminPage->templatePath();
+?>
 <!-- body_eof //-->
 
 <!-- footer //-->

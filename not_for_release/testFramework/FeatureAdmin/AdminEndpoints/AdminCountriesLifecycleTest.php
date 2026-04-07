@@ -123,6 +123,129 @@ class AdminCountriesLifecycleTest extends zcInProcessFeatureTestCaseAdmin
         $this->assertNull($deletedCountry);
     }
 
+    public function testAdminCanSelectAnotherVisibleCountryRowAndToggleItsStatus(): void
+    {
+        $this->completeInitialAdminSetup();
+
+        $letterGroup = TestDb::selectOne(
+            "SELECT UPPER(SUBSTRING(countries_name, 1, 1)) AS letter, COUNT(*) AS total
+               FROM countries
+              GROUP BY UPPER(SUBSTRING(countries_name, 1, 1))
+             HAVING COUNT(*) >= 2
+              ORDER BY letter ASC
+              LIMIT 1"
+        );
+        $this->assertNotNull($letterGroup);
+
+        $statement = TestDb::pdo()->prepare(
+            'SELECT countries_id, countries_name, status
+               FROM countries
+              WHERE UPPER(SUBSTRING(countries_name, 1, 1)) = :letter
+              ORDER BY countries_name ASC, countries_id ASC
+              LIMIT 2'
+        );
+        $statement->bindValue(':letter', $letterGroup['letter']);
+        $statement->execute();
+        $countriesOnLetterPage = $statement->fetchAll();
+
+        $this->assertCount(2, $countriesOnLetterPage);
+        $selectedCountry = $countriesOnLetterPage[0];
+        $toggleCountry = $countriesOnLetterPage[1];
+
+        $selectedPage = $this->getAdmin('/admin/index.php?cmd=countries&page=' . urlencode((string) $letterGroup['letter']) . '&cID=' . $selectedCountry['countries_id'])
+            ->assertOk()
+            ->assertHeader('X-ZC-InProcess-Runner', 'admin')
+            ->assertSee((string) $selectedCountry['countries_name'])
+            ->assertSee((string) $toggleCountry['countries_name'])
+            ->assertSee('cID=' . $selectedCountry['countries_id'] . '&amp;action=edit');
+
+        $this->assertStringContainsString('name="setstatus_' . $selectedCountry['countries_id'] . '"', $selectedPage->content);
+        $this->assertStringContainsString('name="setstatus_' . $toggleCountry['countries_id'] . '"', $selectedPage->content);
+
+        $otherRowPage = $this->getAdmin('/admin/index.php?cmd=countries&page=' . urlencode((string) $letterGroup['letter']) . '&cID=' . $toggleCountry['countries_id'])
+            ->assertOk()
+            ->assertHeader('X-ZC-InProcess-Runner', 'admin')
+            ->assertSee('Countries')
+            ->assertSee((string) $toggleCountry['countries_name'])
+            ->assertSee('cID=' . $toggleCountry['countries_id'] . '&amp;action=edit');
+
+        $originalStatus = (string) $toggleCountry['status'];
+
+        $this->assertContains($originalStatus, ['0', '1']);
+
+        $toggleResponse = $this->submitAdminForm($selectedPage, 'setstatus_' . $toggleCountry['countries_id'], [
+            'current_country' => (string) $toggleCountry['countries_id'],
+            'current_status' => $originalStatus,
+        ]);
+
+        $toggleResponse->assertOk()
+            ->assertHeader('X-ZC-InProcess-Runner', 'admin')
+            ->assertSee((string) $toggleCountry['countries_name'])
+            ->assertSee('cID=' . $toggleCountry['countries_id'] . '&amp;action=edit');
+
+        $toggledStatus = (string) TestDb::selectValue(
+            'SELECT status FROM countries WHERE countries_id = :country_id LIMIT 1',
+            [':country_id' => $toggleCountry['countries_id']]
+        );
+
+        $this->assertSame($originalStatus === '1' ? '0' : '1', $toggledStatus);
+    }
+
+    public function testAdminCanBrowseCountriesByAlphabeticPage(): void
+    {
+        $this->completeInitialAdminSetup();
+
+        $bPage = $this->getAdmin('/admin/index.php?cmd=countries&page=B')
+            ->assertOk()
+            ->assertHeader('X-ZC-InProcess-Runner', 'admin')
+            ->assertSee('Countries')
+            ->assertSee('Bahrain');
+
+        $this->assertStringContainsString('page=B', $bPage->content);
+        $this->assertStringContainsString('action=new', $bPage->content);
+    }
+
+    public function testAdminCanFilterCountriesByStatus(): void
+    {
+        $this->completeInitialAdminSetup();
+
+        $activeCountry = TestDb::selectOne(
+            'SELECT countries_id, countries_name
+               FROM countries
+              WHERE status = 1
+              ORDER BY countries_name ASC
+              LIMIT 1'
+        );
+        $inactiveCountryId = TestDb::insert('countries', [
+            'countries_name' => 'Filter Inactive Republic',
+            'countries_iso_code_2' => 'FI',
+            'countries_iso_code_3' => 'FIR',
+            'address_format_id' => 1,
+            'status' => 0,
+        ]);
+        $inactiveCountry = TestDb::selectOne(
+            'SELECT countries_id, countries_name
+               FROM countries
+              WHERE countries_id = :country_id
+              LIMIT 1',
+            [':country_id' => $inactiveCountryId]
+        );
+
+        $this->assertNotNull($activeCountry);
+        $this->assertNotNull($inactiveCountry);
+
+        $filteredPage = $this->getAdmin('/admin/index.php?cmd=countries&status_filter=1')
+            ->assertOk()
+            ->assertHeader('X-ZC-InProcess-Runner', 'admin')
+            ->assertSee('Countries')
+            ->assertSee((string) $activeCountry['countries_name']);
+
+        $this->assertStringNotContainsString((string) $inactiveCountry['countries_name'], $filteredPage->content);
+        $this->assertStringContainsString('name="status_filter"', $filteredPage->content);
+        $this->assertStringContainsString('Active Countries', $filteredPage->content);
+        $this->assertStringContainsString('<option value="1" selected>', $filteredPage->content);
+    }
+
     protected function completeInitialAdminSetup(): void
     {
         $this->visitAdminHome()

@@ -7,6 +7,7 @@
 /** @var \Aura\Autoload\Loader $psr4Autoloader */
 $psr4Autoloader->addPrefix('Zencart\QueryBuilder', DIR_FS_CATALOG . DIR_WS_CLASSES);
 $psr4Autoloader->addPrefix('Zencart\Traits', DIR_FS_CATALOG . DIR_WS_CLASSES . 'traits');
+$psr4Autoloader->addPrefix('Zencart\Config', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Config');
 $psr4Autoloader->addPrefix('Zencart\FileSystem', DIR_FS_CATALOG . DIR_WS_CLASSES );
 $psr4Autoloader->addPrefix('Zencart\InitSystem', DIR_FS_CATALOG . DIR_WS_CLASSES );
 $psr4Autoloader->addPrefix('Zencart\PluginManager', DIR_FS_CATALOG . DIR_WS_CLASSES);
@@ -16,15 +17,13 @@ $psr4Autoloader->addPrefix('Zencart\PageLoader', DIR_FS_CATALOG . DIR_WS_CLASSES
 $psr4Autoloader->addPrefix('Zencart\Events', DIR_FS_CATALOG . DIR_WS_CLASSES );
 
 $psr4Autoloader->addPrefix('Zencart\DbRepositories', DIR_FS_CATALOG . DIR_WS_CLASSES . 'DbRepositories');
-// The two App\Models classes are aliases for the above Zencart\DbRepositories classes, so that encap plugins built for prior versions can still type-hint against \App\Models without throwing errors.
-$psr4Autoloader->setClassFile('App\Models\PluginControl', DIR_FS_CATALOG . DIR_WS_CLASSES . 'DbRepositories/PluginControl.php');
-$psr4Autoloader->setClassFile('App\Models\PluginControlVersion', DIR_FS_CATALOG . DIR_WS_CLASSES . 'DbRepositories/PluginControlVersion.php');
 
 $psr4Autoloader->addPrefix('Zencart\PluginSupport', DIR_FS_CATALOG . DIR_WS_CLASSES . 'PluginSupport');
 $psr4Autoloader->addPrefix('Zencart\ViewBuilders', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ViewBuilders');
 $psr4Autoloader->addPrefix('Zencart\Exceptions', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Exceptions');
 $psr4Autoloader->addPrefix('Zencart\Filters', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Filters');
 $psr4Autoloader->addPrefix('Zencart\Request', DIR_FS_CATALOG . DIR_WS_CLASSES);
+$psr4Autoloader->addPrefix('Zencart\AdminUi', DIR_FS_CATALOG . DIR_WS_CLASSES . 'AdminUi');
 
 // -----
 // Admin-only classes
