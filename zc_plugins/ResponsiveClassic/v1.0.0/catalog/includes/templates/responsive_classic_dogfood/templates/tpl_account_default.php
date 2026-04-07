@@ -16,7 +16,7 @@
 ?>
 <div class="centerColumn group" id="accountDefault">
 
-<h1 id="accountDefaultHeading"><?php echo HEADING_TITLE; ?></h1>
+<h1 id="accountDefaultHeading"><?php echo HEADING_TITLE; ?>PLUGIN</h1>
 <?php if ($messageStack->size('account') > 0) echo $messageStack->output('account'); ?>
 
 <?php
