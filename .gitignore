@@ -35,7 +35,6 @@ localconfig_*.php
 !localconfig_travis.php
 !localconfig_EXAMPLE.php
 !localconfig_vagrant.php
-zc_plugins/ModList
 
 # Demo Images
 images/small_00.jpg
@@ -244,3 +243,7 @@ modified_files.txt
 
 # ensure test plugin is not checked in
 zc_plugins/zenTestPlugin
+
+# ignore ppr handler files:
+ppr_listener.php
+ppr_webhook.php

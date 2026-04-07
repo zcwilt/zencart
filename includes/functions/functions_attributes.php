@@ -740,6 +740,11 @@ function zen_has_product_attributes_downloads($product_id, $check_if_valid = fal
 {
     global $db;
     if (DOWNLOAD_ENABLED !== 'true') {
+        if ($check_if_valid) {
+            // if downloads aren't enabled, then there can't be any invalid downloads, so we return blank to indicate no invalid downloads
+            return '';
+        }
+        // in attributes controller, we display 'disabled' if the feature is turned off.
         return 'disabled';
     }
     $sql = "SELECT pa.products_attributes_id, pad.products_attributes_filename

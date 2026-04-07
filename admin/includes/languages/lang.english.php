@@ -3,8 +3,8 @@
  * @copyright Copyright 2003-2026 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
-* @version $Id: lat9 2026 Feb 28 Modified in v2.2.1 $
-*/
+ * @version $Id: ZenExpert 2026 Jan 14 Modified in v3.0.0 $
+ */
 
 @setlocale(LC_TIME, ['en_US', 'en_US.utf8', 'en', 'English_United States.1252']);
 
@@ -246,19 +246,33 @@ $define = [
     'ERROR_UNABLE_TO_DISPLAY_SERVER_INFORMATION' => 'Sorry, your PHP configuration cannot be displayed because your hosting company has specified that [phpinfo] should be disabled as part of [disable_functions] in php.ini settings.',
     'FEMALE' => 'Female',
     'HEADER_ALT_TEXT' => 'Admin Powered by Zen Cart :: The Art of E-Commerce',
+    'HEADER_LOGO_IMAGE_HOME' => '',
     'HEADER_LOGO_IMAGE' => 'logo.gif',
     'HEADER_LOGO_WIDTH' => '192',
     'HEADER_LOGO_HEIGHT' => '68',
+    'HEADER_TEXT_ADMIN' => 'Admin',
+    'HEADER_TEXT_HOSTNAME' => 'Hostname',
+    'HEADER_TEXT_IP_ADDRESS' => 'IP Address',
+    'HEADER_TEXT_LANGUAGES' => 'Languages',
+    'HEADER_TEXT_SEARCH_ORDERS' => 'Search Orders...',
+    'HEADER_TEXT_SECURITY_WARNING' => 'Warning: Admin Activity Log action required!',
+    'HEADER_TEXT_TIMEZONE' => 'Timezone',
     'HEADER_TITLE_ACCOUNT' => 'Account',
     'HEADER_TITLE_LOGOFF' => 'Logoff',
+    'HEADER_TITLE_MENU' => 'Menu',
+    'HEADER_TITLE_MENU_ERROR' => 'Menu empty, or settings error.',
     'HEADER_TITLE_ONLINE_CATALOG' => 'Storefront',
+    'HEADER_TITLE_QUICK_ACTIONS' => 'Quick Actions',
     'HEADER_TITLE_SUPPORT_SITE' => 'Support',
     'HEADER_TITLE_TOP' => 'Home',
     'HEADER_TITLE_VERSION' => 'Version',
-    'HEADING_TITLE_VAL' => 'Option Values',
+    'HEADER_TITLE_VERSION_SYSTEM_CHECK' => 'System Check',
+    'HEADER_TITLE_VERSION_UP_TO_DATE' => 'Your system is up to date.',
     'HEADING_TITLE_SEARCH_DETAIL' => 'Search: ',
     'HEADING_TITLE_SEARCH_DETAIL_REPORTS' => 'Search for Product IDs (Delimited by commas)',
     'HEADING_TITLE_SEARCH_DETAIL_REPORTS_NAME_MODEL' => 'Search for Product Name/Model',
+    'HEADING_TITLE_VAL' => 'Option Values',
+    'HEADER_TOGGLE_NAVIGATION' => 'Toggle navigation',
     'HELPTEXT_WHOLESALE_POPUP_TITLE' => 'Setting Wholesale Prices',
     'HELPTEXT_WHOLESALE_PRICES' => 'Enter 0 for retail pricing only. Otherwise, enter the wholesale-pricing levels separated by minus-sign (-). A pricing level can be either a fixed amount or a percent-off. For example, \'2.00-10%-1.00\' gives a price of 2.00 to customers at level-1, 10%-off to those at level-2 and 1.00 to those at level-3 and higher.',
     'HTML_PARAMS' => 'dir="ltr" lang="en"',
@@ -623,6 +637,7 @@ $define = [
     'TEXT_SHOW_GV_QUEUE' => '%s waiting approval ',
     'TEXT_SHOW_OPTION_NAMES_VALUES_COPIER_OFF' => 'Display Global Features - OFF',
     'TEXT_SHOW_OPTION_NAMES_VALUES_COPIER_ON' => 'Display Global Features - ON',
+    'TEXT_SINCE_DATE' => 'Since %s',
     'TEXT_SORT_CATEGORIES_NAME' => 'Categories Name',
     'TEXT_SORT_CATEGORIES_SORT_ORDER_CATEGORIES_NAME' => 'Categories Sort Order, Categories Name',
     'TEXT_SORT_ORDER' => 'Sort Order',

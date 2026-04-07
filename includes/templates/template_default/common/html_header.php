@@ -38,8 +38,6 @@ require(DIR_WS_MODULES . zen_get_module_directory('meta_tags.php'));
 $zco_notifier->notify('NOTIFY_HTML_HEAD_TAG_START', $current_page_base);
 ?>
 <meta charset="<?php echo CHARSET; ?>"/>
-<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-<link rel="dns-prefetch" href="https://code.jquery.com">
 <title><?php echo META_TAG_TITLE; ?></title>
 <meta name="keywords" content="<?php echo META_TAG_KEYWORDS; ?>"/>
 <meta name="description" content="<?php echo META_TAG_DESCRIPTION; ?>"/>
@@ -49,15 +47,11 @@ $zco_notifier->notify('NOTIFY_HTML_HEAD_TAG_START', $current_page_base);
 <?php if (defined('ROBOTS_PAGES_TO_SKIP') && in_array($current_page_base,explode(",",constant('ROBOTS_PAGES_TO_SKIP'))) || $current_page_base=='down_for_maintenance' || $robotsNoIndex === true) { ?>
 <meta name="robots" content="noindex, nofollow"/>
 <?php } ?>
-
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
 
-<?php if (defined('FAVICON')) { ?>
-<link rel="icon" href="<?php echo FAVICON; ?>" type="image/x-icon"/>
-<link rel="shortcut icon" href="<?php echo FAVICON; ?>" type="image/x-icon"/>
-<?php } //endif FAVICON ?>
-
 <base href="<?php echo (($request_type == 'SSL') ? HTTPS_SERVER . DIR_WS_HTTPS_CATALOG : HTTP_SERVER . DIR_WS_CATALOG ); ?>"/>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="https://code.jquery.com">
 <?php if (isset($canonicalLink) && $canonicalLink != '') { ?>
 <link rel="canonical" href="<?php echo $canonicalLink; ?>"/>
 <?php } ?>
@@ -85,6 +79,11 @@ $zco_notifier->notify('NOTIFY_HTML_HEAD_JS_BEGIN', $current_page_base);
  * Load all template-specific jscript files, via the common jscript loader.
  */
 require $template->get_template_dir('html_header_js_loader.php', DIR_WS_TEMPLATE, $current_page_base, 'common') . '/html_header_js_loader.php';
+
+?>
+<?php if (defined('FAVICON')) { ?>
+    <link rel="icon" href="<?php echo FAVICON; ?>">
+<?php } //endif FAVICON
 
 $zco_notifier->notify('NOTIFY_HTML_HEAD_END', $current_page_base);
 ?>

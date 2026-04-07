@@ -11,10 +11,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 /**
  * Get all template directories found in catalog folder structure
  *
- * @return array
  * @since ZC v1.5.8
  */
-function zen_get_catalog_template_directories($include_template_default = false)
+function zen_get_catalog_template_directories(bool $include_template_default = false): array
 {
     $resolver = new \Zencart\TemplateResolver\TemplateResolver();
     return $resolver->getSelectableTemplates((bool)$include_template_default);
@@ -198,10 +197,13 @@ function zen_resolve_template_key(
 /**
  * @since ZC v1.5.8
  */
-function zen_register_new_template($template_dir, $language_id)
+function zen_register_new_template(string $template_dir, int|string $language_id): false|int|string
 {
-    // @TODO: add duplicate-detection and empty-submission detection
     global $db;
+    if (empty($template_dir) || empty($language_id)) {
+        return false;
+    }
+    // check if template already registered for this language
     $sql = "SELECT *
             FROM " . TABLE_TEMPLATE_SELECT . "
             WHERE template_language = :lang:";
@@ -222,7 +224,7 @@ function zen_register_new_template($template_dir, $language_id)
  * @return array of language_name and language_id entries
  * @since ZC v1.5.8
  */
-function zen_get_template_languages_not_registered()
+function zen_get_template_languages_not_registered(): array
 {
     global $db;
     $templates = [];
@@ -237,11 +239,11 @@ function zen_get_template_languages_not_registered()
 }
 
 /**
- * @param int $id
+ * @param numeric $id
  * @param string $template_dir
  * @since ZC v1.5.8
  */
-function zen_update_template_name_for_id($id, $template_dir)
+function zen_update_template_name_for_id(int|string $id, string $template_dir): void
 {
     global $db;
     $sql = "UPDATE " . TABLE_TEMPLATE_SELECT . "
@@ -253,11 +255,11 @@ function zen_update_template_name_for_id($id, $template_dir)
 }
 
 /**
- * @param int $id
+ * @param numeric $id
  * @return bool whether template existed before delete
  * @since ZC v1.5.8
  */
-function zen_deregister_template_id($id)
+function zen_deregister_template_id(int|string $id): bool
 {
     global $db;
     $check_query = $db->Execute("SELECT template_language

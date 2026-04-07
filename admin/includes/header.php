@@ -1,60 +1,22 @@
 <?php
 /**
  * @copyright Copyright 2003-2026 Zen Cart Development Team
- * @copyright Portions Copyright 2003 osCommerce
- * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2025 Dec 01 Modified in v2.2.1 $
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License v2.0
+ * @version $Id: ZenExpert 2026-04-06 Modified in v3.0.0 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
 if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
-  $messageStack->add('STRICT ERROR REPORTING IS ON', 'error');
+    $messageStack->add('STRICT ERROR REPORTING IS ON', 'error');
 }
+
 /*
  * pull in any necessary JS for the page
  * Left here for legacy pages that do not use the new admin_html_head.php file
  */
 require_once DIR_WS_INCLUDES . 'javascript_loader.php';
-
-// Show Languages Dropdown for convenience only if main filename and directory exists
-if (empty($action)) {
-    $languages_array = [];
-    $languages = zen_get_languages();
-    if (count($languages) > 1) {
-        //$languages_selected = $_GET['language'];
-        $languages_selected = $_SESSION['language'];
-        $missing_languages = '';
-        $count = 0;
-        for ($i = 0, $n = count($languages); $i < $n; $i++) {
-            $test_directory = DIR_WS_LANGUAGES . $languages[$i]['directory'];
-            $test_file = DIR_WS_LANGUAGES . 'lang.' . $languages[$i]['directory'] . '.php';
-            if (file_exists($test_file) && file_exists($test_directory)) {
-                $count++;
-                $languages_array[] = [
-                  'id' => $languages[$i]['code'],
-                  'text' => $languages[$i]['name']
-                ];
-                if ($languages[$i]['directory'] == $_SESSION['language']) {
-                    $languages_selected = $languages[$i]['code'];
-                }
-            } else {
-                $missing_languages .= ' ' . ucfirst($languages[$i]['directory']) . ' ' . $languages[$i]['name'];
-            }
-        }
-
-// if languages in table do not match valid languages show error message
-        if ($count != count($languages)) {
-            $messageStack->add('MISSING LANGUAGE FILES OR DIRECTORIES ...' . $missing_languages, 'caution');
-        }
-        $hide_languages = false;
-    } else {
-        $hide_languages = true;
-    } // more than one language
-} else {
-    $hide_languages = true;
-} // hide when other language dropdown is used
 
 // -----
 // If the current page-load did not use the admin_html_head.php for the CSS files'
@@ -69,18 +31,29 @@ if (!isset($zen_admin_html_head_loaded) && !isset($_SESSION['pages_needing_updat
     trigger_error(WARNING_PAGE_REQUIRES_UPDATE, E_USER_DEPRECATED);
 }
 
-// display alerts/error messages, if any
-if ($messageStack->size > 0) {
-    ?>
-    <div class="messageStack-header noprint">
-        <?php
-        echo $messageStack->output();
-        ?>
-    </div>
-    <?php
+// Show Languages Dropdown for convenience only if main filename and directory exists
+$languages_array = [];
+$languages = zen_get_languages();
+if (empty($action) && count($languages) > 1) {
+    $languages_selected = $_SESSION['language'];
+    $missing_languages = '';
+    $count = 0;
+    for ($i = 0, $n = count($languages); $i < $n; $i++) {
+        $test_directory = DIR_WS_LANGUAGES . $languages[$i]['directory'];
+        $test_file = DIR_WS_LANGUAGES . 'lang.' . $languages[$i]['directory'] . '.php';
+        if (file_exists($test_file) && file_exists($test_directory)) {
+            $count++;
+            $languages_array[] = array('id' => $languages[$i]['code'], 'text' => $languages[$i]['name']);
+        } else {
+            $missing_languages .= ' ' . ucfirst($languages[$i]['directory']) . ' ' . $languages[$i]['name'];
+        }
+    }
+    if ($count != count($languages)) {
+        $messageStack->add('MISSING LANGUAGE FILES OR DIRECTORIES ...' . $missing_languages, 'caution');
+    }
 }
 
-// check GV release queue and alert store owner
+// gv queue check
 if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN == 'true') {
     $new_gv_queue = $db->Execute("SELECT * FROM " . TABLE_COUPON_GV_QUEUE . " WHERE release_flag='N'");
     $new_gv_queue_cnt = 0;
@@ -89,109 +62,179 @@ if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_G
         $goto_gv = '<a href="' . zen_href_link(FILENAME_GV_QUEUE) . '">' . '<span class="btn btn-info">' . IMAGE_GIFT_QUEUE . '</span></a>';
     }
 }
+
+// prepare admin info for dropdown
+$admin_ip = $_SERVER['REMOTE_ADDR'];
+$admin_host = gethostname();
+$admin_tz = date_default_timezone_get();
+$admin_locale = setlocale(LC_TIME, 0);
+
+$upperMenuArray = [
+        [ 'a' => zen_href_link(FILENAME_DEFAULT), 'title' => HEADER_TITLE_TOP ],
+        [ 'a' => zen_catalog_href_link(FILENAME_DEFAULT), 'title' => HEADER_TITLE_ONLINE_CATALOG ],
+        [ 'a' => 'https://www.zen-cart.com/forum', 'title' => HEADER_TITLE_SUPPORT_SITE ],
+        [ 'a' => zen_href_link(FILENAME_SERVER_INFO), 'title' => HEADER_TITLE_VERSION ],
+        [ 'a' => zen_href_link(FILENAME_ADMIN_ACCOUNT), 'title' => HEADER_TITLE_ACCOUNT ],
+        [ 'a' => zen_href_link(FILENAME_LOGOFF), 'title' => HEADER_TITLE_LOGOFF ],
+];
+$upperMenuOverrideArray = '';
+$zco_notifier->notify('NOTIFY_ADMIN_HEADER_UPPERMENU', $upperMenuArray, $upperMenuOverrideArray);
+if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
+    $upperMenuArray = $upperMenuOverrideArray;
+}
+// Filter out core links to dynamically append plugin-added links
+$core_links = [
+        zen_href_link(FILENAME_DEFAULT),
+        zen_catalog_href_link(FILENAME_DEFAULT),
+        'https://www.zen-cart.com/forum',
+        zen_href_link(FILENAME_SERVER_INFO),
+        zen_href_link(FILENAME_ADMIN_ACCOUNT),
+        zen_href_link(FILENAME_LOGOFF)
+];
+$plugin_menu_items = [];
+foreach ($upperMenuArray as $menuItem) {
+    if (!in_array($menuItem['a'], $core_links)) {
+        $plugin_menu_items[] = $menuItem;
+    }
+}
 ?>
-<!-- All HEADER_ definitions in the columns below are defined in includes/languages/lang.english.php //-->
-  <div class="row">
-    <div class="col-xs-8 col-sm-3" id="adminHeaderLogo">
-        <?php echo '<a href="' . zen_href_link(FILENAME_DEFAULT) . '">' . zen_image(DIR_WS_IMAGES . HEADER_LOGO_IMAGE, HEADER_ALT_TEXT, HEADER_LOGO_WIDTH, HEADER_LOGO_HEIGHT) . '</a>'; ?>
-    </div>
 
-    <div class="hidden-xs col-sm-3 col-sm-push-6 noprint adminHeaderAlerts" id="versionCheckAlert"></div>
+    <nav class="navbar navbar-inverse navbar-fixed-top top-tier">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-bar-collapse">
+                    <span class="sr-only"><?= HEADER_TOGGLE_NAVIGATION ?></span>
+                    <i class="fa fa-ellipsis-v"></i>
+                </button>
+                <?php if (defined('HEADER_LOGO_IMAGE_HOME') && HEADER_LOGO_IMAGE_HOME !== '') { ?>
+                    <a class="navbar-brand" href="<?= zen_href_link(FILENAME_DEFAULT) ?>" style="padding: 10px;">
+                        <?= zen_image(DIR_WS_IMAGES . HEADER_LOGO_IMAGE_HOME, HEADER_ALT_TEXT, HEADER_LOGO_WIDTH, HEADER_LOGO_HEIGHT, 'class="img-responsive object-fit-contain" style="max-height: 40px;"') ?>
+                    </a>
+                <?php } else { ?>
+                    <a class="navbar-brand" href="<?= zen_href_link(FILENAME_DEFAULT) ?>">
+                        <i class="fa fa-home"></i> <?= STORE_NAME ?>
+                        <small class="text-muted"><?= HEADER_TEXT_ADMIN ?></small>
+                    </a>
+                <?php } ?>
+            </div>
 
-    <div class="hidden-sm hidden-md hidden-lg col-xs-4 noprint adminHeaderAlerts" id="mobileQuickNavButtons">
-        <a class="btn btn-primary" role="button" href="<?php echo zen_href_link(FILENAME_ORDERS); ?>"><?php echo BOX_CUSTOMERS_ORDERS; ?></a>
-    </div>
-
-    <div class="clearfix visible-xs-block"></div>
-    <div class="col-xs-6 col-sm-3 col-sm-pull-3 noprint adminHeaderAlerts" id="ActivityLogAlert">
-        <?php
-        if (isset($_SESSION['reset_admin_activity_log']) && ($_SESSION['reset_admin_activity_log'] == true && (basename($PHP_SELF) == FILENAME_DEFAULT . '.php'))) {
-        ?>
-        <a class="btn btn-warning" role="button" href="<?php echo zen_href_link(FILENAME_ADMIN_ACTIVITY); ?>"><?php echo TEXT_BUTTON_RESET_ACTIVITY_LOG;?></a><p class="hidden-xs"><br><?php echo RESET_ADMIN_ACTIVITY_LOG; ?></p>
-        <?php
-        }
-        ?>
-    </div>
-
-    <div class="col-xs-6 col-sm-3 col-sm-pull-3 noprint adminHeaderAlerts" id="gvQueueAlert">
-        <?php if (!empty($new_gv_queue_cnt)) echo $goto_gv . '<br>' . sprintf(TEXT_SHOW_GV_QUEUE, $new_gv_queue_cnt); ?>
-    </div>
-
-  </div>
-  <div class="row headerBar">
-    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 noprint">
-        <?php
-        if (!$hide_languages) {
-            echo zen_draw_form('languages', basename($PHP_SELF), '', 'get', 'class="form-inline"');
-            echo DEFINE_LANGUAGE . '&nbsp;&nbsp;' . (count($languages) > 1 ? zen_draw_pull_down_menu('language', $languages_array, $languages_selected, 'onChange="this.form.submit();"') : '');
-            echo zen_hide_session_id();
-            echo zen_post_all_get_params(['language']);
-            echo '</form>';
-        } else {
-            echo '&nbsp;';
-        }
-        ?>
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <?php
-        /** @var zcDate $zcDate */
-        $date = $zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time());
-        echo (function_exists('mb_convert_encoding')) ? mb_convert_encoding($date, 'UTF-8') : $date;
-        echo '&nbsp;[' . $_SERVER['REMOTE_ADDR'] . ']'; // current admin user's IP address
-        echo '<br>';
-        echo gethostname();
-        echo ' - ' . date_default_timezone_get(); //what is the PHP timezone set to?
-        $loc = setlocale(LC_TIME, '0');
-        if ($loc !== FALSE) echo ' - ' . $loc; //what is the locale in use?
-        ?>
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 noprint">
-        <ul class="nav nav-pills upperMenu">
-        <?php
-        $upperMenuArray = [
-            [
-                'a' => zen_href_link(FILENAME_DEFAULT),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_TOP,
-            ],
-            [
-                'a' => zen_catalog_href_link(FILENAME_DEFAULT),
-                'params' => 'class="headerLink" rel="noopener" target="_blank"',
-                'title' => HEADER_TITLE_ONLINE_CATALOG,
-            ],
-            [
-                'a' => 'https://www.zen-cart.com/forum',
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_SUPPORT_SITE,
-            ],
-            [
-                'a' => zen_href_link(FILENAME_SERVER_INFO),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_VERSION,
-            ],
-            [
-                'a' => zen_href_link(FILENAME_ADMIN_ACCOUNT),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_ACCOUNT,
-            ],
-            [
-                'a' => zen_href_link(FILENAME_LOGOFF),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_LOGOFF,
-            ],
-        ];
-        $upperMenuOverrideArray = '';
-        $zco_notifier->notify('NOTIFY_ADMIN_HEADER_UPPERMENU', $upperMenuArray, $upperMenuOverrideArray);
-        if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
-            $upperMenuArray = $upperMenuOverrideArray;
-        }
-        foreach ($upperMenuArray as $upperMenu) {
-        ?>
-            <li><a href="<?= $upperMenu['a'] . '" ' . ($upperMenu['params'] ?? 'class="headerLink"') . '>' . $upperMenu['title'] ?></a></li>
-            <?php
-                }
+            <div class="collapse navbar-collapse" id="top-bar-collapse">
+                <?php
+                echo zen_draw_form('orders', FILENAME_ORDERS, '', 'get', 'class="navbar-form navbar-left hidden-xs"', true);
+                echo '<div class="form-group header-search">';
+                echo zen_draw_input_field('oID', '', 'id="oID" class="form-control" placeholder="'.HEADER_TEXT_SEARCH_ORDERS.'"', '', '');
+                echo zen_draw_hidden_field('action', 'edit');
+                echo '</div>';
+                echo '</form>';
                 ?>
-        </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <?php if (!empty($new_gv_queue_cnt)) { ?>
+                        <li>
+                            <a href="<?= zen_href_link(FILENAME_GV_QUEUE) ?>" title="<?= strip_tags(IMAGE_GIFT_QUEUE) ?>">
+                                <i class="fa fa-gift"></i>
+                                <span class="badge"><?= $new_gv_queue_cnt ?></span>
+                            </a>
+                        </li>
+                    <?php } ?>
+
+                    <li>
+                        <a href="<?= zen_catalog_href_link(FILENAME_DEFAULT) ?>" target="_blank" title="<?= HEADER_TITLE_ONLINE_CATALOG ?>">
+                            <i class="fa fa-external-link"></i> <span class="visible-xs-inline"> <?= HEADER_TITLE_ONLINE_CATALOG ?></span>
+                        </a>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="<?= HEADER_TITLE_VERSION ?>">
+                            <i id="versionCheckPill" class="fa fa-server"></i> <span class="visible-xs-inline"> <?= HEADER_TITLE_VERSION ?></span>
+                            <span id="versionCheckNotifyBadge" class="badge-notify" style="display:none"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li>
+                                <div class="version-dropdown-content">
+                                    <h5>
+                                        <?= HEADER_TITLE_VERSION_SYSTEM_CHECK ?>
+                                    </h5>
+                                    <div id="versionCheckAlert"></div>
+                                </div>
+                                <div class="version-dropdown-footer" id="versionCheckFooter">
+                                    <?= TEXT_CURRENT_VER_IS . ' v' . PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR . (PROJECT_VERSION_PATCH1 != '' ? 'p' . PROJECT_VERSION_PATCH1 : '') ?>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <?php if (!empty($languages_array)) { ?>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-flag"></i> <span class="visible-xs-inline"> <?= HEADER_TEXT_LANGUAGES ?></span> <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <?php foreach($languages_array as $lang) { ?>
+                                    <li><a href="<?= zen_href_link(basename($PHP_SELF), zen_get_all_get_params(array('language', 'action')) . 'language=' . $lang['id']) ?>"><?= $lang['text'] ?></a></li>
+                                <?php } ?>
+                            </ul>
+                        </li>
+                    <?php } ?>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="user-avatar"></span>
+                            <?= zen_output_string_protected(zen_get_admin_name($_SESSION['admin_id'])) ?>
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="<?= zen_href_link(FILENAME_ADMIN_ACCOUNT, '', 'NONSSL') ?>"><i class="fa fa-user"></i> <?= HEADER_TITLE_ACCOUNT ?></a></li>
+                            <li><a href="<?= zen_href_link(FILENAME_SERVER_INFO, '', 'NONSSL') ?>"><i class="fa fa-info-circle"></i> <?= HEADER_TITLE_VERSION ?></a></li>
+
+                            <?php if (!empty($plugin_menu_items)) { ?>
+                                <li class="divider"></li>
+                                <?php foreach ($plugin_menu_items as $item) { ?>
+                                    <li><a href="<?= $item['a'] ?>" <?= (isset($item['params']) ? $item['params'] : '') ?>><i class="fa fa-plug"></i> <?= $item['title'] ?></a></li>
+                                <?php } ?>
+                            <?php } ?>
+
+                            <li class="divider"></li>
+                            <li class="header-info-menu">
+                                <span class="info-label"><?= HEADER_TEXT_IP_ADDRESS ?></span>
+                                <span class="info-val"><?= $admin_ip ?></span>
+
+                                <span class="info-label"><?= HEADER_TEXT_HOSTNAME ?></span>
+                                <span class="info-val"><?= $admin_host ?></span>
+
+                                <span class="info-label"><?= HEADER_TEXT_TIMEZONE ?></span>
+                                <span class="info-val"><?= $admin_tz . ($admin_locale ? ' (' . $admin_locale . ')' : '') ?></span>
+                            </li>
+
+                            <li class="divider"></li>
+                            <li><a href="https://www.zen-cart.com/forum"><i class="fa fa-info-circle"></i> <?= HEADER_TITLE_SUPPORT_SITE ?></a></li>
+                            <li><a href="<?= zen_href_link(FILENAME_LOGOFF, '', 'NONSSL') ?>"><i class="fa fa-sign-out"></i> <?= HEADER_TITLE_LOGOFF ?></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div style="height: 50px;"></div>
+
+<?php require(DIR_WS_INCLUDES . 'header_navigation.php') ?>
+
+    <div class="container-fluid admin-alerts-wrapper noprint">
+        <?php if (isset($_SESSION['reset_admin_activity_log']) && ($_SESSION['reset_admin_activity_log'] == true && (basename($PHP_SELF) == FILENAME_DEFAULT . '.php'))) { ?>
+            <div class="alert alert-danger text-center mb-3">
+                <strong><?= HEADER_TEXT_SECURITY_WARNING ?></strong><br>
+                <?= RESET_ADMIN_ACTIVITY_LOG ?><br>
+                <a class="btn btn-warning btn-xs mt-1" role="button" href="<?= zen_href_link(FILENAME_ADMIN_ACTIVITY) ?>">
+                    <?= TEXT_BUTTON_RESET_ACTIVITY_LOG;?>
+                </a>
+            </div>
+        <?php } ?>
+
     </div>
-  </div>
-<?php require DIR_WS_INCLUDES . 'header_navigation.php'; ?>
+
+<?php if($messageStack->size > 0) { ?>
+    <div class="container-fluid mb-3">
+        <?= $messageStack->output() ?>
+    </div>
+<?php } ?>
