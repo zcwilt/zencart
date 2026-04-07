@@ -5,6 +5,9 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: neekfenwick 2023 Dec 09 Modified in v2.0.0-alpha1 $
  */
+use Zencart\DbRepositories\PluginControlRepository;
+use Zencart\PluginSupport\PluginStatus;
+
 require 'includes/application_top.php';
 
 if (isset($_GET['tID'])) {
@@ -13,16 +16,50 @@ if (isset($_GET['tID'])) {
 $action = $_GET['action'] ?? '';
 $template_info = zen_get_catalog_template_directories();
 
+$installedPluginKeys = [];
+foreach ((new PluginControlRepository($db))->getAll() as $plugin) {
+    if (($plugin['status'] ?? PluginStatus::NOT_INSTALLED) !== PluginStatus::NOT_INSTALLED) {
+        $installedPluginKeys[$plugin['unique_key']] = true;
+    }
+}
+
+$template_info = array_filter(
+    $template_info,
+    static function (array $template) use ($installedPluginKeys): bool {
+        if (empty($template['is_plugin_template'])) {
+            return true;
+        }
+
+        return isset($installedPluginKeys[$template['plugin_key'] ?? '']);
+    }
+);
+
+$templateIsSelectable = static function (string $templateKey) use ($template_info): bool {
+    return isset($template_info[$templateKey]);
+};
+
 if (!empty($action)) {
     switch ($action) {
         case 'insert':
-            $selected_template = zen_register_new_template($_POST['ln'], (int)$_POST['lang']);
+            $templateKey = (string)($_POST['ln'] ?? '');
+            if (!$templateIsSelectable($templateKey)) {
+                $messageStack->add_session(ERROR_TEMPLATE_SELECTION_NOT_AVAILABLE, 'error');
+                zen_redirect(zen_href_link(FILENAME_TEMPLATE_SELECT, zen_get_all_get_params(['action'])));
+            }
+
+            $selected_template = zen_register_new_template($templateKey, (int)$_POST['lang']);
             $action = '';
             break;
 
         case 'save':
-            zen_update_template_name_for_id($selected_template, $_POST['ln']);
-            $init_file = zen_get_template_init_file_path($_POST['ln']);
+            $templateKey = (string)($_POST['ln'] ?? '');
+            if (!$templateIsSelectable($templateKey)) {
+                $messageStack->add_session(ERROR_TEMPLATE_SELECTION_NOT_AVAILABLE, 'error');
+                zen_redirect(zen_href_link(FILENAME_TEMPLATE_SELECT, zen_get_all_get_params(['action'])));
+            }
+
+            zen_update_template_name_for_id($selected_template, $templateKey);
+            $init_file = zen_get_template_init_file_path($templateKey);
             if ($init_file !== null && file_exists($init_file)) {
                 require $init_file;
             }
