@@ -8,6 +8,11 @@ use Tests\Support\zcUnitTestCase;
 
 class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
 {
+    private const BASE_THEME_PLUGIN = 'UnitTestHtmlOutputBaseTheme';
+    private const CHILD_THEME_PLUGIN = 'UnitTestHtmlOutputChildTheme';
+    private const BASE_TEMPLATE_KEY = 'unit_test_html_output_base_theme';
+    private const CHILD_TEMPLATE_KEY = 'html_output_child_theme';
+
     private string $baseThemePluginRoot;
     private string $pluginRoot;
     private string $baseImage;
@@ -20,36 +25,41 @@ class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
         require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/functions/html_output.php';
 
-        $this->baseThemePluginRoot = DIR_FS_CATALOG . 'zc_plugins/UnitTestBaseTheme/v1.0.0/';
-        $this->pluginRoot = DIR_FS_CATALOG . 'zc_plugins/UnitTestChildTheme/v1.0.0/';
+        $this->baseThemePluginRoot = DIR_FS_CATALOG . 'zc_plugins/' . self::BASE_THEME_PLUGIN . '/v1.0.0/';
+        $this->pluginRoot = DIR_FS_CATALOG . 'zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/';
         $this->baseImage = DIR_FS_CATALOG . 'includes/templates/responsive_classic/images/zz_unit_image.png';
-        $this->baseThemePluginImage = $this->baseThemePluginRoot . 'catalog/includes/templates/unit_test_base_theme/images/zz_unit_image.png';
-        $this->templateDogfoodLanguageImage = DIR_FS_CATALOG . 'includes/languages/english/unit_test_base_theme/zz_unit_lang.png';
+        $this->baseThemePluginImage = $this->baseThemePluginRoot . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/images/zz_unit_image.png';
+        $this->templateDogfoodLanguageImage = DIR_FS_CATALOG . 'includes/languages/english/' . self::BASE_TEMPLATE_KEY . '/zz_unit_lang.png';
 
-        @mkdir($this->baseThemePluginRoot . 'catalog/includes/templates/unit_test_base_theme/images', 0777, true);
-        @mkdir($this->pluginRoot . 'catalog/includes/templates/child_theme', 0777, true);
+        $this->removeDirectory($this->baseThemePluginRoot);
+        $this->removeDirectory($this->pluginRoot);
+        @mkdir($this->baseThemePluginRoot . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/images', 0777, true);
+        @mkdir($this->pluginRoot . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY, 0777, true);
         @mkdir(dirname($this->baseImage), 0777, true);
         @mkdir(dirname($this->templateDogfoodLanguageImage), 0777, true);
 
         file_put_contents(
             $this->baseThemePluginRoot . 'manifest.php',
-            <<<'PHP'
+            sprintf(<<<'PHP'
 <?php
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Base Theme',
     'pluginCapabilities' => ['template'],
     'template' => [
-        'key' => 'unit_test_base_theme',
+        'key' => '%s',
         'type' => 'selectable',
         'baseTemplate' => 'template_default',
-        'infoFile' => 'catalog/includes/templates/unit_test_base_theme/template_info.php',
+        'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
 ];
 PHP
-        );
+            ,
+            self::BASE_TEMPLATE_KEY,
+            self::BASE_TEMPLATE_KEY
+        ));
         file_put_contents(
-            $this->baseThemePluginRoot . 'catalog/includes/templates/unit_test_base_theme/template_info.php',
+            $this->baseThemePluginRoot . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/template_info.php',
             <<<'PHP'
 <?php
 $template_name = 'Unit Test Base Theme';
@@ -61,23 +71,27 @@ PHP
         );
         file_put_contents(
             $this->pluginRoot . 'manifest.php',
-            <<<'PHP'
+            sprintf(<<<'PHP'
 <?php
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
     'pluginCapabilities' => ['template'],
     'template' => [
-        'key' => 'child_theme',
+        'key' => '%s',
         'type' => 'selectable',
-        'baseTemplate' => 'unit_test_base_theme',
-        'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
+        'baseTemplate' => '%s',
+        'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
 ];
 PHP
-        );
+            ,
+            self::CHILD_TEMPLATE_KEY,
+            self::BASE_TEMPLATE_KEY,
+            self::CHILD_TEMPLATE_KEY
+        ));
         file_put_contents(
-            $this->pluginRoot . 'catalog/includes/templates/child_theme/template_info.php',
+            $this->pluginRoot . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/template_info.php',
             <<<'PHP'
 <?php
 $template_name = 'Child Theme';
@@ -104,21 +118,21 @@ PHP
 
     public function testTemplateAssetFallbackUsesBaseTemplatePath(): void
     {
-        $missingChildPath = 'zc_plugins/UnitTestChildTheme/v1.0.0/catalog/includes/templates/child_theme/images/zz_unit_image.png';
+        $missingChildPath = 'zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/images/zz_unit_image.png';
 
         $this->assertSame(
-            'zc_plugins/UnitTestBaseTheme/v1.0.0/catalog/includes/templates/unit_test_base_theme/images/zz_unit_image.png',
-            zen_resolve_template_fallback_asset_path($missingChildPath, 'child_theme')
+            'zc_plugins/' . self::BASE_THEME_PLUGIN . '/v1.0.0/catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/images/zz_unit_image.png',
+            zen_resolve_template_fallback_asset_path($missingChildPath, self::CHILD_TEMPLATE_KEY)
         );
     }
 
     public function testTemplateLanguageAssetFallbackUsesBaseTemplatePath(): void
     {
-        $missingChildLanguagePath = 'includes/languages/english/child_theme/zz_unit_lang.png';
+        $missingChildLanguagePath = 'includes/languages/english/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_lang.png';
 
         $this->assertSame(
-            'includes/languages/english/unit_test_base_theme/zz_unit_lang.png',
-            zen_resolve_template_fallback_asset_path($missingChildLanguagePath, 'child_theme')
+            'includes/languages/english/' . self::BASE_TEMPLATE_KEY . '/zz_unit_lang.png',
+            zen_resolve_template_fallback_asset_path($missingChildLanguagePath, self::CHILD_TEMPLATE_KEY)
         );
     }
 

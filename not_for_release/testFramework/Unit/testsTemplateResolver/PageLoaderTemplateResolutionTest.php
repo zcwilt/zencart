@@ -12,6 +12,12 @@ use Zencart\PageLoader\PageLoader;
 
 class PageLoaderTemplateResolutionTest extends zcUnitTestCase
 {
+    private const BASE_THEME_PLUGIN = 'UnitTestPageLoaderBaseTheme';
+    private const CHILD_THEME_PLUGIN = 'UnitTestPageLoaderChildTheme';
+    private const OVERLAY_PLUGIN = 'UnitTestPageLoaderTemplateOverlay';
+    private const BASE_TEMPLATE_KEY = 'unit_test_page_loader_base_theme';
+    private const CHILD_TEMPLATE_KEY = 'page_loader_child_theme';
+
     private string $baseThemePluginPath;
     private string $childThemePluginPath;
     private string $overlayPluginPath;
@@ -25,37 +31,44 @@ class PageLoaderTemplateResolutionTest extends zcUnitTestCase
         require_once DIR_FS_CATALOG . 'includes/classes/traits/Singleton.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/PageLoader.php';
 
-        $this->baseThemePluginPath = DIR_FS_CATALOG . 'zc_plugins/UnitTestBaseTheme/v1.0.0/';
-        $this->childThemePluginPath = DIR_FS_CATALOG . 'zc_plugins/UnitTestChildTheme/v1.0.0/';
-        $this->overlayPluginPath = DIR_FS_CATALOG . 'zc_plugins/UnitTestTemplateOverlay/v1.0.0/';
-        $this->baseThemeCssFixture = $this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/css/zz_test_base.css';
+        $this->baseThemePluginPath = DIR_FS_CATALOG . 'zc_plugins/' . self::BASE_THEME_PLUGIN . '/v1.0.0/';
+        $this->childThemePluginPath = DIR_FS_CATALOG . 'zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/';
+        $this->overlayPluginPath = DIR_FS_CATALOG . 'zc_plugins/' . self::OVERLAY_PLUGIN . '/v1.0.0/';
+        $this->baseThemeCssFixture = $this->baseThemePluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/css/zz_test_base.css';
 
-        mkdir($this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/css', 0777, true);
-        mkdir($this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/common', 0777, true);
-        mkdir($this->childThemePluginPath . 'catalog/includes/templates/child_theme/css', 0777, true);
-        mkdir($this->childThemePluginPath . 'catalog/includes/templates/child_theme/common', 0777, true);
-        mkdir($this->overlayPluginPath . 'catalog/includes/templates/unit_test_base_theme/common', 0777, true);
-        mkdir($this->overlayPluginPath . 'catalog/includes/templates/default/css', 0777, true);
+        $this->removeDirectory($this->baseThemePluginPath);
+        $this->removeDirectory($this->childThemePluginPath);
+        $this->removeDirectory($this->overlayPluginPath);
+
+        $this->ensureDirectoryExists($this->baseThemePluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/css');
+        $this->ensureDirectoryExists($this->baseThemePluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/common');
+        $this->ensureDirectoryExists($this->childThemePluginPath . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/css');
+        $this->ensureDirectoryExists($this->childThemePluginPath . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/common');
+        $this->ensureDirectoryExists($this->overlayPluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/common');
+        $this->ensureDirectoryExists($this->overlayPluginPath . 'catalog/includes/templates/default/css');
 
         file_put_contents(
             $this->baseThemePluginPath . 'manifest.php',
-            <<<'PHP'
+            sprintf(<<<'PHP'
 <?php
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Base Theme',
     'pluginCapabilities' => ['template'],
     'template' => [
-        'key' => 'unit_test_base_theme',
+        'key' => '%s',
         'type' => 'selectable',
         'baseTemplate' => 'template_default',
-        'infoFile' => 'catalog/includes/templates/unit_test_base_theme/template_info.php',
+        'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
 ];
 PHP
-        );
+            ,
+            self::BASE_TEMPLATE_KEY,
+            self::BASE_TEMPLATE_KEY
+        ));
         file_put_contents(
-            $this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/template_info.php',
+            $this->baseThemePluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/template_info.php',
             <<<'PHP'
 <?php
 $template_name = 'Unit Test Base Theme';
@@ -66,28 +79,32 @@ $template_screenshot = 'screenshot.png';
 PHP
         );
         file_put_contents(
-            $this->baseThemePluginPath . 'catalog/includes/templates/unit_test_base_theme/common/html_header.php',
+            $this->baseThemePluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/common/html_header.php',
             "<?php\n"
         );
         file_put_contents(
             $this->childThemePluginPath . 'manifest.php',
-            <<<'PHP'
+            sprintf(<<<'PHP'
 <?php
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
     'pluginCapabilities' => ['template'],
     'template' => [
-        'key' => 'child_theme',
+        'key' => '%s',
         'type' => 'selectable',
-        'baseTemplate' => 'unit_test_base_theme',
-        'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
+        'baseTemplate' => '%s',
+        'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
 ];
 PHP
-        );
+            ,
+            self::CHILD_TEMPLATE_KEY,
+            self::BASE_TEMPLATE_KEY,
+            self::CHILD_TEMPLATE_KEY
+        ));
         file_put_contents(
-            $this->childThemePluginPath . 'catalog/includes/templates/child_theme/template_info.php',
+            $this->childThemePluginPath . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/template_info.php',
             <<<'PHP'
 <?php
 $template_name = 'Child Theme';
@@ -97,11 +114,11 @@ $template_description = 'Unit test child theme';
 $template_screenshot = 'screenshot.png';
 PHP
         );
-        file_put_contents($this->childThemePluginPath . 'catalog/includes/templates/child_theme/css/zz_test_child.css', '/* child */');
+        file_put_contents($this->childThemePluginPath . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/css/zz_test_child.css', '/* child */');
 
         file_put_contents(
             $this->overlayPluginPath . 'manifest.php',
-            <<<'PHP'
+            sprintf(<<<'PHP'
 <?php
 return [
     'pluginVersion' => 'v1.0.0',
@@ -109,13 +126,15 @@ return [
     'pluginCapabilities' => ['template-overlay'],
     'template' => [
         'type' => 'overlay',
-        'targets' => ['unit_test_base_theme', 'default'],
+        'targets' => ['%s', 'default'],
     ],
 ];
 PHP
-        );
+            ,
+            self::BASE_TEMPLATE_KEY
+        ));
         file_put_contents(
-            $this->overlayPluginPath . 'catalog/includes/templates/unit_test_base_theme/common/tpl_overlay_unit_test.php',
+            $this->overlayPluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/common/tpl_overlay_unit_test.php',
             "<?php\n"
         );
         file_put_contents(
@@ -138,9 +157,12 @@ PHP
         $pageLoader = PageLoader::getInstance();
         $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem());
 
-        $directory = $pageLoader->getTemplateDirectory('html_header.php', 'child_theme', 'index', 'common');
+        $directory = $pageLoader->getTemplateDirectory('html_header.php', self::CHILD_TEMPLATE_KEY, 'index', 'common');
 
-        $this->assertSame('zc_plugins/UnitTestBaseTheme/v1.0.0/catalog/includes/templates/unit_test_base_theme/common', $directory);
+        $this->assertSame(
+            'zc_plugins/' . self::BASE_THEME_PLUGIN . '/v1.0.0/catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/common',
+            $directory
+        );
     }
 
     public function testGetTemplateDirectoryFindsNamedOverlayBeforeDefaultFallback(): void
@@ -148,9 +170,12 @@ PHP
         $pageLoader = PageLoader::getInstance();
         $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem());
 
-        $directory = $pageLoader->getTemplateDirectory('tpl_overlay_unit_test.php', DIR_WS_TEMPLATES . 'unit_test_base_theme/', 'index', 'common');
+        $directory = $pageLoader->getTemplateDirectory('tpl_overlay_unit_test.php', DIR_WS_TEMPLATES . self::BASE_TEMPLATE_KEY . '/', 'index', 'common');
 
-        $this->assertSame('zc_plugins/UnitTestTemplateOverlay/v1.0.0/catalog/includes/templates/unit_test_base_theme/common', $directory);
+        $this->assertSame(
+            'zc_plugins/' . self::OVERLAY_PLUGIN . '/v1.0.0/catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/common',
+            $directory
+        );
     }
 
     public function testGetTemplatePartMergesChildBaseAndOverlayAssets(): void
@@ -158,7 +183,7 @@ PHP
         $pageLoader = PageLoader::getInstance();
         $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem());
 
-        $files = $pageLoader->getTemplatePart('includes/templates/child_theme/css', '/^zz_test_/', '.css');
+        $files = $pageLoader->getTemplatePart('includes/templates/' . self::CHILD_TEMPLATE_KEY . '/css', '/^zz_test_/', '.css');
 
         $this->assertSame(
             ['zz_test_base.css', 'zz_test_child.css', 'zz_test_overlay.css'],
@@ -169,10 +194,19 @@ PHP
     private function getInstalledPlugins(): array
     {
         return [
-            ['unique_key' => 'UnitTestBaseTheme', 'version' => 'v1.0.0'],
-            ['unique_key' => 'UnitTestChildTheme', 'version' => 'v1.0.0'],
-            ['unique_key' => 'UnitTestTemplateOverlay', 'version' => 'v1.0.0'],
+            ['unique_key' => self::BASE_THEME_PLUGIN, 'version' => 'v1.0.0'],
+            ['unique_key' => self::CHILD_THEME_PLUGIN, 'version' => 'v1.0.0'],
+            ['unique_key' => self::OVERLAY_PLUGIN, 'version' => 'v1.0.0'],
         ];
+    }
+
+    private function ensureDirectoryExists(string $directory): void
+    {
+        if (is_dir($directory)) {
+            return;
+        }
+
+        mkdir($directory, 0777, true);
     }
 
     private function removeDirectory(string $directory): void

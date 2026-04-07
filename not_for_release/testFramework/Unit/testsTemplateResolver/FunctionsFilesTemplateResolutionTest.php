@@ -8,6 +8,9 @@ use Tests\Support\zcUnitTestCase;
 
 class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
 {
+    private const CHILD_THEME_PLUGIN = 'UnitTestFunctionsChildTheme';
+    private const CHILD_TEMPLATE_KEY = 'functions_child_theme';
+
     private string $pluginRoot;
     private string $moduleFixture;
     private string $sideboxFixture;
@@ -21,12 +24,13 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
         require_once DIR_FS_CATALOG . 'includes/functions/functions_templates.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_files.php';
 
-        $this->pluginRoot = DIR_FS_CATALOG . 'zc_plugins/UnitTestChildTheme/v1.0.0/';
-        $this->moduleFixture = $this->pluginRoot . 'catalog/includes/modules/child_theme/zz_unit_module.php';
-        $this->sideboxFixture = $this->pluginRoot . 'catalog/includes/modules/sideboxes/child_theme/zz_unit_sidebox.php';
-        $this->indexFilterFixture = $this->pluginRoot . 'catalog/includes/index_filters/child_theme/zz_unit_filter.php';
+        $this->pluginRoot = DIR_FS_CATALOG . 'zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/';
+        $this->moduleFixture = $this->pluginRoot . 'catalog/includes/modules/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_module.php';
+        $this->sideboxFixture = $this->pluginRoot . 'catalog/includes/modules/sideboxes/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_sidebox.php';
+        $this->indexFilterFixture = $this->pluginRoot . 'catalog/includes/index_filters/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_filter.php';
         $this->htmlIncludeFixture = DIR_FS_CATALOG . 'includes/languages/english/html_includes/responsive_classic/define_zz_unit.php';
 
+        $this->removeDirectory($this->pluginRoot);
         @mkdir(dirname($this->moduleFixture), 0777, true);
         @mkdir(dirname($this->sideboxFixture), 0777, true);
         @mkdir(dirname($this->indexFilterFixture), 0777, true);
@@ -34,24 +38,27 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
 
         file_put_contents(
             $this->pluginRoot . 'manifest.php',
-            <<<'PHP'
+            sprintf(<<<'PHP'
 <?php
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
     'pluginCapabilities' => ['template'],
     'template' => [
-        'key' => 'child_theme',
+        'key' => '%s',
         'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
-        'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
+        'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
 ];
 PHP
-        );
-        @mkdir($this->pluginRoot . 'catalog/includes/templates/child_theme', 0777, true);
+            ,
+            self::CHILD_TEMPLATE_KEY,
+            self::CHILD_TEMPLATE_KEY
+        ));
+        @mkdir($this->pluginRoot . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY, 0777, true);
         file_put_contents(
-            $this->pluginRoot . 'catalog/includes/templates/child_theme/template_info.php',
+            $this->pluginRoot . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/template_info.php',
             <<<'PHP'
 <?php
 $template_name = 'Child Theme';
@@ -68,7 +75,7 @@ PHP
         file_put_contents($this->htmlIncludeFixture, "<?php\n");
 
         $_SESSION['language'] = 'english';
-        $GLOBALS['template_dir'] = 'child_theme';
+        $GLOBALS['template_dir'] = self::CHILD_TEMPLATE_KEY;
     }
 
     public function tearDown(): void
@@ -84,7 +91,7 @@ PHP
     public function testGetModuleDirectoryReturnsPluginRelativePath(): void
     {
         $this->assertSame(
-            '../../zc_plugins/UnitTestChildTheme/v1.0.0/catalog/includes/modules/child_theme/zz_unit_module.php',
+            '../../zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/catalog/includes/modules/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_module.php',
             zen_get_module_directory('zz_unit_module.php')
         );
     }
@@ -92,7 +99,7 @@ PHP
     public function testGetModuleSideboxDirectoryReturnsPluginRelativePath(): void
     {
         $this->assertSame(
-            '../../zc_plugins/UnitTestChildTheme/v1.0.0/catalog/includes/modules/sideboxes/child_theme/zz_unit_sidebox.php',
+            '../../zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/catalog/includes/modules/sideboxes/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_sidebox.php',
             zen_get_module_sidebox_directory('zz_unit_sidebox.php')
         );
     }
@@ -100,7 +107,7 @@ PHP
     public function testGetIndexFiltersDirectoryReturnsPluginCatalogPath(): void
     {
         $this->assertSame(
-            'zc_plugins/UnitTestChildTheme/v1.0.0/catalog/includes/index_filters/child_theme/zz_unit_filter.php',
+            'zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/catalog/includes/index_filters/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_filter.php',
             zen_get_index_filters_directory('zz_unit_filter.php')
         );
     }
