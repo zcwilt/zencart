@@ -90,6 +90,7 @@ $footer_template = 'tpl_footer.php';
 $left_column_file = 'column_left.php';
 $right_column_file = 'column_right.php';
 $body_id = ($this_is_home_page) ? 'indexHome' : str_replace('_', '', $_GET['main_page']);
+$zv_onload = rtrim($zv_onload, '; ');
 ?>
 <body id="<?php echo $body_id . 'Body'; ?>"<?php if($zv_onload !='') echo ' onload="'.$zv_onload.'"'; ?> class="<?= 'tpl_' . $template_dir ?>">
 <?php /* add any start-of-body-section code via an observer class */

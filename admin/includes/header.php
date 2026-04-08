@@ -19,6 +19,7 @@ if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
 require_once DIR_WS_INCLUDES . 'javascript_loader.php';
 
 // -----
+// Admin Framework Incompatibility Alerting for old addons:
 // If the current page-load did not use the admin_html_head.php for the CSS files'
 // loading, let the admin know via message and log a PHP Deprecated issue ... once for
 // each page during an admin's session.
@@ -54,9 +55,9 @@ if (empty($action) && count($languages) > 1) {
 }
 
 // gv queue check
-if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN == 'true') {
+$new_gv_queue_cnt = 0;
+if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN === 'true' && (zen_is_superuser() || check_page(FILENAME_GV_QUEUE, ''))) {
     $new_gv_queue = $db->Execute("SELECT * FROM " . TABLE_COUPON_GV_QUEUE . " WHERE release_flag='N'");
-    $new_gv_queue_cnt = 0;
     if ($new_gv_queue->RecordCount() > 0) {
         $new_gv_queue_cnt = $new_gv_queue->RecordCount();
         $goto_gv = '<a href="' . zen_href_link(FILENAME_GV_QUEUE) . '">' . '<span class="btn btn-info">' . IMAGE_GIFT_QUEUE . '</span></a>';
@@ -71,7 +72,7 @@ $admin_locale = setlocale(LC_TIME, 0);
 
 $upperMenuArray = [
         [ 'a' => zen_href_link(FILENAME_DEFAULT), 'title' => HEADER_TITLE_TOP ],
-        [ 'a' => zen_catalog_href_link(FILENAME_DEFAULT), 'title' => HEADER_TITLE_ONLINE_CATALOG ],
+        [ 'a' => zen_catalog_href_link(FILENAME_DEFAULT), 'title' => HEADER_TITLE_ONLINE_CATALOG, 'params' => 'target="_blank" rel="noopener"' ],
         [ 'a' => 'https://www.zen-cart.com/forum', 'title' => HEADER_TITLE_SUPPORT_SITE ],
         [ 'a' => zen_href_link(FILENAME_SERVER_INFO), 'title' => HEADER_TITLE_VERSION ],
         [ 'a' => zen_href_link(FILENAME_ADMIN_ACCOUNT), 'title' => HEADER_TITLE_ACCOUNT ],
@@ -129,6 +130,12 @@ foreach ($upperMenuArray as $menuItem) {
                 ?>
 
                 <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden-xs">
+                        <a href="<?= zen_href_link(FILENAME_DEFAULT) ?>" title="<?= HEADER_TITLE_TOP ?>">
+                            <i class="fa fa-home"></i> <?= HEADER_TITLE_TOP ?>
+                        </a>
+                    </li>
+
                     <?php if (!empty($new_gv_queue_cnt)) { ?>
                         <li>
                             <a href="<?= zen_href_link(FILENAME_GV_QUEUE) ?>" title="<?= strip_tags(IMAGE_GIFT_QUEUE) ?>">
@@ -139,8 +146,8 @@ foreach ($upperMenuArray as $menuItem) {
                     <?php } ?>
 
                     <li>
-                        <a href="<?= zen_catalog_href_link(FILENAME_DEFAULT) ?>" target="_blank" title="<?= HEADER_TITLE_ONLINE_CATALOG ?>">
-                            <i class="fa fa-external-link"></i> <span class="visible-xs-inline"> <?= HEADER_TITLE_ONLINE_CATALOG ?></span>
+                        <a href="<?= zen_catalog_href_link(FILENAME_DEFAULT) ?>" target="_blank" title="<?= HEADER_TITLE_ONLINE_CATALOG ?>" rel="noopener">
+                            <i class="fa fa-store"></i> <?= HEADER_TITLE_ONLINE_CATALOG ?>
                         </a>
                     </li>
 
@@ -190,7 +197,7 @@ foreach ($upperMenuArray as $menuItem) {
                             <?php if (!empty($plugin_menu_items)) { ?>
                                 <li class="divider"></li>
                                 <?php foreach ($plugin_menu_items as $item) { ?>
-                                    <li><a href="<?= $item['a'] ?>" <?= (isset($item['params']) ? $item['params'] : '') ?>><i class="fa fa-plug"></i> <?= $item['title'] ?></a></li>
+                                <li <?= $item['id'] ? 'id="' . $item['id'] . '"' : '' ?>  <?= $item['li-class'] ? 'class="' . $item['li-class'] . '"' : '' ?>></li><a href="<?= $item['a'] ?>" <?= $item['params'] ?? '' ?>><i class="fa <?= $item['icon'] ?? 'fa-plug' ?>"></i> <?= $item['title'] ?></a></li>
                                 <?php } ?>
                             <?php } ?>
 
@@ -203,7 +210,10 @@ foreach ($upperMenuArray as $menuItem) {
                                 <span class="info-val"><?= $admin_host ?></span>
 
                                 <span class="info-label"><?= HEADER_TEXT_TIMEZONE ?></span>
-                                <span class="info-val"><?= $admin_tz . ($admin_locale ? ' (' . $admin_locale . ')' : '') ?></span>
+                                <span class="info-val"><?= $admin_tz ?></span>
+
+                                <span class="info-label"><?= HEADER_TEXT_LOCALE ?></span>
+                                <span class="info-val"><?= $admin_locale ?></span>
                             </li>
 
                             <li class="divider"></li>
@@ -218,8 +228,9 @@ foreach ($upperMenuArray as $menuItem) {
 
     <div style="height: 50px;"></div>
 
-<?php require(DIR_WS_INCLUDES . 'header_navigation.php') ?>
+<?php require DIR_WS_INCLUDES . 'header_navigation.php'; ?>
 
+<?php if (zen_is_superuser() || check_page(FILENAME_ADMIN_ACTIVITY, '')) { ?>
     <div class="container-fluid admin-alerts-wrapper noprint">
         <?php if (isset($_SESSION['reset_admin_activity_log']) && ($_SESSION['reset_admin_activity_log'] == true && (basename($PHP_SELF) == FILENAME_DEFAULT . '.php'))) { ?>
             <div class="alert alert-danger text-center mb-3">
@@ -232,8 +243,9 @@ foreach ($upperMenuArray as $menuItem) {
         <?php } ?>
 
     </div>
+<?php } ?>
 
-<?php if($messageStack->size > 0) { ?>
+<?php if ($messageStack->size > 0) { ?>
     <div class="container-fluid mb-3">
         <?= $messageStack->output() ?>
     </div>

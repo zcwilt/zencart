@@ -102,7 +102,7 @@ if (!$doVersionCheck || $versionCheckError) {
     $url .= (str_contains($url, '?') ? '&amp;' : '?') . 'vcheck=yes';
 
     if ($zv_db_patch_ok === true || $version_check_sysinfo === true) {
-        $new_version .= '<a href="' . $url . '" role="button" class="btn btn-link">' . TEXT_VERSION_CHECK_BUTTON . '</a>';
+        $new_version .= '<a href="' . $url . '" role="button" class="btn btn-primary">' . TEXT_VERSION_CHECK_BUTTON . '</a>';
     }
 }
 

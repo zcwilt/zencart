@@ -257,6 +257,7 @@ $define = [
     'HEADER_TEXT_HOSTNAME' => 'Hostname',
     'HEADER_TEXT_IP_ADDRESS' => 'IP Address',
     'HEADER_TEXT_LANGUAGES' => 'Languages',
+    'HEADER_TEXT_LOCALE' => 'Locale',
     'HEADER_TEXT_SEARCH_ORDERS' => 'Search Orders...',
     'HEADER_TEXT_SECURITY_WARNING' => 'Warning: Admin Activity Log action required!',
     'HEADER_TEXT_TIMEZONE' => 'Timezone',
