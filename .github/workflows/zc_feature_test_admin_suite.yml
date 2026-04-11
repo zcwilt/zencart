@@ -86,7 +86,7 @@ jobs:
           ZC_TEST_DB_BASE_NAME: db
           ZC_TEST_DB_WORKERS: 2
           ZC_TEST_DB_INCLUDE_BASE: 0
-        run: composer feature-tests-admin-ci
+        run: composer tests-feature-admin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7

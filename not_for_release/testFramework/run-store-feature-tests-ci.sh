@@ -17,8 +17,8 @@ Runs the storefront feature-test CI flow:
   4. storefront parallel feature runner
 
 Examples:
-  composer feature-tests-store-ci -- --filter SearchInProcessTest
-  composer feature-tests-store-ci-dry-run -- --filter SearchInProcessTest
+  composer tests-feature-store -- --filter SearchInProcessTest
+  composer tests-feature-store -- --dry-run --filter SearchInProcessTest
   ZC_TEST_DB_BASE_NAME=db ZC_TEST_DB_WORKERS=2 ZC_TEST_DB_INCLUDE_BASE=0 bash not_for_release/testFramework/run-store-feature-tests-ci.sh --filter SearchInProcessTest
 EOF
 }
