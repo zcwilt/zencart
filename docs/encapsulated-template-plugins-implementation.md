@@ -271,11 +271,40 @@ return [
         'key' => 'example_theme',
         'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
-        'infoFile' => 'catalog/includes/templates/example_theme/template_info.php',
-        'settingsFile' => 'catalog/includes/templates/example_theme/template_settings.php',
     ],
 ];
 ```
+
+For the common case, the resolver should infer metadata paths from `template.key`:
+
+- `catalog/includes/templates/example_theme/template_info.php`
+- `catalog/includes/templates/example_theme/template_settings.php`
+
+The base convention should remain:
+
+```text
+zc_plugins/<Plugin>/<version>/
+  catalog/
+    includes/
+      templates/
+        <templateKey>/
+          template_info.php
+          template_settings.php
+```
+
+`infoFile` and `settingsFile` should be optional escape hatches only for non-standard package layouts:
+
+```php
+'template' => [
+    'key' => 'example_theme',
+    'type' => 'selectable',
+    'baseTemplate' => 'responsive_classic',
+    'infoFile' => 'custom/path/template_info.php',
+    'settingsFile' => 'custom/path/template_settings.php',
+],
+```
+
+This keeps normal template plugins convention-based while still allowing rare advanced packages to override metadata paths.
 
 For overlay-only plugins:
 
@@ -293,6 +322,7 @@ Notes:
 - `baseTemplate` is important for fallback behavior
 - metadata should be optional so existing plugins remain valid
 - `baseTemplate` also doubles as the child-template inheritance declaration
+- `infoFile` and `settingsFile` should not be required when the files live in the conventional template root
 
 ## Architecture Changes
 
@@ -573,6 +603,63 @@ Must verify:
 - classic core templates still behave unchanged
 - existing overlay-style plugins such as GDPR DSAR and POSM continue to load their assets
 - direct asset helpers such as `zen_image` do not generate broken URLs
+
+## Current Test Coverage Status
+
+The current test suite covers a meaningful subset of resolver behavior, but it does not yet prove that every legacy template override surface works end-to-end with encapsulated templates.
+
+Currently covered:
+
+- selectable plugin-backed template discovery and metadata
+- plugin-backed template filesystem and web path records
+- base-template inheritance chains
+- plugin-backed template overriding a core template key
+- custom `template_settings.php` path support
+- template search directories for admin/developer-tool style lookups
+- template language override directories
+- template-first language directories
+- template init file path resolution
+- template screenshot web path resolution
+- `PageLoader::getTemplateDirectory()` fallback from child template to base template
+- named overlay lookup before default fallback
+- CSS/template-part merge behavior across child, base, and overlay sources
+- sidebox discovery across inherited and plugin template paths
+- sidebox path resolution for inherited and plugin template paths
+- template-aware `zen_get_module_directory()`
+- template-aware `zen_get_module_sidebox_directory()`
+- template-aware `zen_get_index_filters_directory()`
+- `zen_get_file_directory()` fallback through inherited template directories
+- template image and language asset fallback through HTML output helpers
+
+Relevant unit test files:
+
+- `not_for_release/testFramework/Unit/testsTemplateResolver/TemplateResolverTest.php`
+- `not_for_release/testFramework/Unit/testsTemplateResolver/PageLoaderTemplateResolutionTest.php`
+- `not_for_release/testFramework/Unit/testsTemplateResolver/FunctionsFilesTemplateResolutionTest.php`
+- `not_for_release/testFramework/Unit/testsTemplateResolver/SideboxFinderTemplateResolutionTest.php`
+- `not_for_release/testFramework/Unit/testsTemplateResolver/BaseLanguageLoaderTemplateChainTest.php`
+- `not_for_release/testFramework/Unit/testsTemplateResolver/HtmlOutputTemplateAssetFallbackTest.php`
+- `not_for_release/testFramework/Unit/testsTemplateResolver/FunctionsTemplatesTest.php`
+
+Still not fully covered:
+
+- full storefront request rendering using a selected plugin-backed template
+- `template_select.php` selecting a plugin-backed template and persisting it
+- runtime bootstrap constants such as `DIR_WS_TEMPLATE`, `DIR_WS_TEMPLATE_IMAGES`, and `DIR_WS_TEMPLATE_ICONS` across plugin-backed templates
+- full CSS/JS loader behavior in real page rendering, including ordering and duplicate handling
+- `template_settings.php` behavior in admin/layout controller beyond path resolution
+- `template_init.php` execution behavior beyond path resolution
+- page-specific overrides under `templates/`, `common/`, `sideboxes/`, `modalboxes/`, and `menu_templates` in a full request
+- module overrides beyond targeted helper-path tests
+- language override behavior in a full storefront/admin request lifecycle
+- admin developer-tool search behavior as an end-to-end feature
+- define pages / `html_includes` editing workflow in admin
+- layout controller sidebox editing for plugin-backed selected templates
+- behavior when a plugin-backed selected template is disabled, missing, or uninstalled
+- precedence collision tests where child, base, selected-template overlay, default overlay, and `template_default` all provide the same file
+- suppression/removal semantics for inherited CSS/JS assets, if that becomes a supported feature
+
+The next required test layer should be feature-level coverage that selects `responsive_classic_dogfood` and renders real storefront/admin pages while asserting that specific files resolve from plugin, base, overlay, and `template_default` locations.
 
 ## Suggested First Reference Implementations
 
