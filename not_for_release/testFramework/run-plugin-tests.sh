@@ -103,6 +103,20 @@ discover_files() {
     done
 }
 
+describe_test_file() {
+    local file="$1"
+    local relative="${file#$ROOT_DIR/}"
+    local remainder="${relative#zc_plugins/}"
+    local plugin="${remainder%%/*}"
+    remainder="${remainder#*/}"
+    local version="${remainder%%/*}"
+    remainder="${remainder#*/tests/}"
+    local suite="${remainder%%/*}"
+    local test_file="${file##*/}"
+
+    printf '%s %s %s %s' "$plugin" "$version" "$suite" "$test_file"
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --help|-h)
@@ -164,11 +178,12 @@ fi
 if [ "$DRY_RUN" -eq 1 ]; then
     echo "RUN   [plugin-local] phpunit (dry run)"
     for file in "${TEST_FILES[@]}"; do
-        echo "DRY   [plugin-local] ${file#$ROOT_DIR/}"
+        echo "DRY   [plugin-local] $(describe_test_file "$file")"
     done
     exit 0
 fi
 
 for file in "${TEST_FILES[@]}"; do
+    echo "RUN   [plugin-local] $(describe_test_file "$file")"
     "$ROOT_DIR/vendor/bin/phpunit" --verbose "${PHPUNIT_ARGS[@]}" "$file"
 done
