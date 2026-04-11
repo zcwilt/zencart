@@ -60,6 +60,13 @@ class order_total
                     $language_dir = (IS_ADMIN_FLAG === false) ? DIR_WS_LANGUAGES : (DIR_FS_CATALOG . DIR_WS_LANGUAGES);
                     $lang_file = zen_get_file_directory($language_dir . $_SESSION['language'] . '/modules/order_total/', $value, 'false');
 
+                    // -----
+                    // If the language file's name doesn't start with 'lang.' (which they do,
+                    // as of zc300), add that prefix for the cautionary message.
+                    //
+                    if (!str_starts_with($value, 'lang.')) {
+                        $lang_file = str_replace($lang_file, $value, 'lang.' . $value);
+                    }
                     if (is_object($messageStack)) {
                         if (IS_ADMIN_FLAG === false) {
                             $messageStack->add('header', WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');

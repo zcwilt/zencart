@@ -323,7 +323,8 @@ class ModulesController
 
         foreach ($this->modulesFound as $moduleName => $moduleFileDir) {
             if (!$this->languageLoader->loadModuleLanguageFile($moduleName, $this->moduleType)) {
-                echo ERROR_MODULE_FILE_NOT_FOUND . DIR_FS_CATALOG_LANGUAGES . $_SESSION['language'] . '/modules/' . $this->moduleType . '/' . $moduleName . '<br>';
+                $languageFileName = str_starts_with($moduleName, 'lang.') ? $moduleName : 'lang.' . $moduleName;
+                $this->messageStack->add(ERROR_MODULE_FILE_NOT_FOUND . DIR_FS_CATALOG_LANGUAGES . $_SESSION['language'] . '/modules/' . $this->moduleType . '/' . $languageFileName, 'caution');
                 continue;
             }
 

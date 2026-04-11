@@ -60,7 +60,7 @@ function check_page(string $page, $params = []): bool
     $sql = $db->bindVars($sql, ':adminId:', $_SESSION['admin_id'], 'integer');
     $result = $db->Execute($sql);
     foreach ($result as $row) {
-        $adjustedPageKey = preg_replace('/_productTypes_/', '', $row['page_key']);
+        $adjustedPageKey = preg_replace('/_productTypes_/', '', $row['page_key'] ?? '');
         if ($adjustedPageKey === $page) {
             return true;
         }

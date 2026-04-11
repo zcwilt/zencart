@@ -135,7 +135,7 @@ class LanguageLoader
             $moduleType .= '/';
         }
         $match_string = 'modules/' . $moduleType . 'lang.' . $fileName;
-        $match_string_template = 'modules/' . $moduleType . $this->arrayLoader->getTemplateDir() . 'lang.' . $fileName;
+        $match_string_template = 'modules/' . $moduleType . $this->arrayLoader->getTemplateDir() . '/lang.' . $fileName;
         foreach ($language_files_loaded as $next_file) {
             if (str_contains($next_file, $match_string) || str_contains($next_file, $match_string_template)) {
                 return true;
