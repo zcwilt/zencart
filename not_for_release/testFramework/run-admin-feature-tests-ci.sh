@@ -34,6 +34,30 @@ suite_has_matches() {
     return "$found_any"
 }
 
+plugin_local_suite_has_matches() {
+    local requested_filter="$1"
+    local found_any=1
+
+    if [ ! -d "$ROOT_DIR/zc_plugins" ]; then
+        return "$found_any"
+    fi
+
+    while IFS= read -r file; do
+        if ! grep -q "@group plugin-filesystem" "$file"; then
+            continue
+        fi
+
+        local name="${file##*/}"
+        local stem="${name%.php}"
+        if [ -z "$requested_filter" ] || [ "$name" = "$requested_filter" ] || [ "$stem" = "$requested_filter" ] || [[ "$file" == *"$requested_filter"* ]]; then
+            found_any=0
+            break
+        fi
+    done < <(find "$ROOT_DIR/zc_plugins" -path '*/tests/FeatureAdmin/*Test.php' -type f | sort)
+
+    return "$found_any"
+}
+
 usage() {
     cat <<EOF
 Usage: $(basename "$0") [--dry-run] [feature-runner-args...]
@@ -117,7 +141,17 @@ else
     echo "SKIP  [admin-plugin] no matching admin plugin-filesystem files"
 fi
 
-if ! suite_has_matches "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" "parallel-candidate" "$CLI_FILTER" && ! suite_has_matches "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" "plugin-filesystem" "$CLI_FILTER"; then
+if plugin_local_suite_has_matches "$CLI_FILTER"; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+        bash "$ROOT_DIR/not_for_release/testFramework/run-plugin-tests.sh" --dry-run --suite FeatureAdmin --require-group plugin-filesystem --group plugin-filesystem "${FEATURE_ARGS[@]}"
+    else
+        bash "$ROOT_DIR/not_for_release/testFramework/run-plugin-tests.sh" --suite FeatureAdmin --require-group plugin-filesystem --group plugin-filesystem "${FEATURE_ARGS[@]}"
+    fi
+else
+    echo "SKIP  [plugin-local] no matching plugin-local plugin-filesystem files"
+fi
+
+if ! suite_has_matches "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" "parallel-candidate" "$CLI_FILTER" && ! suite_has_matches "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" "plugin-filesystem" "$CLI_FILTER" && ! plugin_local_suite_has_matches "$CLI_FILTER"; then
     echo "No admin feature test files matched the requested filter." >&2
     exit 1
 fi
