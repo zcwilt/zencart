@@ -91,6 +91,14 @@ jobs:
           ZC_TEST_DB_INCLUDE_BASE: 0
         run: composer feature-tests-store-ci
 
+      - name: Execute Plugin-Local Store Feature Tests
+        run: |
+          if composer plugin-tests-store -- --dry-run; then
+            composer plugin-tests-store
+          else
+            echo "No plugin-local storefront feature tests found."
+          fi
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         if: always()

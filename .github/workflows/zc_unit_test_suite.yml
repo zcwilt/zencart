@@ -39,6 +39,14 @@ jobs:
           ZC_PARALLEL_PROCESSES: 4
         run: composer unit-tests-ci
 
+      - name: Run Plugin-Local Unit Tests
+        run: |
+          if composer plugin-tests-unit -- --dry-run; then
+            composer plugin-tests-unit
+          else
+            echo "No plugin-local unit tests found."
+          fi
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         if: always()
