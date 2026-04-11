@@ -22,6 +22,9 @@ $define = [
     'TEXT_INFO_HEADING_DELETE_COUNTRY' => 'Delete Country',
     'ERROR_COUNTRY_IN_USE' => 'ERROR: Cannot delete selected country because it is connected to customer records.',
     'ISO_COUNTRY_CODES_LINK' => '<a href="https://en.wikipedia.org/wiki/ISO_3166-1#Officially_assigned_code_elements" rel="noreferrer noopener" target="_blank">ISO 3166 Country Codes Reference</a>',
+    'TEXT_COUNTRIES_FILTER_STATUS_ALL' => 'All Statuses',
+    'TEXT_COUNTRIES_FILTER_STATUS_ACTIVE' => 'Active Countries',
+    'TEXT_COUNTRIES_FILTER_STATUS_INACTIVE' => 'Inactive Countries',
 ];
 
 return $define;
