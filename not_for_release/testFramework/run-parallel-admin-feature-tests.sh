@@ -51,12 +51,12 @@ Useful environment variables:
   PHPUNIT_BIN                     PHPUnit binary to use (default: vendor/bin/phpunit)
 
 Examples:
-  composer feature-tests-admin-parallel -- --dry-run
-  composer feature-tests-admin-parallel
-  composer feature-tests-admin-parallel -- --prepare-databases
-  composer feature-tests-admin-parallel -- --filter AdminEndpointsTest
-  composer feature-tests-admin-parallel-local
-  ZC_FEATURE_TEST_FILTER=AdminEndpoints composer feature-tests-admin-parallel -- --dry-run
+  composer tests-feature-admin-parallel -- --dry-run
+  composer tests-feature-admin-parallel
+  composer tests-feature-admin-parallel -- --prepare-databases
+  composer tests-feature-admin-parallel -- --filter AdminEndpointsTest
+  ZC_TEST_DB_BASE_NAME=db ZC_TEST_DB_WORKERS=2 ZC_TEST_DB_INCLUDE_BASE=0 composer tests-feature-admin-parallel -- --prepare-databases
+  ZC_FEATURE_TEST_FILTER=AdminEndpoints composer tests-feature-admin-parallel -- --dry-run
 EOF
 }
 
@@ -181,13 +181,13 @@ verify_worker_databases_exist() {
         fi
 
         echo "Unable to verify worker databases on ${DB_HOST}:${DB_PORT} for user ${DB_USER}." >&2
-        echo "Try: ZC_TEST_DB_BASE_NAME=$DB_BASE_NAME ZC_TEST_DB_WORKERS=$PROCESS_COUNT composer test-db-prepare-workers-dry-run" >&2
+        echo "Try: ZC_TEST_DB_BASE_NAME=$DB_BASE_NAME ZC_TEST_DB_WORKERS=$PROCESS_COUNT composer tests-db-prepare-workers -- --dry-run" >&2
         exit 1
     done
 
     if [ "${#missing_databases[@]}" -gt 0 ]; then
         echo "Missing worker databases: ${missing_databases[*]}" >&2
-        echo "Create them with: ZC_TEST_DB_BASE_NAME=$DB_BASE_NAME ZC_TEST_DB_WORKERS=$PROCESS_COUNT ZC_TEST_DB_INCLUDE_BASE=0 composer test-db-prepare-workers" >&2
+        echo "Create them with: ZC_TEST_DB_BASE_NAME=$DB_BASE_NAME ZC_TEST_DB_WORKERS=$PROCESS_COUNT ZC_TEST_DB_INCLUDE_BASE=0 composer tests-db-prepare-workers" >&2
         echo "Or rerun with --prepare-databases to create them automatically." >&2
         exit 1
     fi

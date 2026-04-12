@@ -17,10 +17,10 @@ Runs the aggregate feature-test CI flow:
   4. aggregate feature runner
 
 Examples:
-  composer feature-tests-ci -- --filter SearchInProcessTest
-  composer feature-tests-ci-dry-run -- --filter BasicPluginInstallTest
-  composer feature-tests-ci-local
-  composer feature-tests-ci-local-dry-run -- --filter AdminEndpointsTest
+  composer tests-feature -- --filter SearchInProcessTest
+  composer tests-feature -- --dry-run --filter BasicPluginInstallTest
+  composer tests-feature-local
+  composer tests-feature-local -- --dry-run --filter AdminEndpointsTest
 EOF
 }
 

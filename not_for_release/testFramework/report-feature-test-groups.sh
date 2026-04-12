@@ -39,6 +39,9 @@ done
 mapfile -t TEST_FILES < <(
     find "$ROOT_DIR/not_for_release/testFramework/FeatureStore" "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" \
         -type f -name '*Test.php' | sort
+    if [ -d "$ROOT_DIR/zc_plugins" ]; then
+        find "$ROOT_DIR/zc_plugins" \( -path '*/tests/FeatureStore/*Test.php' -o -path '*/tests/FeatureAdmin/*Test.php' \) -type f | sort
+    fi
 )
 
 if [ "${#TEST_FILES[@]}" -eq 0 ]; then
@@ -53,6 +56,7 @@ untagged_count=0
 direct_db_write_count=0
 custom_seeder_count=0
 filesystem_write_count=0
+plugin_local_count=0
 store_total_count=0
 store_serial_count=0
 store_parallel_candidate_count=0
@@ -109,7 +113,7 @@ for file in "${TEST_FILES[@]}"; do
         custom_seeder_files+=("$relative")
     fi
 
-    if grep -Eq 'installPluginToFilesystem\(|removePlugin\(|touch\(|file_put_contents\(|unlink\(' "$file"; then
+    if grep -Eq 'installPluginToFilesystem\(|installCurrentPluginToFilesystem\(|installPluginFromLocalSource\(|removePlugin\(|touch\(|file_put_contents\(|unlink\(' "$file"; then
         has_filesystem_write=1
         filesystem_write_count=$((filesystem_write_count + 1))
         filesystem_write_files+=("$relative")
@@ -123,8 +127,20 @@ for file in "${TEST_FILES[@]}"; do
         store_total_count=$((store_total_count + 1))
     fi
 
+    if [[ "$relative" == zc_plugins/*/*/tests/FeatureStore/* ]]; then
+        is_store_test=1
+        plugin_local_count=$((plugin_local_count + 1))
+        store_total_count=$((store_total_count + 1))
+    fi
+
     if [[ "$relative" == not_for_release/testFramework/FeatureAdmin/* ]]; then
         is_admin_test=1
+        admin_total_count=$((admin_total_count + 1))
+    fi
+
+    if [[ "$relative" == zc_plugins/*/*/tests/FeatureAdmin/* ]]; then
+        is_admin_test=1
+        plugin_local_count=$((plugin_local_count + 1))
         admin_total_count=$((admin_total_count + 1))
     fi
 
@@ -175,6 +191,7 @@ echo "Tagged serial: $serial_count"
 echo "Tagged plugin-filesystem: $plugin_fs_count"
 echo "Tagged parallel-candidate: $parallel_candidate_count"
 echo "Untagged files: $untagged_count"
+echo "Plugin-local feature test files: $plugin_local_count"
 echo "Heuristic direct DB writers: $direct_db_write_count"
 echo "Heuristic custom seeder users: $custom_seeder_count"
 echo "Heuristic filesystem writers: $filesystem_write_count"

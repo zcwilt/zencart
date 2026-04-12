@@ -303,7 +303,7 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertContains('Usage: run-parallel-unit-tests.sh [phpunit-args...]', $output);
         $this->assertStringContainsString('ZC_PARALLEL_PROCESSES', implode(PHP_EOL, $output));
         $this->assertStringContainsString('ZC_UNIT_TEST_FILTER', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer unit-tests-parallel -- --filter RuntimeConfigTest', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-unit -- --filter RuntimeConfigTest', implode(PHP_EOL, $output));
     }
 
     public function testParallelUnitRunnerEnvFilterNarrowsFileSelection(): void
@@ -355,9 +355,8 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertStringContainsString('ZC_TEST_DB_WORKERS', implode(PHP_EOL, $output));
         $this->assertStringContainsString('ZC_TEST_DB_BASE_NAME', implode(PHP_EOL, $output));
         $this->assertStringContainsString('ZC_FEATURE_TEST_FILTER', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer feature-tests-store-parallel -- --prepare-databases', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer feature-tests-store-parallel-local', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer feature-tests-store-parallel -- --filter SearchInProcessTest', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-feature-store-parallel -- --prepare-databases', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-feature-store-parallel -- --filter SearchInProcessTest', implode(PHP_EOL, $output));
     }
 
     public function testParallelStorefrontFeatureRunnerDryRunNarrowsFileSelection(): void
@@ -494,9 +493,8 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Usage: run-parallel-admin-feature-tests.sh [--dry-run] [--prepare-databases] [phpunit-args...]', $output);
         $this->assertStringContainsString('ZC_FEATURE_PARALLEL_PROCESSES', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer feature-tests-admin-parallel -- --prepare-databases', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer feature-tests-admin-parallel -- --filter AdminEndpointsTest', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer feature-tests-admin-parallel-local', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-feature-admin-parallel -- --prepare-databases', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-feature-admin-parallel -- --filter AdminEndpointsTest', implode(PHP_EOL, $output));
     }
 
     public function testParallelAdminFeatureRunnerDryRunNarrowsFileSelection(): void
@@ -595,7 +593,7 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('SKIP  [store] no matching storefront parallel-candidate files', $output);
         $this->assertContains('SKIP  [admin] no matching admin parallel-candidate files', $output);
-        $this->assertContains('RUN   [admin-plugin] feature-tests-admin-plugin-filesystem (dry run)', $output);
+        $this->assertContains('RUN   [admin-plugin] tests-feature-admin-plugin-filesystem (dry run)', $output);
         $this->assertContains('DRY   [admin-plugin] not_for_release/testFramework/FeatureAdmin/PluginTests/BasicPluginInstallTest.php', $output);
     }
 
@@ -609,7 +607,7 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('RUN   [store] run-parallel-storefront-feature-tests.sh', $output);
         $this->assertContains('RUN   [admin] run-parallel-admin-feature-tests.sh', $output);
-        $this->assertContains('RUN   [admin-plugin] feature-tests-admin-plugin-filesystem (dry run)', $output);
+        $this->assertContains('RUN   [admin-plugin] tests-feature-admin-plugin-filesystem (dry run)', $output);
         $this->assertContains('DRY   [admin-plugin] not_for_release/testFramework/FeatureAdmin/PluginTests/BasicPluginInstallTest.php', $output);
         $this->assertContains('DRY   [admin-plugin] not_for_release/testFramework/FeatureAdmin/Security/PluginsLFITest.php', $output);
     }
@@ -623,8 +621,8 @@ class TestFrameworkRunnersTest extends TestCase
 
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Usage: run-feature-tests-ci.sh [--dry-run] [feature-runner-args...]', $output);
-        $this->assertStringContainsString('composer feature-tests-ci -- --filter SearchInProcessTest', implode(PHP_EOL, $output));
-        $this->assertStringContainsString('composer feature-tests-ci-dry-run -- --filter BasicPluginInstallTest', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-feature -- --filter SearchInProcessTest', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-feature -- --dry-run --filter BasicPluginInstallTest', implode(PHP_EOL, $output));
     }
 
     public function testFeatureTestsCiRunnerDryRunForwardsFilterToAggregateFeatureRunner(): void
@@ -710,7 +708,7 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Dry run for 2 planned test database(s) on 127.0.0.1:3306 for user root.', $output);
         $this->assertContains('SKIP  [admin] no matching admin parallel-candidate files', $output);
-        $this->assertContains('RUN   [admin-plugin] feature-tests-admin-plugin-filesystem (dry run)', $output);
+        $this->assertContains('RUN   [admin-plugin] tests-feature-admin-plugin-filesystem (dry run)', $output);
         $this->assertContains('DRY   [admin-plugin] not_for_release/testFramework/FeatureAdmin/PluginTests/BasicPluginInstallTest.php', $output);
         $this->assertStringNotContainsString('PluginsLFITest.php', implode(PHP_EOL, $output));
     }
@@ -724,7 +722,7 @@ class TestFrameworkRunnersTest extends TestCase
 
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Usage: run-tests-ci.sh [--dry-run] [test-runner-args...]', $output);
-        $this->assertStringContainsString('composer tests-ci-dry-run -- --filter BasicPluginInstallTest', implode(PHP_EOL, $output));
+        $this->assertStringContainsString('composer tests-ci -- --dry-run --filter BasicPluginInstallTest', implode(PHP_EOL, $output));
     }
 
     public function testTestsCiRunnerRunsBothLanesWithoutFilter(): void
@@ -821,7 +819,7 @@ class TestFrameworkRunnersTest extends TestCase
 
         $this->assertSame(1, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Unable to verify worker databases on invalid-host-for-tests:3306 for user root.', $output);
-        $this->assertContains('Try: ZC_TEST_DB_BASE_NAME=db_local ZC_TEST_DB_WORKERS=2 composer test-db-prepare-workers-dry-run', $output);
+        $this->assertContains('Try: ZC_TEST_DB_BASE_NAME=db_local ZC_TEST_DB_WORKERS=2 composer tests-db-prepare-workers -- --dry-run', $output);
     }
 
     public function testDescribeWorkerRuntimePrintsDefaultDerivedPaths(): void
