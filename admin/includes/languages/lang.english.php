@@ -621,6 +621,7 @@ $define = [
     'TEXT_PRODUCTS' => 'Products:',
     'TEXT_PRODUCTS_ID' => 'Product ID# ',
     'TEXT_PRODUCTS_IMAGE_MANUAL' => '<br><strong>Or, use an existing image file from server, filename:</strong>',
+    'TEXT_PRODUCTS_IS_CALL_EDIT' => '*Product is marked as CALL FOR PRICE',
     'TEXT_PRODUCTS_MIX_OFF' => '*No Mixed Options',
     'TEXT_PRODUCTS_MIX_ON' => '*Yes Mixed Options',
     'TEXT_PRODUCTS_MODEL' => 'Products Model:',
