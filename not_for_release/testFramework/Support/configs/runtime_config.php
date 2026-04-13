@@ -50,6 +50,42 @@ if (!function_exists('zc_test_config_database_name')) {
     }
 }
 
+if (!function_exists('zc_test_config_bool')) {
+    function zc_test_config_bool(string $envName, bool $default): bool
+    {
+        $value = getenv($envName);
+        if (!is_string($value) || $value === '') {
+            return $default;
+        }
+
+        $parsed = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        return $parsed ?? $default;
+    }
+}
+
+if (!function_exists('zc_test_config_value')) {
+    function zc_test_config_value(string $envName, mixed $default): mixed
+    {
+        $value = getenv($envName);
+
+        return is_string($value) && $value !== '' ? $value : $default;
+    }
+}
+
+if (!function_exists('zc_test_config_mailserver_options')) {
+    function zc_test_config_mailserver_options(): array
+    {
+        return [
+            'use-mailserver' => zc_test_config_bool('ZC_TEST_USE_MAILSERVER', false),
+            'mailserver-port' => (int) zc_test_config_value('ZC_TEST_MAILSERVER_PORT', 1025),
+            'mailserver-host' => zc_test_config_value('ZC_TEST_MAILSERVER_HOST', 'localhost'),
+            'mailserver-user' => zc_test_config_value('ZC_TEST_MAILSERVER_USER', 'ddev'),
+            'mailserver-password' => zc_test_config_value('ZC_TEST_MAILSERVER_PASSWORD', 'mailpit'),
+        ];
+    }
+}
+
 if (!function_exists('zc_test_config_progress_file')) {
     function zc_test_config_progress_file(string $rootPath): string
     {

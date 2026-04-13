@@ -21,6 +21,11 @@ class RuntimeConfigTest extends TestCase
     {
         putenv('GITHUB_WORKSPACE');
         putenv('ZC_TEST_DB_DATABASE');
+        putenv('ZC_TEST_USE_MAILSERVER');
+        putenv('ZC_TEST_MAILSERVER_HOST');
+        putenv('ZC_TEST_MAILSERVER_PORT');
+        putenv('ZC_TEST_MAILSERVER_USER');
+        putenv('ZC_TEST_MAILSERVER_PASSWORD');
         putenv('ZC_TEST_WORKER');
         putenv('TEST_TOKEN');
 
@@ -78,6 +83,40 @@ class RuntimeConfigTest extends TestCase
         putenv('ZC_TEST_WORKER=---');
 
         $this->assertNull(zc_test_config_worker_token());
+    }
+
+    public function testMailserverOptionsDefaultToDisabledLocalSmtpCatcherSettings(): void
+    {
+        $this->assertSame(
+            [
+                'use-mailserver' => false,
+                'mailserver-port' => 1025,
+                'mailserver-host' => 'localhost',
+                'mailserver-user' => 'ddev',
+                'mailserver-password' => 'mailpit',
+            ],
+            zc_test_config_mailserver_options()
+        );
+    }
+
+    public function testMailserverOptionsCanBeConfiguredFromEnvironment(): void
+    {
+        putenv('ZC_TEST_USE_MAILSERVER=true');
+        putenv('ZC_TEST_MAILSERVER_HOST=mailpit');
+        putenv('ZC_TEST_MAILSERVER_PORT=2525');
+        putenv('ZC_TEST_MAILSERVER_USER=test-user');
+        putenv('ZC_TEST_MAILSERVER_PASSWORD=test-password');
+
+        $this->assertSame(
+            [
+                'use-mailserver' => true,
+                'mailserver-port' => 2525,
+                'mailserver-host' => 'mailpit',
+                'mailserver-user' => 'test-user',
+                'mailserver-password' => 'test-password',
+            ],
+            zc_test_config_mailserver_options()
+        );
     }
 
     public function testProgressFileDefaultsWhenNoWorkerIsConfigured(): void

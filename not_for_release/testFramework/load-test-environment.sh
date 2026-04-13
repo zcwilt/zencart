@@ -2,6 +2,16 @@
 
 source_test_framework_env_file() {
     local env_file="$1"
+
+    set -a
+    # shellcheck source=/dev/null
+    . "$env_file"
+    set +a
+}
+
+load_test_framework_env() {
+    local root_dir="$1"
+    local env_file="${ZC_TEST_ENV_FILE:-}"
     local -a preserved_names=()
     local -A preserved_values=()
     local variable_name=""
@@ -15,20 +25,6 @@ source_test_framework_env_file() {
         esac
     done < <(compgen -v)
 
-    set -a
-    # shellcheck source=/dev/null
-    . "$env_file"
-    set +a
-
-    for variable_name in "${preserved_names[@]}"; do
-        export "$variable_name=${preserved_values[$variable_name]}"
-    done
-}
-
-load_test_framework_env() {
-    local root_dir="$1"
-    local env_file="${ZC_TEST_ENV_FILE:-}"
-
     if [ -n "$env_file" ]; then
         if [ ! -r "$env_file" ]; then
             echo "Configured test environment file not found: $env_file" >&2
@@ -36,6 +32,9 @@ load_test_framework_env() {
         fi
 
         source_test_framework_env_file "$env_file"
+        for variable_name in "${preserved_names[@]}"; do
+            export "$variable_name=${preserved_values[$variable_name]}"
+        done
         return 0
     fi
 
@@ -50,5 +49,9 @@ load_test_framework_env() {
         fi
 
         source_test_framework_env_file "$env_file"
+    done
+
+    for variable_name in "${preserved_names[@]}"; do
+        export "$variable_name=${preserved_values[$variable_name]}"
     done
 }
