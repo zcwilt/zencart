@@ -27,6 +27,10 @@ function check_page(string $page, $params = []): bool
         return false;
     }
 
+    if (zen_is_superuser()) {
+        return true;
+    }
+
     $page_params = '';
     // Most entries (normal case) have their own pages. However, everything on the Configuration
     // and Modules menus are handled by the single pages configuration.php and modules.php. So for
