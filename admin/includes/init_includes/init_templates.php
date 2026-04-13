@@ -11,7 +11,6 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 use Zencart\TemplateResolver\TemplateResolver;
 
-require_once DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_templates.php';
 
 // Set theme related directories
 if (!isset($template_dir) || $template_dir == '') {

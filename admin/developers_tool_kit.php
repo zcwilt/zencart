@@ -6,7 +6,6 @@
  * @version $Id: DrByte 2026 Mar 05 Modified in v2.2.1 $
  */
 require('includes/application_top.php');
-require_once DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_templates.php';
 
 $default_context_lines = 0;
 $output = '';
