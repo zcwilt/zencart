@@ -146,7 +146,7 @@ foreach ($upperMenuArray as $menuItem) {
                     <li class="hidden-xs">
                         <?= zen_draw_form('goto', FILENAME_CATEGORY_PRODUCT_LISTING, '', 'get', 'class="navbar-form"') ?>
                         <div class="form-group header-search goto-category">
-                            <small class="text-muted"><?= HEADER_TEXT_JUMP_TO_CATEGORY ?>><br></small>
+                            <small class="text-muted"><?= HEADER_TEXT_JUMP_TO_CATEGORY ?><br></small>
                         <?= zen_draw_pull_down_menu('cPath', zen_get_category_tree(), $current_category_id, 'onchange="this.form.submit();" class="form-control" id="cPath-search"') ?>
                         </div>
                         <?= '</form>' ?>
