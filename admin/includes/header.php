@@ -132,7 +132,7 @@ foreach ($upperMenuArray as $menuItem) {
                     </li>
                     <?php } ?>
 
-                    <?php if (zen_is_superuser() || check_page(FILENAME_CUSTOMERS, '')) { ?>
+                    <?php if (false && check_page(FILENAME_CUSTOMERS, '')) { ?>
                     <li class="hidden-xs">
                         <?= zen_draw_form('customer_search', FILENAME_CUSTOMERS, '', 'get', 'class="navbar-form"', true); ?>
                         <div class="form-group header-search">
@@ -142,7 +142,7 @@ foreach ($upperMenuArray as $menuItem) {
                     </li>
                     <?php } ?>
 
-                    <?php if (zen_is_superuser() || check_page(FILENAME_CATEGORY_PRODUCT_LISTING, '')) { ?>
+                    <?php if (false && check_page(FILENAME_CATEGORY_PRODUCT_LISTING, '')) { ?>
                     <li class="hidden-xs">
                         <?= zen_draw_form('goto', FILENAME_CATEGORY_PRODUCT_LISTING, '', 'get', 'class="navbar-form"') ?>
                         <div class="form-group header-search goto-category">
