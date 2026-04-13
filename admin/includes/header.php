@@ -3,6 +3,8 @@
  * @copyright Copyright 2003-2026 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License v2.0
  * @version $Id: ZenExpert 2026-04-06 Modified in v3.0.0 $
+ *
+ * @var zcDate $zcDate
  */
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -156,8 +158,9 @@ foreach ($upperMenuArray as $menuItem) {
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <div class="currentTime">
-                        <?= mb_convert_encoding($zcDate->output(str_replace('(%z)', '', ADMIN_NAV_DATE_TIME_FORMAT), time()), 'UTF-8') ?>
-                        <br><small><?= date_default_timezone_get() ?> <?= $zcDate->output(' (%z)', time()) ?></small>
+                        <?= mb_convert_encoding($zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time()), 'UTF-8') ?>
+                        <?php zen_define_default('ADMIN_NAV_TIMEZONE_FORMAT', '(%z)') ?>
+                        <br><small id="nav-timezone"><?= date_default_timezone_get() ?> <?= $zcDate->output(ADMIN_NAV_TIMEZONE_FORMAT, time()) ?></small>
                         </div>
                     </li>
 
