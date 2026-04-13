@@ -7,9 +7,6 @@
  * @version $Id: DrByte 2025 Sep 29 Modified in v2.2.0 $
  */
 
-require_once __DIR__ . '/functions_templates.php';
-
-
 /**
  * build a list of directories in a specified parent folder
  * (formatted in id/text pairs for SELECT boxes)

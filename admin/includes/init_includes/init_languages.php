@@ -12,8 +12,6 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-require_once DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_templates.php';
-
 // set the language
 if (!isset($_SESSION['language']) || isset($_GET['language'])) {
     $lng = new language();
