@@ -19,6 +19,11 @@ class RunnerConfigureFilesTest extends TestCase
         putenv('ZC_TEST_WORKER');
         putenv('TEST_TOKEN');
         putenv('ZC_TEST_DB_DATABASE');
+        putenv('ZC_TEST_USE_MAILSERVER');
+        putenv('ZC_TEST_MAILSERVER_HOST');
+        putenv('ZC_TEST_MAILSERVER_PORT');
+        putenv('ZC_TEST_MAILSERVER_USER');
+        putenv('ZC_TEST_MAILSERVER_PASSWORD');
 
         parent::tearDown();
     }
@@ -55,5 +60,27 @@ class RunnerConfigureFilesTest extends TestCase
         $this->assertSame('/tmp/zc-runner-config/', DIR_FS_CATALOG);
         $this->assertSame('db_worker_2', DB_DATABASE);
         $this->assertSame('/tmp/zc-runner-config/logs/worker_2', DIR_FS_LOGS);
+    }
+
+    public function testMainRunnerConfigureUsesMailserverEnvironmentOverrides(): void
+    {
+        putenv('ZC_TEST_USE_MAILSERVER=1');
+        putenv('ZC_TEST_MAILSERVER_HOST=mailpit');
+        putenv('ZC_TEST_MAILSERVER_PORT=2525');
+        putenv('ZC_TEST_MAILSERVER_USER=test-user');
+        putenv('ZC_TEST_MAILSERVER_PASSWORD=test-password');
+
+        $config = require dirname(__DIR__, 2) . '/Support/configs/runner.main.configure.php';
+
+        $this->assertSame(
+            [
+                'use-mailserver' => true,
+                'mailserver-port' => 2525,
+                'mailserver-host' => 'mailpit',
+                'mailserver-user' => 'test-user',
+                'mailserver-password' => 'test-password',
+            ],
+            $config
+        );
     }
 }

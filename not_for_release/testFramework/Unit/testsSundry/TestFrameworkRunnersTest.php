@@ -292,6 +292,54 @@ class TestFrameworkRunnersTest extends TestCase
         }
     }
 
+    public function testTestEnvironmentLoaderAllowsLocalEnvToOverrideDefaultsWhileKeepingShellOverrides(): void
+    {
+        $root = sys_get_temp_dir() . '/zc-test-env-root-' . uniqid('', true);
+        $configDir = $root . '/not_for_release/testFramework/Support/configs';
+        mkdir($configDir, 0777, true);
+
+        file_put_contents(
+            $configDir . '/test-runner.env',
+            implode(PHP_EOL, [
+                'ZC_TEST_DB_HOST=default-db',
+                'ZC_TEST_USE_MAILSERVER=false',
+                '',
+            ])
+        );
+        file_put_contents(
+            $configDir . '/test-runner.local.env',
+            implode(PHP_EOL, [
+                'ZC_TEST_DB_HOST=local-db',
+                'ZC_TEST_USE_MAILSERVER=true',
+                '',
+            ])
+        );
+
+        try {
+            $loader = $this->rootPath . '/not_for_release/testFramework/load-test-environment.sh';
+            $command = sprintf(
+                'ZC_TEST_DB_HOST=%s bash -c %s bash %s %s',
+                escapeshellarg('shell-db'),
+                escapeshellarg('. "$1"; load_test_framework_env "$2"; printf "%s\n" "$ZC_TEST_DB_HOST"; printf "%s\n" "$ZC_TEST_USE_MAILSERVER"'),
+                escapeshellarg($loader),
+                escapeshellarg($root)
+            );
+
+            exec($command . ' 2>&1', $output, $exitCode);
+
+            $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+            $this->assertSame(['shell-db', 'true'], $output);
+        } finally {
+            unlink($configDir . '/test-runner.local.env');
+            unlink($configDir . '/test-runner.env');
+            rmdir($configDir);
+            rmdir($root . '/not_for_release/testFramework/Support');
+            rmdir($root . '/not_for_release/testFramework');
+            rmdir($root . '/not_for_release');
+            rmdir($root);
+        }
+    }
+
     public function testParallelUnitRunnerHelpPrintsUsage(): void
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-parallel-unit-tests.sh';
@@ -743,7 +791,7 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Running 1 unit test files in parallel with 4 worker(s).', $output);
         $this->assertContains('Env filter narrowed file selection using substring: RuntimeConfigTest', $output);
-        $this->assertContains('Parallel unit test summary: 0 failing file(s), 19 test(s), 22 assertion(s).', $output);
+        $this->assertContains('Parallel unit test summary: 0 failing file(s), 21 test(s), 24 assertion(s).', $output);
         $this->assertContains('Feature Test Group Report', $output);
         $this->assertContains('DRY   [admin-plugin] not_for_release/testFramework/FeatureAdmin/PluginTests/BasicPluginInstallTest.php', $output);
     }
