@@ -42,7 +42,7 @@ if (!empty($new_version)) { ?>
       if ($target1.length) {
         $target1.html(newVersion);
       }
-      if (newVersion !== <?php echo json_encode(TEXT_VERSION_CHECK_CURRENT); ?>) {
+      if (newVersion !== <?php echo json_encode(TEXT_VERSION_CHECK_CURRENT); ?> && <?= !empty($doVersionCheck) ? 'true' : 'false' ?>) {
           $('#versionCheckPill').addClass('text-danger');
           $('#versionCheckNotifyBadge').toggle();
       }
