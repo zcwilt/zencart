@@ -796,7 +796,8 @@ function zen_getOrdersStatuses(bool $keyed = false): array
 /**
  * @since ZC v1.5.8
  */
-function zen_get_customer_email_from_id($cid) {
+function zen_get_customer_email_from_id($cid)
+{
    global $db;
    $query = $db->Execute("SELECT customers_email_address FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . (int)$cid);
    if ($query->EOF) return '';

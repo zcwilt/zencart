@@ -23,8 +23,8 @@ tests, so targeted feature dry-runs do not fail on unit no-match errors.
 Examples:
   composer tests-ci
   composer tests-ci-local
-  composer tests-ci-dry-run -- --filter BasicPluginInstallTest
-  composer tests-ci-local-dry-run -- --filter SearchInProcessTest
+  composer tests-ci -- --dry-run --filter BasicPluginInstallTest
+  composer tests-ci-local -- --dry-run --filter SearchInProcessTest
 EOF
 }
 

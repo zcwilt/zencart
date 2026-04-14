@@ -40,8 +40,10 @@ DELETE FROM customers_auth_tokens WHERE created_at > DATE_SUB(CURRENT_TIMESTAMP,
 #PROGRESS_FEEDBACK:!TEXT=Updating table structures!
 DROP TABLE IF EXISTS paypal_testing;
 ALTER TABLE admin ADD dashboard_layout TEXT NULL;
+ALTER TABLE reviews_description ADD reviews_title VARCHAR(128) NOT NULL DEFAULT '';
 
 #PROGRESS_FEEDBACK:!TEXT=Updating configuration settings...
+UPDATE configuration SET configuration_value = '5' WHERE configuration_key = 'REVIEW_TEXT_MIN_LENGTH';
 
 
 
