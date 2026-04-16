@@ -6,6 +6,9 @@
 
 namespace Zencart\TemplateResolver;
 
+/**
+ * @since ZC v3.0.0
+ */
 class TemplateResolver
 {
     private string $catalogRoot;
@@ -13,6 +16,9 @@ class TemplateResolver
     private string $pluginsRoot;
     private array $templateRecords = [];
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function __construct(?string $catalogRoot = null, ?string $coreTemplatesPath = null, ?string $pluginsRoot = null)
     {
         $this->catalogRoot = $this->normalizeDirectory($catalogRoot ?? (defined('DIR_FS_CATALOG') ? DIR_FS_CATALOG : dirname(__DIR__, 2)));
@@ -20,6 +26,9 @@ class TemplateResolver
         $this->pluginsRoot = $this->normalizeDirectory($pluginsRoot ?? $this->catalogRoot . '/zc_plugins');
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getSelectableTemplates(bool $includeTemplateDefault = false): array
     {
         $templates = $this->getTemplateRecords();
@@ -31,28 +40,43 @@ class TemplateResolver
         return $templates;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getTemplateRecord(string $templateKey): ?array
     {
         $templates = $this->getTemplateRecords();
         return $templates[$templateKey] ?? null;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getTemplateFilesystemPath(string $templateKey): ?string
     {
         return $this->getTemplateRecord($templateKey)['template_path'] ?? null;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getTemplateCatalogPath(string $templateKey): ?string
     {
         return $this->getTemplateRecord($templateKey)['template_catalog_path'] ?? null;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getTemplateWebPath(string $templateKey): ?string
     {
         $record = $this->getTemplateRecord($templateKey);
         return $record['template_web_path'] ?? null;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getBaseTemplate(string $templateKey): string
     {
         $record = $this->getTemplateRecord($templateKey);
@@ -63,6 +87,9 @@ class TemplateResolver
         return $record['base_template'] ?? 'template_default';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getTemplateInheritanceChain(string $templateKey): array
     {
         $chain = [];
@@ -93,12 +120,18 @@ class TemplateResolver
         return $chain;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function isPluginTemplate(string $templateKey): bool
     {
         $record = $this->getTemplateRecord($templateKey);
         return !empty($record['is_plugin_template']);
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getTemplateRecords(): array
     {
         if ($this->templateRecords === []) {
@@ -111,6 +144,9 @@ class TemplateResolver
         return $this->templateRecords;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function loadCoreTemplates(): array
     {
         $templates = [];
@@ -146,6 +182,9 @@ class TemplateResolver
         return $templates;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function loadPluginTemplates(): array
     {
         $templates = [];
@@ -193,6 +232,9 @@ class TemplateResolver
         return $templates;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function isSelectableTemplateManifest(mixed $manifest): bool
     {
         if (!is_array($manifest) || empty($manifest['template']) || !is_array($manifest['template'])) {
@@ -208,6 +250,9 @@ class TemplateResolver
             && !empty($manifest['template']['key']);
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function buildPluginTemplateRecord(string $pluginKey, string $pluginVersion, string $versionPath, array $manifest): ?array
     {
         $template = $manifest['template'];
@@ -243,6 +288,9 @@ class TemplateResolver
         ]);
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function loadTemplateInfo(string $templateInfoFile): ?array
     {
         if (!file_exists($templateInfoFile)) {
@@ -271,18 +319,27 @@ class TemplateResolver
         ];
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function buildCoreWebPath(string $templateKey): string
     {
         $catalogWebRoot = defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/';
         return rtrim($catalogWebRoot, '/') . '/includes/templates/' . $templateKey . '/';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function buildPluginWebPath(string $templateCatalogPath): string
     {
         $catalogWebRoot = defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/';
         return rtrim($catalogWebRoot, '/') . '/' . trim($templateCatalogPath, '/') . '/';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function normalizeDirectory(string $path): string
     {
         return rtrim(str_replace('\\', '/', $path), '/');

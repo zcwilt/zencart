@@ -20,7 +20,7 @@ function zen_get_catalog_template_directories(bool $include_template_default = f
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_get_template_search_directories(
     string $templateKey,
@@ -56,7 +56,7 @@ function zen_get_template_search_directories(
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_get_template_inheritance_chain(
     string $templateKey,
@@ -73,7 +73,7 @@ function zen_get_template_inheritance_chain(
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_get_template_catalog_override_directories(
     string $templateKey,
@@ -103,7 +103,7 @@ function zen_get_template_catalog_override_directories(
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_get_template_language_override_directories(
     string $templateKey,
@@ -131,7 +131,7 @@ function zen_get_template_language_override_directories(
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_get_template_first_language_directories(
     string $templateKey,
@@ -151,7 +151,7 @@ function zen_get_template_first_language_directories(
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_get_template_init_file_path(
     string $templateKey,
@@ -167,7 +167,7 @@ function zen_get_template_init_file_path(
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_get_template_screenshot_web_path(
     string $templateKey,
@@ -183,7 +183,7 @@ function zen_get_template_screenshot_web_path(
 }
 
 /**
- * @since ZC v2.2.1
+ * @since ZC v3.0.0
  */
 function zen_resolve_template_key(
     string $templateKey,
