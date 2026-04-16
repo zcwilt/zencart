@@ -9,7 +9,7 @@ namespace Tests\Unit\testsTemplateResolver;
 use Tests\Support\zcUnitTestCase;
 use Zencart\FileSystem\FileSystem;
 use Zencart\ResourceLoaders\SideboxFinder;
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 
 class SideboxFinderTemplateResolutionTest extends zcUnitTestCase
 {
@@ -19,7 +19,7 @@ class SideboxFinderTemplateResolutionTest extends zcUnitTestCase
     {
         parent::setUp();
         require_once DIR_FS_CATALOG . 'includes/classes/FileSystem.php';
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/SideboxFinder.php';
 
         $this->fixtureRoot = sys_get_temp_dir() . '/zencart-sidebox-finder-' . uniqid('', true);

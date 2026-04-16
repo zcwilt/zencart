@@ -7,7 +7,7 @@
 namespace Tests\Unit\testsTemplateResolver;
 
 use Tests\Support\zcUnitTestCase;
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 
 class TemplateResolverTest extends zcUnitTestCase
 {
@@ -16,7 +16,7 @@ class TemplateResolverTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         $this->fixtureRoot = sys_get_temp_dir() . '/zencart-template-resolver-' . uniqid('', true);
         mkdir($this->fixtureRoot . '/includes/templates/template_default', 0777, true);
         mkdir($this->fixtureRoot . '/includes/templates/responsive_classic', 0777, true);

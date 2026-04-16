@@ -27,7 +27,7 @@ class PageLoaderTemplateResolutionTest extends zcUnitTestCase
     {
         parent::setUp();
         require_once DIR_FS_CATALOG . 'includes/classes/FileSystem.php';
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/classes/traits/Singleton.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/PageLoader.php';
 

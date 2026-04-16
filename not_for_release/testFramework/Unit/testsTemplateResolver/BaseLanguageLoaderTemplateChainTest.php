@@ -16,7 +16,7 @@ class BaseLanguageLoaderTemplateChainTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/classes/FileSystem.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/BaseLanguageLoader.php';
 
@@ -152,7 +152,7 @@ class TestableBaseLanguageLoader extends BaseLanguageLoader
             define('DIR_FS_CATALOG', $catalogRoot . '/');
         }
         parent::__construct([], 'index', $templateDir, 'english');
-        $this->templateResolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $this->templateResolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $catalogRoot,
             $catalogRoot . '/includes/templates',
             $catalogRoot . '/zc_plugins'

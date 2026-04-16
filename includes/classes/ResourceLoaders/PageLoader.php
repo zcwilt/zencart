@@ -8,7 +8,7 @@
 namespace Zencart\PageLoader;
 
 use Zencart\FileSystem\FileSystem as FileSystem;
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 use Zencart\Traits\Singleton;
 
 /**

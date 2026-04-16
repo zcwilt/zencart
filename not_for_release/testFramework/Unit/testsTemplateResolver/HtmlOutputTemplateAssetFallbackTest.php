@@ -22,7 +22,7 @@ class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/functions/html_output.php';
 
         $this->baseThemePluginRoot = DIR_FS_CATALOG . 'zc_plugins/' . self::BASE_THEME_PLUGIN . '/v1.0.0/';

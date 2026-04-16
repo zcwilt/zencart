@@ -120,11 +120,11 @@ function zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONS
  */
 function zen_resolve_template_fallback_asset_path(string $src, string $template_dir): string
 {
-    if (is_file($src) || !class_exists(\Zencart\TemplateResolver\TemplateResolver::class)) {
+    if (is_file($src) || !class_exists(\Zencart\ResourceLoaders\TemplateResolver::class)) {
         return $src;
     }
 
-    $resolver = new \Zencart\TemplateResolver\TemplateResolver();
+    $resolver = new \Zencart\ResourceLoaders\TemplateResolver();
     $chain = $resolver->getTemplateInheritanceChain($template_dir);
     if ($chain === []) {
         return $src;

@@ -342,7 +342,7 @@ Suggested responsibilities:
 
 Suggested file:
 
-- `includes/classes/TemplateResolver.php`
+- `includes/classes/ResourceLoaders/TemplateResolver.php`
 
 Suggested methods:
 
