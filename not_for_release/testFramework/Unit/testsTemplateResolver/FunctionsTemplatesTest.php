@@ -40,10 +40,8 @@ class FunctionsTemplatesTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'child_theme',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
     ],

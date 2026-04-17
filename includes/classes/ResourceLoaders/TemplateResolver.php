@@ -199,13 +199,7 @@ class TemplateResolver
             return false;
         }
 
-        $capabilities = $manifest['pluginCapabilities'] ?? [];
-        if (!is_array($capabilities) || !in_array('template', $capabilities, true)) {
-            return false;
-        }
-
-        return ($manifest['template']['type'] ?? null) === 'selectable'
-            && !empty($manifest['template']['key']);
+        return !empty($manifest['template']['key']);
     }
 
     private function buildPluginTemplateRecord(string $pluginKey, string $pluginVersion, string $versionPath, array $manifest): ?array

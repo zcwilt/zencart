@@ -54,10 +54,8 @@ class PageLoaderTemplateResolutionTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Base Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => 'template_default',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
@@ -89,10 +87,8 @@ PHP
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => '%s',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
@@ -116,23 +112,6 @@ PHP
         );
         file_put_contents($this->childThemePluginPath . 'catalog/includes/templates/' . self::CHILD_TEMPLATE_KEY . '/css/zz_test_child.css', '/* child */');
 
-        file_put_contents(
-            $this->overlayPluginPath . 'manifest.php',
-            sprintf(<<<'PHP'
-<?php
-return [
-    'pluginVersion' => 'v1.0.0',
-    'pluginName' => 'Unit Test Overlay',
-    'pluginCapabilities' => ['template-overlay'],
-    'template' => [
-        'type' => 'overlay',
-        'targets' => ['%s', 'default'],
-    ],
-];
-PHP
-            ,
-            self::BASE_TEMPLATE_KEY
-        ));
         file_put_contents(
             $this->overlayPluginPath . 'catalog/includes/templates/' . self::BASE_TEMPLATE_KEY . '/common/tpl_overlay_unit_test.php',
             "<?php\n"

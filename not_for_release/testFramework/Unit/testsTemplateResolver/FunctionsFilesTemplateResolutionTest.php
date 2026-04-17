@@ -43,10 +43,8 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],

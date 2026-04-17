@@ -43,13 +43,9 @@ class TemplateResolverTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'child_theme',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
-        'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
-        'settingsFile' => 'catalog/includes/templates/child_theme/template_settings.php',
     ],
 ];
 PHP
@@ -106,6 +102,10 @@ PHP
             $resolver->getTemplateWebPath('child_theme')
         );
         $this->assertSame(
+            $this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/templates/child_theme/template_settings.php',
+            $record['template_settings_path']
+        );
+        $this->assertSame(
             ['child_theme', 'responsive_classic', 'template_default'],
             $resolver->getTemplateInheritanceChain('child_theme')
         );
@@ -157,10 +157,8 @@ PHP
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Responsive Classic Plugin',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'responsive_classic',
-        'type' => 'selectable',
         'baseTemplate' => 'template_default',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
     ],
@@ -193,10 +191,8 @@ PHP
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'child_theme',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
         'settingsFile' => 'catalog/config/child-settings.php',

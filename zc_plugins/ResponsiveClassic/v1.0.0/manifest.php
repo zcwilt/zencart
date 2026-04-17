@@ -10,12 +10,8 @@ return [
     'changelog' => '',
     'github_repo' => '',
     'pluginGroups' => [],
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'responsive_classic_dogfood',
-        'type' => 'selectable',
         'baseTemplate' => 'template_default',
-        'infoFile' => 'catalog/includes/templates/responsive_classic_dogfood/template_info.php',
-        'settingsFile' => 'catalog/includes/templates/responsive_classic_dogfood/template_settings.php',
     ],
 ];

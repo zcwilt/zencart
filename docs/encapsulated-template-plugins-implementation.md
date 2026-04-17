@@ -266,14 +266,14 @@ return [
     'pluginAuthor' => 'Zen Cart Team',
     'pluginId' => 0,
     'zcVersions' => [],
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'example_theme',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
     ],
 ];
 ```
+
+The presence of `template` with a `key` declares a selectable template plugin.
 
 For the common case, the resolver should infer metadata paths from `template.key`:
 
@@ -297,7 +297,6 @@ zc_plugins/<Plugin>/<version>/
 ```php
 'template' => [
     'key' => 'example_theme',
-    'type' => 'selectable',
     'baseTemplate' => 'responsive_classic',
     'infoFile' => 'custom/path/template_info.php',
     'settingsFile' => 'custom/path/template_settings.php',
@@ -306,19 +305,15 @@ zc_plugins/<Plugin>/<version>/
 
 This keeps normal template plugins convention-based while still allowing rare advanced packages to override metadata paths.
 
-For overlay-only plugins:
+Overlay-only plugins do not need manifest hints. PageLoader discovers overlay directories from installed plugin files:
 
-```php
-'pluginCapabilities' => ['template-overlay'],
-'template' => [
-    'type' => 'overlay',
-    'targets' => ['default', 'responsive_classic'],
-],
+```text
+zc_plugins/<Plugin>/<version>/catalog/includes/templates/default/
+zc_plugins/<Plugin>/<version>/catalog/includes/templates/responsive_classic/
 ```
 
 Notes:
 
-- `pluginCapabilities` is clearer than overloading `pluginGroups`
 - `baseTemplate` is important for fallback behavior
 - metadata should be optional so existing plugins remain valid
 - `baseTemplate` also doubles as the child-template inheritance declaration

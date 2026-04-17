@@ -45,10 +45,8 @@ class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Base Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => 'template_default',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
@@ -76,10 +74,8 @@ PHP
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => '%s',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
