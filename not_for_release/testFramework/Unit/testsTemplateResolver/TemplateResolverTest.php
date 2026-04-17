@@ -111,6 +111,43 @@ PHP
         );
     }
 
+    public function testCoreTemplateRecordUsesBaseTemplateFromTemplateInfo(): void
+    {
+        $this->writeTemplateInfo(
+            $this->fixtureRoot . '/includes/templates/responsive_classic/template_info.php',
+            'Responsive Classic',
+            'template_default'
+        );
+
+        $resolver = new TemplateResolver(
+            $this->fixtureRoot,
+            $this->fixtureRoot . '/includes/templates',
+            $this->fixtureRoot . '/zc_plugins'
+        );
+
+        $this->assertSame('template_default', $resolver->getBaseTemplate('responsive_classic'));
+        $this->assertSame(
+            ['responsive_classic', 'template_default'],
+            $resolver->getTemplateInheritanceChain('responsive_classic')
+        );
+    }
+
+    public function testTemplateDefaultDoesNotRecordItselfAsBaseTemplate(): void
+    {
+        $resolver = new TemplateResolver(
+            $this->fixtureRoot,
+            $this->fixtureRoot . '/includes/templates',
+            $this->fixtureRoot . '/zc_plugins'
+        );
+
+        $record = $resolver->getTemplateRecord('template_default');
+
+        $this->assertNotNull($record);
+        $this->assertNull($record['base_template']);
+        $this->assertSame('template_default', $resolver->getBaseTemplate('template_default'));
+        $this->assertSame(['template_default'], $resolver->getTemplateInheritanceChain('template_default'));
+    }
+
     public function testPluginTemplateCanOverrideCoreTemplateRecordByKey(): void
     {
         file_put_contents(
@@ -184,8 +221,9 @@ PHP
         );
     }
 
-    private function writeTemplateInfo(string $path, string $templateName): void
+    private function writeTemplateInfo(string $path, string $templateName, ?string $baseTemplate = null): void
     {
+        $baseTemplateDefinition = $baseTemplate === null ? '' : "\$template_base = '{$baseTemplate}';\n";
         file_put_contents(
             $path,
             <<<PHP
@@ -195,6 +233,7 @@ PHP
 \$template_author = 'Zen Cart';
 \$template_description = '{$templateName} description';
 \$template_screenshot = 'screenshot.png';
+{$baseTemplateDefinition}
 PHP
         );
     }
