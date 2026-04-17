@@ -333,7 +333,7 @@ Suggested responsibilities:
 - return metadata from `template_info.php`
 - return base template for fallback
 - return whether a template is acting as a child of another template
-- return whether the template is selectable or overlay-only
+- return selectable template records declared by plugin manifests
 
 Suggested file:
 
