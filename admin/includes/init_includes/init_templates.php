@@ -9,7 +9,7 @@ if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
 
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 
 
 // Set theme related directories

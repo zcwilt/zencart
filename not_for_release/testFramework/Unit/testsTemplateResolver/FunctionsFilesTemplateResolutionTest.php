@@ -20,7 +20,7 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_templates.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_files.php';
 
@@ -43,10 +43,8 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],

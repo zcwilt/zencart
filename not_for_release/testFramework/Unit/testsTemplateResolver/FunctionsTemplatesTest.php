@@ -13,7 +13,7 @@ class FunctionsTemplatesTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_templates.php';
 
         $this->fixtureRoot = sys_get_temp_dir() . '/zencart-functions-templates-' . uniqid('', true);
@@ -40,10 +40,8 @@ class FunctionsTemplatesTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'child_theme',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
     ],
@@ -60,7 +58,7 @@ PHP
 
     public function testTemplateSearchDirectoriesFollowInheritanceChain(): void
     {
-        $resolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
             $this->fixtureRoot . '/zc_plugins'
@@ -76,7 +74,7 @@ PHP
 
     public function testTemplateLanguageOverrideDirectoriesFollowInheritanceChain(): void
     {
-        $resolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
             $this->fixtureRoot . '/zc_plugins'
@@ -100,7 +98,7 @@ PHP
 
     public function testTemplateFirstLanguageDirectoriesFollowInheritanceChain(): void
     {
-        $resolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
             $this->fixtureRoot . '/zc_plugins'
@@ -122,7 +120,7 @@ PHP
 
     public function testTemplateCatalogOverrideDirectoriesIncludePluginAndInheritedCorePaths(): void
     {
-        $resolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
             $this->fixtureRoot . '/zc_plugins'
@@ -149,7 +147,7 @@ PHP
             "<?php\n"
         );
 
-        $resolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
             $this->fixtureRoot . '/zc_plugins'
@@ -163,7 +161,7 @@ PHP
 
     public function testTemplateScreenshotWebPathResolvesPluginTemplateWebPath(): void
     {
-        $resolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
             $this->fixtureRoot . '/zc_plugins'
@@ -177,7 +175,7 @@ PHP
 
     public function testResolveTemplateKeyFallsBackToTemplateDefaultForMissingTemplate(): void
     {
-        $resolver = new \Zencart\TemplateResolver\TemplateResolver(
+        $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
             $this->fixtureRoot . '/zc_plugins'

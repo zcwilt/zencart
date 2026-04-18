@@ -7,7 +7,7 @@
 namespace Tests\Unit\testsTemplateResolver;
 
 use Tests\Support\zcUnitTestCase;
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 
 class TemplateResolverTest extends zcUnitTestCase
 {
@@ -16,7 +16,7 @@ class TemplateResolverTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         $this->fixtureRoot = sys_get_temp_dir() . '/zencart-template-resolver-' . uniqid('', true);
         mkdir($this->fixtureRoot . '/includes/templates/template_default', 0777, true);
         mkdir($this->fixtureRoot . '/includes/templates/responsive_classic', 0777, true);
@@ -43,13 +43,9 @@ class TemplateResolverTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'child_theme',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
-        'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
-        'settingsFile' => 'catalog/includes/templates/child_theme/template_settings.php',
     ],
 ];
 PHP
@@ -106,9 +102,50 @@ PHP
             $resolver->getTemplateWebPath('child_theme')
         );
         $this->assertSame(
+            $this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/templates/child_theme/template_settings.php',
+            $record['template_settings_path']
+        );
+        $this->assertSame(
             ['child_theme', 'responsive_classic', 'template_default'],
             $resolver->getTemplateInheritanceChain('child_theme')
         );
+    }
+
+    public function testCoreTemplateRecordUsesBaseTemplateFromTemplateInfo(): void
+    {
+        $this->writeTemplateInfo(
+            $this->fixtureRoot . '/includes/templates/responsive_classic/template_info.php',
+            'Responsive Classic',
+            'template_default'
+        );
+
+        $resolver = new TemplateResolver(
+            $this->fixtureRoot,
+            $this->fixtureRoot . '/includes/templates',
+            $this->fixtureRoot . '/zc_plugins'
+        );
+
+        $this->assertSame('template_default', $resolver->getBaseTemplate('responsive_classic'));
+        $this->assertSame(
+            ['responsive_classic', 'template_default'],
+            $resolver->getTemplateInheritanceChain('responsive_classic')
+        );
+    }
+
+    public function testTemplateDefaultDoesNotRecordItselfAsBaseTemplate(): void
+    {
+        $resolver = new TemplateResolver(
+            $this->fixtureRoot,
+            $this->fixtureRoot . '/includes/templates',
+            $this->fixtureRoot . '/zc_plugins'
+        );
+
+        $record = $resolver->getTemplateRecord('template_default');
+
+        $this->assertNotNull($record);
+        $this->assertNull($record['base_template']);
+        $this->assertSame('template_default', $resolver->getBaseTemplate('template_default'));
+        $this->assertSame(['template_default'], $resolver->getTemplateInheritanceChain('template_default'));
     }
 
     public function testPluginTemplateCanOverrideCoreTemplateRecordByKey(): void
@@ -120,10 +157,8 @@ PHP
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Responsive Classic Plugin',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'responsive_classic',
-        'type' => 'selectable',
         'baseTemplate' => 'template_default',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
     ],
@@ -156,10 +191,8 @@ PHP
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => 'child_theme',
-        'type' => 'selectable',
         'baseTemplate' => 'responsive_classic',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
         'settingsFile' => 'catalog/config/child-settings.php',
@@ -184,8 +217,9 @@ PHP
         );
     }
 
-    private function writeTemplateInfo(string $path, string $templateName): void
+    private function writeTemplateInfo(string $path, string $templateName, ?string $baseTemplate = null): void
     {
+        $baseTemplateDefinition = $baseTemplate === null ? '' : "\$template_base = '{$baseTemplate}';\n";
         file_put_contents(
             $path,
             <<<PHP
@@ -195,6 +229,7 @@ PHP
 \$template_author = 'Zen Cart';
 \$template_description = '{$templateName} description';
 \$template_screenshot = 'screenshot.png';
+{$baseTemplateDefinition}
 PHP
         );
     }

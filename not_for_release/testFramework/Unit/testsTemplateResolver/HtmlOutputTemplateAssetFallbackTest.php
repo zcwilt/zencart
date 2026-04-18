@@ -22,7 +22,7 @@ class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require_once DIR_FS_CATALOG . 'includes/classes/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/functions/html_output.php';
 
         $this->baseThemePluginRoot = DIR_FS_CATALOG . 'zc_plugins/' . self::BASE_THEME_PLUGIN . '/v1.0.0/';
@@ -45,10 +45,8 @@ class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Base Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => 'template_default',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
@@ -76,10 +74,8 @@ PHP
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Unit Test Child Theme',
-    'pluginCapabilities' => ['template'],
     'template' => [
         'key' => '%s',
-        'type' => 'selectable',
         'baseTemplate' => '%s',
         'infoFile' => 'catalog/includes/templates/%s/template_info.php',
     ],
