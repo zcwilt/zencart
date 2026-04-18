@@ -179,6 +179,9 @@ class PageLoader
         return $this->getTemplateDirectory('tpl_' . preg_replace('/.php/', '', $this->mainPage) . '_default.php', DIR_WS_TEMPLATE, $this->mainPage, 'templates') . '/tpl_' . $this->mainPage . '_default.php';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getTemplateSearchDirectories(string $templateKey, string $currentPage, string $templateDir): array
     {
         $directories = [];
@@ -201,6 +204,9 @@ class PageLoader
         return array_values(array_unique(array_filter($directories)));
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getTemplateSearchDirectoriesFromPath(string $pageDirectory): array
     {
         $normalized = $this->normalizeDirectory($pageDirectory);
@@ -213,6 +219,9 @@ class PageLoader
         return $this->getTemplateSearchDirectories($templateKey, $this->mainPage, $templateDir);
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getCoreTemplateDirectories(string $templateKey, string $currentPage, string $templateDir): array
     {
         $record = $this->getTemplateResolver()->getTemplateRecord($templateKey);
@@ -231,6 +240,9 @@ class PageLoader
         ];
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getOverlayDirectoriesForTarget(string $targetTemplate, string $templateDir): array
     {
         $directories = [];
@@ -242,6 +254,9 @@ class PageLoader
         return $directories;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getPluginOverlayDirectories(array $plugin, string $templateDir, ?array $targets = null): array
     {
         $templatesRoot = 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/templates/';
@@ -261,6 +276,9 @@ class PageLoader
         return $directories;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getPluginTemplateTargets(string $templatesRoot): array
     {
         $targets = [];
@@ -276,6 +294,9 @@ class PageLoader
         return $targets;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getTemplateResolver(): TemplateResolver
     {
         if ($this->templateResolver === null) {
@@ -285,6 +306,9 @@ class PageLoader
         return $this->templateResolver;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getCurrentTemplateKey(string $currentTemplate): string
     {
         $normalized = trim($this->normalizeDirectory($currentTemplate), '/');
@@ -299,12 +323,18 @@ class PageLoader
         return basename($normalized);
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getNonDefaultInheritanceChain(string $templateKey): array
     {
         $chain = $this->getTemplateResolver()->getTemplateInheritanceChain($templateKey);
         return array_values(array_filter($chain, static fn(string $item): bool => $item !== 'template_default'));
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function getRelativeCatalogPath(string $path): ?string
     {
         $normalizedCatalogRoot = rtrim(str_replace('\\', '/', DIR_FS_CATALOG), '/');
@@ -316,11 +346,17 @@ class PageLoader
         return substr($normalizedPath, strlen($normalizedCatalogRoot) + 1);
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function isTemplatePath(string $path): bool
     {
         return str_contains($this->normalizeDirectory($path), 'includes/templates/');
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function normalizeDirectory(string $path): string
     {
         return rtrim(str_replace('\\', '/', $path), '/');

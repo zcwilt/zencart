@@ -89,7 +89,7 @@ class SideboxFinder
     }
 
     /**
-     * @since ZC v2.2.1
+     * @since ZC v3.0.0
      */
     protected function getTemplateSpecificSideboxDirectories(string $templateDir): array
     {

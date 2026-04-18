@@ -114,9 +114,7 @@ function zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONS
 }
 
 /**
- * The HTML image wrapper function for non-proportional images
- * used when "proportional images" is turned off or if calling from a template directory
- * @since ZC v1.2.4
+ * @since ZC v3.0.0
  */
 function zen_resolve_template_fallback_asset_path(string $src, string $template_dir): string
 {
@@ -174,6 +172,11 @@ function zen_resolve_template_fallback_asset_path(string $src, string $template_
     return $src;
 }
 
+/**
+ * The HTML image wrapper function for non-proportional images
+ * used when "proportional images" is turned off or if calling from a template directory
+ * @since ZC v1.2.4
+ */
 function zen_image_OLD($src, $title = '', $width = '', $height = '', $parameters = '')
 {
     global $template_dir;
