@@ -13,7 +13,7 @@
  */
 
 use Zencart\LanguageLoader\LanguageLoaderFactory;
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
