@@ -81,22 +81,27 @@ function zen_get_template_catalog_override_directories(
     bool $includeTemplateDefault = true,
     ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
 ): array {
+    global $installedPlugins;
+
     $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
     $catalogBasePath = trim($catalogBasePath, '/');
     $directories = [];
 
     foreach (zen_get_template_inheritance_chain($templateKey, $includeTemplateDefault, $resolver) as $chainTemplateKey) {
         $record = $resolver->getTemplateRecord($chainTemplateKey);
-        if ($record === null) {
-            continue;
-        }
-
-        if (!empty($record['is_plugin_template'])) {
+        if (!empty($record['is_plugin_template']) && !empty($record['plugin_key']) && !empty($record['plugin_version'])) {
             $directories[] = 'zc_plugins/' . $record['plugin_key'] . '/' . $record['plugin_version'] . '/catalog/' . $catalogBasePath . '/' . $chainTemplateKey . '/';
             continue;
         }
 
         $directories[] = $catalogBasePath . '/' . $chainTemplateKey . '/';
+
+        foreach (($installedPlugins ?? []) as $plugin) {
+            if (empty($plugin['unique_key']) || empty($plugin['version'])) {
+                continue;
+            }
+            $directories[] = 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/' . $catalogBasePath . '/' . $chainTemplateKey . '/';
+        }
     }
 
     return array_values(array_unique($directories));

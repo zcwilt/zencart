@@ -81,13 +81,10 @@ class BaseLanguageLoader
         $rootPath = rtrim($rootPath, '/') . '/';
         $extraPath = trim($extraPath, '/');
         foreach ($this->getTemplateInheritanceChainForLookup() as $templateKey) {
-            $path = $rootPath . $language . '/';
-            if ($extraPath !== '') {
-                $path .= $extraPath . '/';
-            }
-            $path .= $templateKey . '/' . $fileName;
-            if (is_file($path)) {
-                return $path;
+            foreach ($this->getTemplateLanguageOverrideCandidates($rootPath, $language, $templateKey, $fileName, $extraPath) as $path) {
+                if (is_file($path)) {
+                    return $path;
+                }
             }
         }
 
@@ -124,13 +121,10 @@ class BaseLanguageLoader
         $files = [];
 
         foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
-            $path = $rootPath . $language . '/';
-            if ($extraPath !== '') {
-                $path .= $extraPath . '/';
-            }
-            $path .= $templateKey . '/' . $fileName;
-            if (is_file($path)) {
-                $files[] = $path;
+            foreach ($this->getTemplateLanguageOverrideCandidates($rootPath, $language, $templateKey, $fileName, $extraPath) as $path) {
+                if (is_file($path)) {
+                    $files[] = $path;
+                }
             }
         }
 
@@ -152,5 +146,66 @@ class BaseLanguageLoader
         }
 
         return $files;
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function getTemplateLanguageOverrideCandidates(
+        string $rootPath,
+        string $language,
+        string $templateKey,
+        string $fileName,
+        string $extraPath = ''
+    ): array {
+        $paths = [];
+        $rootPath = rtrim($rootPath, '/') . '/';
+        $extraPath = trim($extraPath, '/');
+
+        $paths[] = $this->buildTemplateLanguageOverridePath($rootPath, $language, $templateKey, $fileName, $extraPath);
+
+        foreach ($this->getPluginTemplateLanguageRoots($templateKey) as $pluginLanguageRoot) {
+            $paths[] = $this->buildTemplateLanguageOverridePath($pluginLanguageRoot, $language, $templateKey, $fileName, $extraPath);
+        }
+
+        return array_values(array_unique($paths));
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function getPluginTemplateLanguageRoots(string $templateKey): array
+    {
+        $roots = [];
+        $templateRecord = $this->templateResolver->getTemplateRecord($templateKey);
+        if (!empty($templateRecord['is_plugin_template']) && !empty($templateRecord['plugin_key']) && !empty($templateRecord['plugin_version'])) {
+            $roots[] = $this->zcPluginsDir . $templateRecord['plugin_key'] . '/' . $templateRecord['plugin_version'] . '/catalog/includes/languages/';
+        }
+
+        foreach ($this->pluginList as $plugin) {
+            if (empty($plugin['unique_key']) || empty($plugin['version'])) {
+                continue;
+            }
+            $roots[] = $this->zcPluginsDir . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/languages/';
+        }
+
+        return array_values(array_unique($roots));
+    }
+
+    /**
+     * @since ZC v2.2.1
+     */
+    protected function buildTemplateLanguageOverridePath(
+        string $rootPath,
+        string $language,
+        string $templateKey,
+        string $fileName,
+        string $extraPath = ''
+    ): string {
+        $path = rtrim($rootPath, '/') . '/' . $language . '/';
+        if ($extraPath !== '') {
+            $path .= trim($extraPath, '/') . '/';
+        }
+        return $path . $templateKey . '/' . $fileName;
     }
 }

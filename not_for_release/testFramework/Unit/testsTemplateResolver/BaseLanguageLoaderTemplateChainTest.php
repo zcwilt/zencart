@@ -26,6 +26,7 @@ class BaseLanguageLoaderTemplateChainTest extends zcUnitTestCase
         mkdir($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/templates/child_theme', 0777, true);
         mkdir($this->fixtureRoot . '/includes/languages/english/template_default', 0777, true);
         mkdir($this->fixtureRoot . '/includes/languages/english/responsive_classic', 0777, true);
+        mkdir($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme', 0777, true);
         mkdir($this->fixtureRoot . '/includes/languages/template_default', 0777, true);
         mkdir($this->fixtureRoot . '/includes/languages/responsive_classic', 0777, true);
         $this->writeTemplateInfo($this->fixtureRoot . '/includes/templates/template_default/template_info.php', 'Template Default');
@@ -49,6 +50,7 @@ PHP
 
         file_put_contents($this->fixtureRoot . '/includes/languages/english/template_default/lang.example.php', "<?php\nreturn ['A' => 'default'];\n");
         file_put_contents($this->fixtureRoot . '/includes/languages/english/responsive_classic/lang.example.php', "<?php\nreturn ['A' => 'base'];\n");
+        file_put_contents($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme/lang.example.php', "<?php\nreturn ['A' => 'plugin child'];\n");
         file_put_contents($this->fixtureRoot . '/includes/languages/template_default/lang.english.php', "<?php\nreturn ['A' => 'default main'];\n");
         file_put_contents($this->fixtureRoot . '/includes/languages/responsive_classic/lang.english.php', "<?php\nreturn ['A' => 'base main'];\n");
     }
@@ -69,7 +71,7 @@ PHP
             'lang.example.php'
         );
 
-        $this->assertSame($this->fixtureRoot . '/includes/languages/english/responsive_classic/lang.example.php', $file);
+        $this->assertSame($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme/lang.example.php', $file);
     }
 
     public function testTemplateLanguageOverrideFilesLoadFromBaseToChild(): void
@@ -85,6 +87,7 @@ PHP
         $this->assertSame([
             $this->fixtureRoot . '/includes/languages/english/template_default/lang.example.php',
             $this->fixtureRoot . '/includes/languages/english/responsive_classic/lang.example.php',
+            $this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme/lang.example.php',
         ], $files);
     }
 
@@ -150,6 +153,7 @@ class TestableBaseLanguageLoader extends BaseLanguageLoader
             define('DIR_FS_CATALOG', $catalogRoot . '/');
         }
         parent::__construct([], 'index', $templateDir, 'english');
+        $this->zcPluginsDir = $catalogRoot . '/zc_plugins/';
         $this->templateResolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $catalogRoot,
             $catalogRoot . '/includes/templates',

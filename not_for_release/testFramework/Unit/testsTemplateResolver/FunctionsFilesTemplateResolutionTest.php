@@ -13,6 +13,7 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
 
     private string $pluginRoot;
     private string $moduleFixture;
+    private string $baseModuleOverlayFixture;
     private string $sideboxFixture;
     private string $indexFilterFixture;
     private string $htmlIncludeFixture;
@@ -26,12 +27,14 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
 
         $this->pluginRoot = DIR_FS_CATALOG . 'zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/';
         $this->moduleFixture = $this->pluginRoot . 'catalog/includes/modules/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_module.php';
+        $this->baseModuleOverlayFixture = $this->pluginRoot . 'catalog/includes/modules/responsive_classic/zz_unit_base_module.php';
         $this->sideboxFixture = $this->pluginRoot . 'catalog/includes/modules/sideboxes/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_sidebox.php';
         $this->indexFilterFixture = $this->pluginRoot . 'catalog/includes/index_filters/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_filter.php';
         $this->htmlIncludeFixture = DIR_FS_CATALOG . 'includes/languages/english/html_includes/responsive_classic/define_zz_unit.php';
 
         $this->removeDirectory($this->pluginRoot);
         @mkdir(dirname($this->moduleFixture), 0777, true);
+        @mkdir(dirname($this->baseModuleOverlayFixture), 0777, true);
         @mkdir(dirname($this->sideboxFixture), 0777, true);
         @mkdir(dirname($this->indexFilterFixture), 0777, true);
         @mkdir(dirname($this->htmlIncludeFixture), 0777, true);
@@ -68,21 +71,30 @@ PHP
         );
 
         file_put_contents($this->moduleFixture, "<?php\n");
+        file_put_contents($this->baseModuleOverlayFixture, "<?php\n");
         file_put_contents($this->sideboxFixture, "<?php\n");
         file_put_contents($this->indexFilterFixture, "<?php\n");
         file_put_contents($this->htmlIncludeFixture, "<?php\n");
 
         $_SESSION['language'] = 'english';
         $GLOBALS['template_dir'] = self::CHILD_TEMPLATE_KEY;
+        $GLOBALS['installedPlugins'] = [
+            [
+                'unique_key' => self::CHILD_THEME_PLUGIN,
+                'version' => 'v1.0.0',
+            ],
+        ];
     }
 
     public function tearDown(): void
     {
         @unlink($this->moduleFixture);
+        @unlink($this->baseModuleOverlayFixture);
         @unlink($this->sideboxFixture);
         @unlink($this->indexFilterFixture);
         @unlink($this->htmlIncludeFixture);
         $this->removeDirectory($this->pluginRoot);
+        unset($GLOBALS['installedPlugins']);
         parent::tearDown();
     }
 
@@ -91,6 +103,14 @@ PHP
         $this->assertSame(
             '../../zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/catalog/includes/modules/' . self::CHILD_TEMPLATE_KEY . '/zz_unit_module.php',
             zen_get_module_directory('zz_unit_module.php')
+        );
+    }
+
+    public function testGetModuleDirectoryReturnsPluginOverlayForInheritedTemplate(): void
+    {
+        $this->assertSame(
+            '../../zc_plugins/' . self::CHILD_THEME_PLUGIN . '/v1.0.0/catalog/includes/modules/responsive_classic/zz_unit_base_module.php',
+            zen_get_module_directory('zz_unit_base_module.php')
         );
     }
 
@@ -130,14 +150,21 @@ PHP
         );
 
         foreach ($iterator as $item) {
-            if ($item->isDir()) {
-                rmdir($item->getPathname());
+            $path = $item->getPathname();
+            if ($item->isDir() && !$item->isLink()) {
+                if (is_dir($path)) {
+                    rmdir($path);
+                }
                 continue;
             }
 
-            unlink($item->getPathname());
+            if (file_exists($path) || is_link($path)) {
+                unlink($path);
+            }
         }
 
-        rmdir($directory);
+        if (is_dir($directory)) {
+            rmdir($directory);
+        }
     }
 }
