@@ -8,7 +8,7 @@
 namespace Zencart\LanguageLoader;
 
 use Zencart\FileSystem\FileSystem;
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 
 /**
  * @since ZC v1.5.8

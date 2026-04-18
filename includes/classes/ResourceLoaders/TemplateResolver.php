@@ -4,7 +4,7 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
 
-namespace Zencart\TemplateResolver;
+namespace Zencart\ResourceLoaders;
 
 /**
  * @since ZC v3.0.0
@@ -173,7 +173,7 @@ class TemplateResolver
                 'template_catalog_path' => 'includes/templates/' . $templateKey . '/',
                 'template_web_path' => $this->buildCoreWebPath($templateKey),
                 'template_settings_path' => $templatePath . '/template_settings.php',
-                'base_template' => $templateKey === 'template_default' ? 'template_default' : 'template_default',
+                'base_template' => $this->normalizeBaseTemplate($templateInfo['base_template'] ?? null, $templateKey),
                 'is_plugin_template' => false,
                 'template_source' => 'core',
             ]);
@@ -241,13 +241,7 @@ class TemplateResolver
             return false;
         }
 
-        $capabilities = $manifest['pluginCapabilities'] ?? [];
-        if (!is_array($capabilities) || !in_array('template', $capabilities, true)) {
-            return false;
-        }
-
-        return ($manifest['template']['type'] ?? null) === 'selectable'
-            && !empty($manifest['template']['key']);
+        return !empty($manifest['template']['key']);
     }
 
     /**
@@ -278,7 +272,7 @@ class TemplateResolver
             'template_catalog_path' => $templateCatalogPath,
             'template_web_path' => $this->buildPluginWebPath($templateCatalogPath),
             'template_settings_path' => $settingsFile,
-            'base_template' => $template['baseTemplate'] ?? 'template_default',
+            'base_template' => $this->normalizeBaseTemplate($template['baseTemplate'] ?? null, $templateKey),
             'is_plugin_template' => true,
             'template_source' => 'plugin',
             'plugin_key' => $pluginKey,
@@ -302,6 +296,8 @@ class TemplateResolver
         $template_author = null;
         $template_description = null;
         $template_screenshot = null;
+        $template_base = null;
+        $base_template = null;
         $uses_single_column_layout_settings = false;
         $uses_mobile_sidebox_settings = true;
 
@@ -313,6 +309,7 @@ class TemplateResolver
             'author' => $template_author,
             'description' => $template_description,
             'screenshot' => $template_screenshot,
+            'base_template' => $template_base ?: ($base_template ?: null),
             'uses_single_column_layout_settings' => !empty($uses_single_column_layout_settings),
             'uses_mobile_sidebox_settings' => !isset($uses_mobile_sidebox_settings) || !empty($uses_mobile_sidebox_settings),
             'has_template_settings' => file_exists(dirname($templateInfoFile) . '/template_settings.php'),
@@ -340,6 +337,15 @@ class TemplateResolver
     /**
      * @since ZC v3.0.0
      */
+    private function normalizeBaseTemplate(?string $baseTemplate, string $templateKey): ?string
+    {
+        if (empty($baseTemplate)) {
+            return $templateKey === 'template_default' ? null : 'template_default';
+        }
+
+        return $baseTemplate === $templateKey ? null : $baseTemplate;
+    }
+
     private function normalizeDirectory(string $path): string
     {
         return rtrim(str_replace('\\', '/', $path), '/');
