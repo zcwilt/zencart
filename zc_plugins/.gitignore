@@ -11,4 +11,5 @@ zenTestPlugin/
 !POSM/
 !SystemInspection/
 !ScanAdditionalImages/
-!ResponsiveClassic
+!ResponsiveClassic/
+!ResponsiveClassic/**
