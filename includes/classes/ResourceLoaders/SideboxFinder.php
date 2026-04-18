@@ -6,8 +6,6 @@
  */
 namespace Zencart\ResourceLoaders;
 
-use Zencart\TemplateResolver\TemplateResolver;
-
 /**
  * @since ZC v1.5.8
  */

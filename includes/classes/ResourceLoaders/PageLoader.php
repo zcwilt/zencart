@@ -8,7 +8,7 @@
 namespace Zencart\PageLoader;
 
 use Zencart\FileSystem\FileSystem as FileSystem;
-use Zencart\TemplateResolver\TemplateResolver;
+use Zencart\ResourceLoaders\TemplateResolver;
 use Zencart\Traits\Singleton;
 
 /**
@@ -22,7 +22,6 @@ class PageLoader
     private string $mainPage;
     private FileSystem $fileSystem;
     private ?TemplateResolver $templateResolver = null;
-    private array $pluginManifestCache = [];
 
     /**
      * @since ZC v1.5.8
@@ -260,34 +259,18 @@ class PageLoader
      */
     private function getPluginOverlayDirectories(array $plugin, string $templateDir, ?array $targets = null): array
     {
-        $manifest = $this->getPluginManifest($plugin);
-        if (empty($manifest)) {
+        $templatesRoot = 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/templates/';
+        if (!is_dir(DIR_FS_CATALOG . $templatesRoot)) {
             return [];
         }
 
-        $capabilities = $manifest['pluginCapabilities'] ?? [];
-        $templateConfig = $manifest['template'] ?? [];
-        $isOverlayPlugin = is_array($capabilities)
-            && in_array('template-overlay', $capabilities, true)
-            && is_array($templateConfig)
-            && (($templateConfig['type'] ?? null) === 'overlay');
-
-        if (!$isOverlayPlugin) {
-            return [];
-        }
-
-        $availableTargets = $templateConfig['targets'] ?? ['default'];
-        if (!is_array($availableTargets)) {
-            $availableTargets = ['default'];
-        }
-
-        if ($targets !== null) {
-            $availableTargets = array_values(array_intersect($availableTargets, $targets));
-        }
-
+        $availableTargets = $targets ?? $this->getPluginTemplateTargets($templatesRoot);
         $directories = [];
         foreach ($availableTargets as $target) {
-            $directories[] = 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/templates/' . trim($target, '/') . '/' . trim($templateDir, '/') . '/';
+            $directory = $templatesRoot . trim($target, '/') . '/' . trim($templateDir, '/') . '/';
+            if (is_dir(DIR_FS_CATALOG . $directory)) {
+                $directories[] = $directory;
+            }
         }
 
         return $directories;
@@ -296,22 +279,19 @@ class PageLoader
     /**
      * @since ZC v3.0.0
      */
-    private function getPluginManifest(array $plugin): array
+    private function getPluginTemplateTargets(string $templatesRoot): array
     {
-        $cacheKey = $plugin['unique_key'] . ':' . $plugin['version'];
-        if (array_key_exists($cacheKey, $this->pluginManifestCache)) {
-            return $this->pluginManifestCache[$cacheKey];
+        $targets = [];
+        $directory = new \DirectoryIterator(DIR_FS_CATALOG . $templatesRoot);
+        foreach ($directory as $fileInfo) {
+            if ($fileInfo->isDot() || !$fileInfo->isDir()) {
+                continue;
+            }
+
+            $targets[] = $fileInfo->getFilename();
         }
 
-        $manifestFile = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/manifest.php';
-        if (!file_exists($manifestFile)) {
-            $this->pluginManifestCache[$cacheKey] = [];
-            return [];
-        }
-
-        $manifest = require $manifestFile;
-        $this->pluginManifestCache[$cacheKey] = is_array($manifest) ? $manifest : [];
-        return $this->pluginManifestCache[$cacheKey];
+        return $targets;
     }
 
     /**
