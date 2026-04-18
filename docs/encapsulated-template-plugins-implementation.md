@@ -454,7 +454,10 @@ Template selection should not feel coupled to generic plugin enable/disable stat
 
 Recommended rules:
 
-- selectable template packages are discoverable if installed on filesystem
+- selectable template packages are
+  - discoverable if installed via the admin's `Plugin Manager`
+  - **not** enabled or disabled via the `Plugin Manager`; the `Template Selection` tool provides that function.
+
 - template overlays only apply when their plugin is enabled
 - selecting a plugin-backed template does not require the template plugin to behave like a normal runtime feature plugin unless it also ships behavioral code
 - `template_default` remains available regardless of plugin state
@@ -464,6 +467,10 @@ This may require a distinction between:
 - installed plugin package
 - enabled overlay behavior
 - selected active template
+
+Primary touchpoints:
+
+- `includes/classes/ViewBuilders/PluginManagerController.php`
 
 ## Implementation Phases
 
