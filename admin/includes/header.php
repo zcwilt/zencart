@@ -69,7 +69,8 @@ if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_G
 // prepare admin info for dropdown
 $admin_ip = $_SERVER['REMOTE_ADDR'];
 $admin_host = gethostname();
-$admin_tz = date_default_timezone_get();
+$admin_time = mb_convert_encoding($zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time()), 'UTF-8');
+$admin_tz = date_default_timezone_get() . ' ' . $zcDate->output(ADMIN_NAV_TIMEZONE_FORMAT, time());
 $admin_locale = setlocale(LC_TIME, 0);
 zen_define_default('ADMIN_NAV_TIMEZONE_FORMAT', '(%z)');
 
@@ -192,10 +193,7 @@ if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
                 <ul class="nav navbar-nav navbar-right">
                     <?php if ($upperMenuArray['nav-current-time']['enabled'] ?? false) { ?>
                     <li id="nav-current-time">
-                        <div class="currentTime">
-                        <?= mb_convert_encoding($zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time()), 'UTF-8') ?>
-                        <br><small id="nav-timezone"><?= date_default_timezone_get() ?> <?= $zcDate->output(ADMIN_NAV_TIMEZONE_FORMAT, time()) ?></small>
-                        </div>
+                        <div class="currentTime"><?= $admin_time ?><br><small id="nav-timezone"><?= $admin_tz ?></small></div>
                     </li>
                     <?php } ?>
 
@@ -291,7 +289,7 @@ if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
                                 <span class="info-val"><?= $admin_host ?></span>
 
                                 <span class="info-label"><?= HEADER_TEXT_TIMEZONE ?></span>
-                                <span class="info-val"><?= mb_convert_encoding($zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time()), 'UTF-8') ?></span>
+                                <span class="info-val"><?= $admin_time ?></span>
                                 <span class="info-val"><?= $admin_tz ?></span>
 
                                 <span class="info-label"><?= HEADER_TEXT_LOCALE ?></span>
