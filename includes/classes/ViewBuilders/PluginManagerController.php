@@ -100,12 +100,20 @@ class PluginManagerController extends BaseController
             );
         }
         if ((int)$this->currentFieldValue('status') === PluginStatus::ENABLED) {
-            $this->setBoxContent(
-                '<a href="' . zen_href_link(
-                    FILENAME_PLUGIN_MANAGER,
-                    $this->pageLink() . '&' . $this->colKeyLink() . '&action=disable'
-                ) . '" class="btn btn-primary" role="button">' . TEXT_DISABLE . '</a>'
-            );
+            // -----
+            // Template packages have a 'template' array within their manifest and
+            // are enabled/disabled via the "Template Selection" tool, so the 'Disable'
+            // action isn't displayed by the "Plugin Manager".
+            //
+            $manifest = $this->getManifest($this->currentFieldValue('unique_key'), $this->currentFieldValue('version'));
+            if (!isset($manifest['template'])) {
+                $this->setBoxContent(
+                    '<a href="' . zen_href_link(
+                        FILENAME_PLUGIN_MANAGER,
+                        $this->pageLink() . '&' . $this->colKeyLink() . '&action=disable'
+                    ) . '" class="btn btn-primary" role="button">' . TEXT_DISABLE . '</a>'
+                );
+            }
             $this->setBoxContent(
                 '<a href="' . zen_href_link(
                     FILENAME_PLUGIN_MANAGER,
