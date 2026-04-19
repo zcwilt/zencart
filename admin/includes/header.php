@@ -67,12 +67,12 @@ if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_G
 }
 
 // prepare admin info for dropdown
+zen_define_default('ADMIN_NAV_TIMEZONE_FORMAT', '(%z)');
 $admin_ip = $_SERVER['REMOTE_ADDR'];
 $admin_host = gethostname();
 $admin_time = mb_convert_encoding($zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time()), 'UTF-8');
 $admin_tz = date_default_timezone_get() . ' ' . $zcDate->output(ADMIN_NAV_TIMEZONE_FORMAT, time());
 $admin_locale = setlocale(LC_TIME, 0);
-zen_define_default('ADMIN_NAV_TIMEZONE_FORMAT', '(%z)');
 
 // Prepare menu items for upper-right nav bar, allowing observers to modify via NOTIFY_ADMIN_HEADER_UPPERMENU
 $upperMenuArray = [];
