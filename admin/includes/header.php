@@ -93,12 +93,14 @@ $upperMenuArray['nav-admin-home-link'] = [
     'title' => HEADER_TITLE_TOP,
     'icon' => 'fa-home',
     'enabled' => true,
+    'show-title' => true,
 ];
 $upperMenuArray['nav-storefront-link'] = [
     'a' => zen_catalog_href_link(FILENAME_DEFAULT),
     'title' => HEADER_TITLE_ONLINE_CATALOG,
     'icon' => 'fa-store',
     'enabled' => true,
+    'show-title' => true,
 ];
 $upperMenuArray['version-indicator-icon'] = [
     // Note: This is just the icon in the nav bar, the actual link and dropdown content is built in the header HTML below to allow for dynamic version checking content
@@ -199,8 +201,8 @@ if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
 
                     <?php if ($upperMenuArray['nav-admin-home-link']['enabled'] ?? false) { ?>
                     <li class="hidden-xs" id="nav-admin-home">
-                        <a href="<?= zen_href_link(FILENAME_DEFAULT) ?>" title="<?= HEADER_TITLE_TOP ?>">
-                            <i class="fa fa-home"></i> <?= HEADER_TITLE_TOP ?>
+                        <a href="<?= zen_href_link(FILENAME_DEFAULT) ?>" title="<?= $upperMenuArray['nav-admin-home-link']['title'] ?>">
+                            <i class="fa fa-home"></i> <?= ($upperMenuArray['nav-admin-home-link']['show-title'] ?? false) ? $upperMenuArray['nav-admin-home-link']['title'] : '' ?>
                         </a>
                     </li>
                     <?php } ?>
@@ -216,8 +218,8 @@ if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
 
                     <?php if ($upperMenuArray['nav-storefront-link']['enabled'] ?? false) { ?>
                     <li id="nav-storefront">
-                        <a href="<?= zen_catalog_href_link(FILENAME_DEFAULT) ?>" target="_blank" title="<?= HEADER_TITLE_ONLINE_CATALOG ?>" rel="noopener">
-                            <i class="fa fa-store"></i> <?= HEADER_TITLE_ONLINE_CATALOG ?>
+                        <a href="<?= zen_catalog_href_link(FILENAME_DEFAULT) ?>" target="_blank" title="<?= $upperMenuArray['nav-storefront-link']['title'] ?>" rel="noopener">
+                            <i class="fa fa-store"></i> <?= ($upperMenuArray['nav-storefront-link']['show-title'] ?? false) ? $upperMenuArray['nav-storefront-link']['title'] : ''?>
                         </a>
                     </li>
                     <?php } ?>
