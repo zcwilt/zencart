@@ -3,6 +3,8 @@
  * @copyright Copyright 2003-2026 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License v2.0
  * @version $Id: ZenExpert 2026-04-06 Modified in v3.0.0 $
+ *
+ * @var zcDate $zcDate
  */
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -56,7 +58,7 @@ if (empty($action) && count($languages) > 1) {
 
 // gv queue check
 $new_gv_queue_cnt = 0;
-if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN === 'true' && (zen_is_superuser() || check_page(FILENAME_GV_QUEUE, ''))) {
+if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN === 'true' && check_page(FILENAME_GV_QUEUE, '')) {
     $new_gv_queue = $db->Execute("SELECT * FROM " . TABLE_COUPON_GV_QUEUE . " WHERE release_flag='N'");
     if ($new_gv_queue->RecordCount() > 0) {
         $new_gv_queue_cnt = $new_gv_queue->RecordCount();
@@ -120,16 +122,48 @@ foreach ($upperMenuArray as $menuItem) {
             </div>
 
             <div class="collapse navbar-collapse" id="top-bar-collapse">
-                <?php
-                echo zen_draw_form('orders', FILENAME_ORDERS, '', 'get', 'class="navbar-form navbar-left hidden-xs"', true);
-                echo '<div class="form-group header-search">';
-                echo zen_draw_input_field('oID', '', 'id="oID" class="form-control" placeholder="'.HEADER_TEXT_SEARCH_ORDERS.'"', '', '');
-                echo zen_draw_hidden_field('action', 'edit');
-                echo '</div>';
-                echo '</form>';
-                ?>
+                <ul class="nav navbar-nav navbar-left">
+                    <?php if (check_page(FILENAME_ORDERS, '')) { ?>
+                    <li class="hidden-xs">
+                        <?= zen_draw_form('order_search', FILENAME_ORDERS, '', 'get', 'class="navbar-form"', true) ?>
+                        <div class="form-group header-search">
+                        <?= zen_draw_input_field('oID', '', 'id="oIDsearch" class="form-control" placeholder="' . HEADER_TEXT_SEARCH_ORDERS . '"', false, 'search') ?>
+                        <?= zen_draw_hidden_field('action', 'edit') ?>
+                        </div>
+                        <?= '</form>' ?>
+                    </li>
+                    <?php } ?>
 
+                    <?php if (false && check_page(FILENAME_CUSTOMERS, '')) { ?>
+                    <li class="hidden-xs">
+                        <?= zen_draw_form('customer_search', FILENAME_CUSTOMERS, '', 'get', 'class="navbar-form"', true); ?>
+                        <div class="form-group header-search">
+                        <?= zen_draw_input_field('search', '', 'id="cIDsearch" class="form-control" placeholder="' . HEADER_TEXT_SEARCH_CUSTOMERS . '"', false, 'search'); ?>
+                        </div>
+                        <?= '</form>' ?>
+                    </li>
+                    <?php } ?>
+
+                    <?php if (false && check_page(FILENAME_CATEGORY_PRODUCT_LISTING, '')) { ?>
+                    <li class="hidden-xs">
+                        <?= zen_draw_form('goto', FILENAME_CATEGORY_PRODUCT_LISTING, '', 'get', 'class="navbar-form"') ?>
+                        <div class="form-group header-search goto-category">
+                            <small class="text-muted"><?= HEADER_TEXT_JUMP_TO_CATEGORY ?><br></small>
+                        <?= zen_draw_pull_down_menu('cPath', zen_get_category_tree(), $current_category_id, 'onchange="this.form.submit();" class="form-control" id="cPath-search"') ?>
+                        </div>
+                        <?= '</form>' ?>
+                    </li>
+                    <?php } ?>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <div class="currentTime">
+                        <?= mb_convert_encoding($zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time()), 'UTF-8') ?>
+                        <?php zen_define_default('ADMIN_NAV_TIMEZONE_FORMAT', '(%z)') ?>
+                        <br><small id="nav-timezone"><?= date_default_timezone_get() ?> <?= $zcDate->output(ADMIN_NAV_TIMEZONE_FORMAT, time()) ?></small>
+                        </div>
+                    </li>
+
                     <li class="hidden-xs">
                         <a href="<?= zen_href_link(FILENAME_DEFAULT) ?>" title="<?= HEADER_TITLE_TOP ?>">
                             <i class="fa fa-home"></i> <?= HEADER_TITLE_TOP ?>
@@ -197,7 +231,8 @@ foreach ($upperMenuArray as $menuItem) {
                             <?php if (!empty($plugin_menu_items)) { ?>
                                 <li class="divider"></li>
                                 <?php foreach ($plugin_menu_items as $item) { ?>
-                                <li <?= $item['id'] ? 'id="' . $item['id'] . '"' : '' ?>  <?= $item['li-class'] ? 'class="' . $item['li-class'] . '"' : '' ?>></li><a href="<?= $item['a'] ?>" <?= $item['params'] ?? '' ?>><i class="fa <?= $item['icon'] ?? 'fa-plug' ?>"></i> <?= $item['title'] ?></a></li>
+                                <li <?= !empty($item['id']) ? 'id="' . $item['id'] . '"' : '' ?>  <?= !empty($item['li-class']) ? 'class="' . $item['li-class'] . '"' : '' ?>><a href="<?= $item['a'] ?>"
+                                        <?= $item['params'] ?? '' ?>><i class="fa <?= $item['icon'] ?? 'fa-plug' ?>"></i> <?= $item['title'] ?></a></li>
                                 <?php } ?>
                             <?php } ?>
 
@@ -230,7 +265,7 @@ foreach ($upperMenuArray as $menuItem) {
 
 <?php require DIR_WS_INCLUDES . 'header_navigation.php'; ?>
 
-<?php if (zen_is_superuser() || check_page(FILENAME_ADMIN_ACTIVITY, '')) { ?>
+<?php if (check_page(FILENAME_ADMIN_ACTIVITY, '')) { ?>
     <div class="container-fluid admin-alerts-wrapper noprint">
         <?php if (isset($_SESSION['reset_admin_activity_log']) && ($_SESSION['reset_admin_activity_log'] == true && (basename($PHP_SELF) == FILENAME_DEFAULT . '.php'))) { ?>
             <div class="alert alert-danger text-center mb-3">

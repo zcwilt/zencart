@@ -34,9 +34,9 @@ Useful environment variables:
   PHPUNIT_BIN             PHPUnit binary to use (default: vendor/bin/phpunit)
 
 Examples:
-  composer unit-tests-parallel
-  composer unit-tests-parallel -- --filter RuntimeConfigTest
-  ZC_UNIT_TEST_FILTER=RuntimeConfig composer unit-tests-parallel
+  composer tests-unit
+  composer tests-unit -- --filter RuntimeConfigTest
+  ZC_UNIT_TEST_FILTER=RuntimeConfig composer tests-unit
 EOF
 }
 
