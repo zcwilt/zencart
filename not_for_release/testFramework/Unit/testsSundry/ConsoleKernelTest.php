@@ -15,6 +15,8 @@ use Zencart\Console\PluginCommandDiscovery;
 
 class ConsoleKernelTest extends TestCase
 {
+    protected $preserveGlobalState = false;
+
     public static function setUpBeforeClass(): void
     {
         UnitTestBootstrap::initialize();
