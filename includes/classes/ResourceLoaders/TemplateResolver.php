@@ -6,6 +6,8 @@
 
 namespace Zencart\ResourceLoaders;
 
+use Zencart\Templates\TemplateDto;
+
 /**
  * @since ZC v3.0.0
  */
@@ -14,7 +16,6 @@ class TemplateResolver
     private string $catalogRoot;
     private string $coreTemplatesPath;
     private string $pluginsRoot;
-    private array $templateRecords = [];
 
     /**
      * @since ZC v3.0.0
@@ -45,8 +46,10 @@ class TemplateResolver
      */
     public function getTemplateRecord(string $templateKey): ?array
     {
-        $templates = $this->getTemplateRecords();
-        return $templates[$templateKey] ?? null;
+        if (TemplateDto::getInstance()->getAllTemplates() === []) {
+            $this->getTemplateRecords();
+        }
+        return TemplateDto::getInstance()->getTemplate($templateKey);
     }
 
     /**
@@ -134,14 +137,18 @@ class TemplateResolver
      */
     private function getTemplateRecords(): array
     {
-        if ($this->templateRecords === []) {
-            $this->templateRecords = array_merge(
+        if (TemplateDto::getInstance()->getAllTemplates() === []) {
+            $templateRecords = array_merge(
                 $this->loadCoreTemplates(),
                 $this->loadPluginTemplates()
             );
+
+            foreach ($templateRecords as $templateKey => $templateProperties) {
+                TemplateDto::getInstance()->updateTemplate($templateKey, $templateProperties);
+            }
         }
 
-        return $this->templateRecords;
+        return $templateRecords;
     }
 
     /**
