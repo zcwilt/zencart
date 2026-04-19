@@ -137,7 +137,8 @@ class TemplateResolver
      */
     private function getTemplateRecords(): array
     {
-        if (TemplateDto::getInstance()->getAllTemplates() === []) {
+        $templateRecords = TemplateDto::getInstance()->getAllTemplates();
+        if ($templateRecords === []) {
             $templateRecords = array_merge(
                 $this->loadCoreTemplates(),
                 $this->loadPluginTemplates()
