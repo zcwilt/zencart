@@ -106,6 +106,11 @@ trait PluginLocalTestConcerns
 
         $this->definePluginInstallerConstant('PLUGIN_INSTALL_SQL_FAILURE', 'one or more database errors occurred');
         $this->definePluginInstallerConstant('ERROR_REMOVE_FILES_CONTEXT', 'Invalid context supplied (%s), it must be either "catalog" or "admin".');
+        $this->definePluginInstallerConstant('ERROR_UNKNOWN_FAILURE_INSTALL', 'install');
+        $this->definePluginInstallerConstant('ERROR_UNKNOWN_FAILURE_UNINSTALL', 'un-install');
+        $this->definePluginInstallerConstant('ERROR_UNKNOWN_FAILURE_UPGRADE', 'upgrade');
+        $this->definePluginInstallerConstant('ERROR_UNKNOWN_FAILURE_DISABLE', 'disable');
+        $this->definePluginInstallerConstant('ERROR_UNKNOWN_FAILURE_ENABLE', 'enable');
     }
 
     protected function definePluginInstallerConstant(string $name, string $value): void

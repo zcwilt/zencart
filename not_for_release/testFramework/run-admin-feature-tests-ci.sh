@@ -7,6 +7,14 @@ DRY_RUN=0
 declare -a FEATURE_ARGS=()
 CLI_FILTER=""
 
+file_has_group() {
+    local file="$1"
+    local group="$2"
+
+    grep -Eq "^[[:space:]]*\*[[:space:]]+@group[[:space:]]+${group}([[:space:]]|$)" "$file" \
+        || grep -Eq "^[[:space:]]*#\[[^]]*Group\(['\"]${group}['\"]\)\]" "$file"
+}
+
 suite_has_matches() {
     local suite_dir="$1"
     local required_group="$2"
@@ -14,7 +22,7 @@ suite_has_matches() {
     local found_any=1
 
     while IFS= read -r file; do
-        if ! grep -q "@group ${required_group}" "$file"; then
+        if ! file_has_group "$file" "$required_group"; then
             continue
         fi
 
@@ -43,7 +51,7 @@ plugin_local_suite_has_matches() {
     fi
 
     while IFS= read -r file; do
-        if ! grep -q "@group plugin-filesystem" "$file"; then
+        if ! file_has_group "$file" "plugin-filesystem"; then
             continue
         fi
 
@@ -129,7 +137,13 @@ if suite_has_matches "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" "plu
             continue
         fi
         echo "DRY   [admin-plugin] ${file#$ROOT_DIR/}"
-    done < <(find "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" -type f -name '*Test.php' | sort | xargs grep -l "@group plugin-filesystem")
+    done < <(
+        while IFS= read -r file; do
+            if file_has_group "$file" "plugin-filesystem"; then
+                printf '%s\n' "$file"
+            fi
+        done < <(find "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" -type f -name '*Test.php' | sort)
+    )
     else
         if [ -n "$CLI_FILTER" ]; then
         composer tests-feature-admin-plugin-filesystem -- --filter "$CLI_FILTER"
