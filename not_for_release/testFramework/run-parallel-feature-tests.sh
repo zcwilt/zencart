@@ -9,6 +9,14 @@ PREPARE_DATABASES=0
 DRY_RUN=0
 declare -a EXTRA_ARGS=()
 
+file_has_group() {
+    local file="$1"
+    local group="$2"
+
+    grep -Eq "^[[:space:]]*\*[[:space:]]+@group[[:space:]]+${group}([[:space:]]|$)" "$file" \
+        || grep -Eq "^[[:space:]]*#\[[^]]*Group\(['\"]${group}['\"]\)\]" "$file"
+}
+
 usage() {
     cat <<EOF
 Usage: $(basename "$0") [--dry-run] [--prepare-databases] [phpunit-args...]
@@ -45,7 +53,7 @@ suite_has_matches() {
     local found_any=1
 
     while IFS= read -r file; do
-        if ! grep -q "@group ${required_group}" "$file"; then
+        if ! file_has_group "$file" "$required_group"; then
             continue
         fi
 
@@ -77,7 +85,7 @@ list_plugin_suite_matches() {
     local requested_filter="$1"
 
     while IFS= read -r file; do
-        if ! grep -q "@group plugin-filesystem" "$file"; then
+        if ! file_has_group "$file" "plugin-filesystem"; then
             continue
         fi
 
@@ -99,7 +107,7 @@ list_plugin_local_suite_matches() {
     fi
 
     while IFS= read -r file; do
-        if ! grep -q "@group plugin-filesystem" "$file"; then
+        if ! file_has_group "$file" "plugin-filesystem"; then
             continue
         fi
 

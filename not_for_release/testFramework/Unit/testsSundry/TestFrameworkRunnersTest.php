@@ -116,7 +116,7 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s bash %s --dry-run --base %s --workers %d',
+            'ZC_TEST_ENV_FILE=%s env -u ZC_TEST_DB_BASE_NAME -u ZC_TEST_DB_WORKERS -u ZC_TEST_DB_INCLUDE_BASE -u ZC_FEATURE_PARALLEL_PROCESSES bash %s --dry-run --base %s --workers %d',
             escapeshellarg('/dev/null'),
             escapeshellarg($script),
             escapeshellarg('db_testing'),
@@ -276,7 +276,7 @@ class TestFrameworkRunnersTest extends TestCase
 
         try {
             $command = sprintf(
-                'ZC_TEST_ENV_FILE=%s bash %s --dry-run',
+                'ZC_TEST_ENV_FILE=%s env -u ZC_TEST_DB_BASE_NAME -u ZC_TEST_DB_WORKERS -u ZC_TEST_DB_INCLUDE_BASE -u ZC_FEATURE_PARALLEL_PROCESSES bash %s --dry-run',
                 escapeshellarg($envFile),
                 escapeshellarg($script)
             );
@@ -482,7 +482,7 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s ZC_FEATURE_PARALLEL_PROCESSES=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s --dry-run --base %s',
+            'ZC_TEST_ENV_FILE=%s ZC_FEATURE_PARALLEL_PROCESSES=%s ZC_TEST_DB_INCLUDE_BASE=%s env -u ZC_TEST_DB_WORKERS bash %s --dry-run --base %s',
             escapeshellarg('/dev/null'),
             escapeshellarg('3'),
             escapeshellarg('0'),
