@@ -17,10 +17,10 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
             define('IS_ADMIN_FLAG', true);
         }
         parent::setUp();
-        require DIR_FS_ADMIN . DIR_WS_FUNCTIONS . 'general.php';
-        require DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_strings.php';
-        require DIR_FS_ADMIN . 'includes/functions/html_output.php';
-        require_once(TESTCWD . 'Support/zcURLTestObserver.php');
+        require_once DIR_FS_ADMIN . DIR_WS_FUNCTIONS . 'general.php';
+        require_once DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_strings.php';
+        require_once DIR_FS_ADMIN . 'includes/functions/html_output.php';
+        require_once TESTCWD . 'Support/zcURLTestObserver.php';
         $GLOBALS['zcURLTestObserver'] = new zcURLTestObserver();
 
         if (!defined('ENABLE_SSL')) {
