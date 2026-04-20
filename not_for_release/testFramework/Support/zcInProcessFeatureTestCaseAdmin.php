@@ -103,6 +103,36 @@ abstract class zcInProcessFeatureTestCaseAdmin extends zcInProcessFeatureTestCas
         return $response->isRedirect() ? $this->followAdminRedirect($response, $server) : $response;
     }
 
+    protected function completeInitialAdminSetup(): void
+    {
+        $home = $this->visitAdminHome()->assertOk();
+        if (str_contains($home->content, 'Admin Home')) {
+            return;
+        }
+        $home->assertSee('Admin Login');
+
+        $login = $this->submitAdminLogin([
+            'admin_name' => 'Admin',
+            'admin_pass' => 'password',
+        ])->assertOk();
+
+        if (str_contains($login->content, 'Admin Home')) {
+            return;
+        }
+        $login->assertSee('Initial Setup Wizard');
+
+        $this->submitAdminSetupWizard([
+            'store_name' => 'Zencart Store',
+        ])->assertOk()
+            ->assertSee('Initial Setup Wizard');
+
+        $this->submitAdminSetupWizard([
+            'store_name' => 'Zencart Store',
+            'store_owner' => 'Store Owner',
+        ])->assertOk()
+            ->assertSee('Admin Home');
+    }
+
     protected function followAdminRedirect(FeatureResponse $response, array $server = []): FeatureResponse
     {
         $response->assertRedirect();

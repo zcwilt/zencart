@@ -4,6 +4,7 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
 
+use PHPUnit\Framework\Attributes\Depends;
 use Tests\Support\zcUnitTestCase;
 
 /**
@@ -49,9 +50,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         }
     }
 
-    /**
-     * @depends testUrlFunctionsExist
-     */
+    #[Depends('testUrlFunctionsExist')]
     public function testAdminPage()
     {
         $this->assertURLGenerated(
@@ -68,9 +67,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAdminPage
-     */
+    #[Depends('testAdminPage')]
     public function testAddSessionWhenSidDefined()
     {
         if (PHP_VERSION_ID >= 80401) {
@@ -88,9 +85,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAdminPage
-     */
+    #[Depends('testAdminPage')]
     public function testAutoCorrectLeadingQuerySeparator()
     {
         $this->assertURLGenerated(
@@ -119,9 +114,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAdminPage
-     */
+    #[Depends('testAdminPage')]
     public function testAutoCorrectTrailingQuerySeparator()
     {
         $this->assertURLGenerated(
@@ -150,9 +143,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAdminPage
-     */
+    #[Depends('testAdminPage')]
     public function testAutoCorrectMultipleAmpersandsInQuery()
     {
         $this->assertURLGenerated(
@@ -195,9 +186,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAdminPage
-     */
+    #[Depends('testAdminPage')]
     public function testAutoCorrectAmpersandEntitiesInQuery()
     {
         $this->assertURLGenerated(
@@ -218,9 +207,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAdminPage
-     */
+    #[Depends('testAdminPage')]
     public function testAutoCorrectMixedAmpersandAndAmbersandEntitiesInQuery()
     {
         $this->assertURLGenerated(
@@ -257,9 +244,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAdminPage
-     */
+    #[Depends('testAdminPage')]
     public function testConfigurationURLs()
     {
         $this->assertURLGenerated(

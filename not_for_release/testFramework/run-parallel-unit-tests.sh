@@ -11,6 +11,7 @@ WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/zc-unit-parallel.XXXXXX")"
 TEST_LIST_FILE="$WORK_DIR/test-files.txt"
 TEST_FILTER="${ZC_UNIT_TEST_FILTER:-}"
 declare -a EXTRA_PHPUNIT_ARGS=("$@")
+declare -a PHPUNIT_ARGS=()
 CLI_FILTER=""
 
 declare -A PID_TO_FILE=()
@@ -91,13 +92,16 @@ fi
 for ((i = 0; i < ${#EXTRA_PHPUNIT_ARGS[@]}; i++)); do
     if [ "${EXTRA_PHPUNIT_ARGS[$i]}" = "--filter" ] && [ $((i + 1)) -lt ${#EXTRA_PHPUNIT_ARGS[@]} ]; then
         CLI_FILTER="${EXTRA_PHPUNIT_ARGS[$((i + 1))]}"
-        break
+        i=$((i + 1))
+        continue
     fi
 
     if [[ "${EXTRA_PHPUNIT_ARGS[$i]}" == --filter=* ]]; then
         CLI_FILTER="${EXTRA_PHPUNIT_ARGS[$i]#--filter=}"
-        break
+        continue
     fi
+
+    PHPUNIT_ARGS+=("${EXTRA_PHPUNIT_ARGS[$i]}")
 done
 
 find "$ROOT_DIR/not_for_release/testFramework/Unit" -type f -name '*Test.php' | sort > "$TEST_LIST_FILE"
@@ -140,12 +144,12 @@ run_test_file() {
 
     (
         if [ -n "$class_name" ]; then
-            if "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --verbose --process-isolation --debug --testsuite Unit "${EXTRA_PHPUNIT_ARGS[@]}" --filter "${class_name}" >"$output_file" 2>&1; then
+            if "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --process-isolation --testsuite Unit "${PHPUNIT_ARGS[@]}" --filter "${class_name}" >"$output_file" 2>&1; then
                 echo 0 >"$status_file"
             else
                 echo $? >"$status_file"
             fi
-        elif "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --verbose --process-isolation --debug "${EXTRA_PHPUNIT_ARGS[@]}" "$file" >"$output_file" 2>&1; then
+        elif "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --process-isolation "${PHPUNIT_ARGS[@]}" "$file" >"$output_file" 2>&1; then
             echo 0 >"$status_file"
         else
             echo $? >"$status_file"

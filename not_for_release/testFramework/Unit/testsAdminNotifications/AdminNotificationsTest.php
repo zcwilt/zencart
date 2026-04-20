@@ -83,7 +83,7 @@ class AdminNotificationsTest extends zcUnitTestCase
 
         $this->an = $this->getMockBuilder(AdminNotifications::class)
                    ->disableOriginalConstructor()
-                   ->setMethods(['getNotificationInfo', 'getSavedState', 'getStoreCountryIso3', 'getCurrentDate', 'pruneSavedState'])
+                   ->onlyMethods(['getNotificationInfo', 'getSavedState', 'getStoreCountryIso3', 'getCurrentDate', 'pruneSavedState'])
                    ->getMock();
 
         $this->an->method('getNotificationInfo')->willReturn($this->dummy);
