@@ -27,6 +27,27 @@ class TemplateSelect
         foreach ($result as $next_template) {
             $this->activeTemplates[$next_template['template_language']] = $next_template;
         }
+
+        $active_template_dir = $this->getActiveTemplateDir();
+        if ($active_template_dir !== null) {
+            TemplateDto::getInstance()->updateTemplate($active_template_dir, ['is_active' => true]);
+        }
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
+    public function getAllActiveTemplates(): array
+    {
+        return $this->activeTemplates;
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
+    public function getActiveTemplateId(): int
+    {
+        return (int)$this->getActiveTemplateField('template_id');
     }
 
     /**
@@ -113,7 +134,7 @@ class TemplateSelect
 
         foreach ($this->activeTemplates as $language_id => $template_info) {
             if ($id === (int)$template_info['template_id']) {
-                if ((int)$template_info['template__language'] === 0) {
+                if ((int)$template_info['template_language'] === 0) {
                     return false;
                 }
 
@@ -154,14 +175,6 @@ class TemplateSelect
      */
     protected function getActiveTemplateField(string $field_name): ?string
     {
-        if (isset($this->activeTemplates[$_SESSION['languages_id']])) {
-            return $this->activeTemplates[$_SESSION['languages_id']][$field_name];
-        }
-
-        if (isset($this->activeTemplates['0'])) {
-            return $this->activeTemplates['0'][$field_name];
-        }
-
-        return null;
+        return $this->activeTemplates[$_SESSION['languages_id']][$field_name] ?? $this->activeTemplates['0'][$field_name] ?? null;
     }
 }
