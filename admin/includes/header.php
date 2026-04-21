@@ -72,7 +72,7 @@ $admin_ip = $_SERVER['REMOTE_ADDR'];
 $admin_host = gethostname();
 $admin_time = mb_convert_encoding($zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time()), 'UTF-8');
 $admin_tz = date_default_timezone_get() . ' ' . $zcDate->output(ADMIN_NAV_TIMEZONE_FORMAT, time());
-$admin_locale = setlocale(LC_TIME, 0);
+$admin_locale = setlocale(LC_TIME, '0');
 
 // Prepare menu items for upper-right nav bar, allowing observers to modify via NOTIFY_ADMIN_HEADER_UPPERMENU
 $upperMenuArray = [];
