@@ -3,6 +3,14 @@
 set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+file_has_group() {
+    local file="$1"
+    local group="$2"
+
+    grep -Eq "^[[:space:]]*\*[[:space:]]+@group[[:space:]]+${group}([[:space:]]|$)" "$file" \
+        || grep -Eq "^[[:space:]]*#\[[^]]*Group\(['\"]${group}['\"]\)\]" "$file"
+}
 # shellcheck source=/dev/null
 . "$ROOT_DIR/not_for_release/testFramework/load-test-environment.sh"
 load_test_framework_env "$ROOT_DIR"
@@ -242,7 +250,7 @@ done
 
 find "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" -type f -name '*Test.php' | sort > "$TEST_LIST_FILE.all"
 while IFS= read -r file; do
-    if grep -q "@group parallel-candidate" "$file"; then
+    if file_has_group "$file" "parallel-candidate"; then
         printf '%s\n' "$file" >> "$TEST_LIST_FILE"
     fi
 done < "$TEST_LIST_FILE.all"
@@ -300,7 +308,7 @@ run_test_file() {
     (
         export ZC_TEST_WORKER="$worker_token"
 
-        if "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --verbose --testsuite FeatureAdmin --group parallel-candidate "${EXTRA_PHPUNIT_ARGS[@]}" "$file" >"$output_file" 2>&1; then
+        if "$PHP_BIN" "$PHPUNIT_BIN" --configuration "$ROOT_DIR/phpunit.xml" --testsuite FeatureAdmin --group parallel-candidate "${EXTRA_PHPUNIT_ARGS[@]}" "$file" >"$output_file" 2>&1; then
             echo 0 >"$status_file"
         else
             echo $? >"$status_file"

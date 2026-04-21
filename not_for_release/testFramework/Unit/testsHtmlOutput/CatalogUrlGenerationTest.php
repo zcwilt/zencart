@@ -4,6 +4,7 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
 
+use PHPUnit\Framework\Attributes\Depends;
 use Tests\Support\zcUnitTestCase;
 use Tests\Support\zcURLTestObserver;
 
@@ -71,9 +72,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         }
     }
 
-    /**
-     * @depends testUrlFunctionsExist
-     */
+    #[Depends('testUrlFunctionsExist')]
     public function testHomePage()
     {
 //        $this->assertURLGenerated(
@@ -88,9 +87,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
 //        zen_href_link();
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testHomePageSsl()
     {
         $this->assertURLGenerated(
@@ -103,9 +100,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testAddSessionWhenSwitchingProtocolAndServers()
     {
         $GLOBALS['session_started'] = true;
@@ -124,9 +119,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testAddSessionWhenSwitchingProtocolAndServers
-     */
+    #[Depends('testAddSessionWhenSwitchingProtocolAndServers')]
     public function testAddSessionWhenSidDefined()
     {
         if (PHP_VERSION_ID >= 80401) {
@@ -144,9 +137,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testAutoCorrectLeadingQuerySeparator()
     {
         $this->assertURLGenerated(
@@ -159,9 +150,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testAutoCorrectTrailingQuerySeparator()
     {
         $this->assertURLGenerated(
@@ -190,9 +179,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testAutoCorrectMultipleAmpersandsInQuery()
     {
         $this->assertURLGenerated(
@@ -235,9 +222,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePageSsl
-     */
+    #[Depends('testHomePageSsl')]
     public function testStaticUrlGeneration()
     {
         $this->assertURLGenerated(
@@ -250,9 +235,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testValidCategoryUrls()
     {
         $this->assertURLGenerated(
@@ -265,9 +248,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testValidCategoryUrls
-     */
+    #[Depends('testValidCategoryUrls')]
     public function testValidCategoryUrlsFilters()
     {
         $this->assertURLGenerated(
@@ -280,9 +261,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePageSsl
-     */
+    #[Depends('testHomePageSsl')]
     public function testValidCategoryUrlsSsl()
     {
         $this->assertURLGenerated(
@@ -295,9 +274,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testValidEzPageUrls()
     {
         $this->assertURLGenerated(
@@ -310,9 +287,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePage
-     */
+    #[Depends('testHomePage')]
     public function testDefinePageUrls()
     {
         $this->assertURLGenerated(
@@ -329,9 +304,7 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
         );
     }
 
-    /**
-     * @depends testHomePageSsl
-     */
+    #[Depends('testHomePageSsl')]
     public function testObserverCannotDowngradeFromSsl()
     {
         $GLOBALS['zcURLTestObserver']->mode = zcURLTestObserver::$CHANGE_CONNECTION;
