@@ -58,7 +58,11 @@ class TemplateResolver
      */
     public function getTemplateFilesystemPath(string $templateKey): ?string
     {
-        return $this->getTemplateRecord($templateKey)['template_path'] ?? null;
+        $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return null;
+        }
+        return $record['template_path'];
     }
 
     /**
@@ -66,7 +70,11 @@ class TemplateResolver
      */
     public function getTemplateCatalogPath(string $templateKey): ?string
     {
-        return $this->getTemplateRecord($templateKey)['template_catalog_path'] ?? null;
+        $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return null;
+        }
+        return $record['template_catalog_path'];
     }
 
     /**
@@ -74,7 +82,11 @@ class TemplateResolver
      */
     public function getTemplateWebPath(string $templateKey): ?string
     {
-        $record = $this->getTemplateRecord($templateKey)['template_web_path'] ?? null;
+        $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return null;
+        }
+        return $record['template_web_path'];
     }
 
     /**
@@ -129,6 +141,9 @@ class TemplateResolver
     public function isPluginTemplate(string $templateKey): bool
     {
         $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return false;
+        }
         return !empty($record['is_plugin_template']);
     }
 

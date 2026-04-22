@@ -157,7 +157,7 @@ class PluginManagerController extends BaseController
                 if ($plugin_template_key !== null) {
                     $templateResolver = new \Zencart\ResourceLoaders\TemplateResolver();
                     $template_record = $templateResolver->getTemplateRecord($plugin_template_key);
-                    if (!empty($template_record['is_active'])) {
+                    if ($template_record !== null && !empty($template_record['is_active'])) {
                         $btn_type = 'warning';
                         $this->setBoxContent(
                             sprintf(WARNING_TEMPLATE_IS_ACTIVE, zen_href_link(FILENAME_TEMPLATE_SELECT), BOX_TOOLS_TEMPLATE_SELECT)

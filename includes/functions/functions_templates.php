@@ -89,7 +89,7 @@ function zen_get_template_catalog_override_directories(
 
     foreach (zen_get_template_inheritance_chain($templateKey, $includeTemplateDefault, $resolver) as $chainTemplateKey) {
         $record = $resolver->getTemplateRecord($chainTemplateKey);
-        if (!empty($record['is_plugin_template']) && !empty($record['plugin_key']) && !empty($record['plugin_version'])) {
+        if ($record !== null && !empty($record['is_plugin_template']) && !empty($record['plugin_key']) && !empty($record['plugin_version'])) {
             $directories[] = 'zc_plugins/' . $record['plugin_key'] . '/' . $record['plugin_version'] . '/catalog/' . $catalogBasePath . '/' . $chainTemplateKey . '/';
             continue;
         }
@@ -196,7 +196,10 @@ function zen_resolve_template_key(?\Zencart\ResourceLoaders\TemplateResolver $re
     $templateKey = $templateSelect->getActiveTemplateDir() ?? '';
 
     $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
-    $record = $resolver->getTemplateRecord($templateKey) ?? $resolver->getTemplateRecord('template_default');
+    $record = $resolver->getTemplateRecord($templateKey);
+    if ($record === null) {
+        return 'template_default';
+    }
     return $record['template_key'] ?? 'template_default';
 }
 
