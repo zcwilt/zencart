@@ -201,7 +201,7 @@ if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
 
                     <?php if ($upperMenuArray['nav-admin-home-link']['enabled'] ?? false) { ?>
                     <li class="hidden-xs" id="nav-admin-home">
-                        <a href="<?= zen_href_link(FILENAME_DEFAULT) ?>" title="<?= $upperMenuArray['nav-admin-home-link']['title'] ?>">
+                        <a href="<?= $upperMenuArray['nav-admin-home-link']['a'] ?? zen_href_link(FILENAME_DEFAULT) ?>" title="<?= $upperMenuArray['nav-admin-home-link']['title'] ?>">
                             <i class="fa fa-home"></i> <span class="nav-item-label"><?= ($upperMenuArray['nav-admin-home-link']['show-title'] ?? false) ? $upperMenuArray['nav-admin-home-link']['title'] : '' ?></span>
                         </a>
                     </li>
@@ -218,7 +218,7 @@ if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
 
                     <?php if ($upperMenuArray['nav-storefront-link']['enabled'] ?? false) { ?>
                     <li id="nav-storefront">
-                        <a href="<?= zen_catalog_href_link(FILENAME_DEFAULT) ?>" target="_blank" title="<?= $upperMenuArray['nav-storefront-link']['title'] ?>" rel="noopener">
+                        <a href="<?= $upperMenuArray['nav-storefront-link']['a'] ?? zen_catalog_href_link(FILENAME_DEFAULT) ?>" target="_blank" title="<?= $upperMenuArray['nav-storefront-link']['title'] ?>" rel="noopener">
                             <i class="fa fa-store"></i> <span class="nav-item-label"><?= ($upperMenuArray['nav-storefront-link']['show-title'] ?? false) ? $upperMenuArray['nav-storefront-link']['title'] : ''?></span>
                         </a>
                     </li>
