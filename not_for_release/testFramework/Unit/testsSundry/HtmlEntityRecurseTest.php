@@ -13,9 +13,9 @@ class HtmlEntityRecurseTest extends zcUnitTestCase
     /**
      *
      */
-    public function setup(): void
+    public function setUp(): void
     {
-        parent::setup();
+        parent::setUp();
         require DIR_FS_CATALOG . 'includes/functions/functions_strings.php';
     }
 
