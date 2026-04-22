@@ -17,6 +17,8 @@ class TemplateResolver
     private string $coreTemplatesPath;
     private string $pluginsRoot;
 
+    private static array $templateRecords;
+
     /**
      * @since ZC v3.0.0
      */
@@ -72,8 +74,7 @@ class TemplateResolver
      */
     public function getTemplateWebPath(string $templateKey): ?string
     {
-        $record = $this->getTemplateRecord($templateKey);
-        return $record['template_web_path'] ?? null;
+        $record = $this->getTemplateRecord($templateKey)['template_web_path'] ?? null;
     }
 
     /**
@@ -136,16 +137,19 @@ class TemplateResolver
      */
     private function getTemplateRecords(): array
     {
-        $templateRecords = array_merge(
-            $this->loadCoreTemplates(),
-            $this->loadPluginTemplates()
-        );
+        $templateDto = TemplateDto::getInstance();
+        if (!isset(self::$templateRecords)) {
+            self::$templateRecords = array_merge(
+                $this->loadCoreTemplates(),
+                $this->loadPluginTemplates()
+            );
 
-        foreach ($templateRecords as $templateKey => $templateProperties) {
-            TemplateDto::getInstance()->updateTemplate($templateKey, $templateProperties);
+            foreach (self::$templateRecords as $templateKey => $templateProperties) {
+                $templateDto->updateTemplate($templateKey, $templateProperties);
+            }
         }
 
-        return $templateRecords;
+        return $templateDto->getAllTemplates();
     }
 
     /**

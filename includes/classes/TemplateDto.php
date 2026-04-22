@@ -36,15 +36,6 @@ class TemplateDto
     /**
      * @since ZC v3.0.0
      */
-    public function setTemplate(string $template_name, array $template_parameters): array
-    {
-        $this->templates[$template_name] = $template_parameters;
-        return $this->templates[$template_name];
-    }
-
-    /**
-     * @since ZC v3.0.0
-     */
     public function updateTemplate(string $template_name, array $template_parameters): array
     {
         $this->templates[$template_name] = array_merge($this->templates[$template_name] ?? [], $template_parameters);
