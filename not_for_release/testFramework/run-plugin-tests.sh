@@ -10,6 +10,14 @@ REQUIRED_GROUP=""
 CLI_FILTER=""
 declare -a PHPUNIT_ARGS=()
 
+file_has_group() {
+    local file="$1"
+    local group="$2"
+
+    grep -Eq "^[[:space:]]*\*[[:space:]]+@group[[:space:]]+${group}([[:space:]]|$)" "$file" \
+        || grep -Eq "^[[:space:]]*#\[[^]]*Group\(['\"]${group}['\"]\)\]" "$file"
+}
+
 usage() {
     cat <<EOF
 Usage: $(basename "$0") [--dry-run] [--plugin <name>] [--suite <Unit|FeatureAdmin|FeatureStore>] [--require-group <group>] [phpunit-args...]
@@ -61,7 +69,7 @@ matches_required_group() {
         return 0
     fi
 
-    grep -q "@group ${REQUIRED_GROUP}" "$file"
+    file_has_group "$file" "$REQUIRED_GROUP"
 }
 
 discover_suite_files() {
@@ -185,5 +193,5 @@ fi
 
 for file in "${TEST_FILES[@]}"; do
     echo "RUN   [plugin-local] $(describe_test_file "$file")"
-    "$ROOT_DIR/vendor/bin/phpunit" --verbose "${PHPUNIT_ARGS[@]}" "$file"
+    "$ROOT_DIR/vendor/bin/phpunit" "${PHPUNIT_ARGS[@]}" "$file"
 done
