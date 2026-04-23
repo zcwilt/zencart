@@ -2,24 +2,19 @@
 
 ## Progress
 
-Last updated: 2026-04-04
+Last updated: 2026-04-23
 
-- Phase 1 complete: added `TemplateResolver`, merged core and plugin-backed selectable template discovery, and covered it with unit tests.
-- Phase 2 in progress: `PageLoader` is being updated to resolve selected-template, base-template, and overlay-plugin precedence for storefront assets.
-- Bootstrap progress started: catalog and admin template init now resolve the selected template through `TemplateResolver` instead of assuming `includes/templates/<template>/`.
-- Compatibility sweep started: admin developer-tool template searches now follow resolver-based template filesystem paths and inheritance.
-- Language-override compatibility started: template language loaders now understand selected-template inheritance for template-specific language files and extra definitions.
-- Sidebox compatibility started: sidebox-module discovery now follows template inheritance and plugin-backed template module paths.
-- Legacy file-resolution compatibility started: `functions_files.php` now resolves template-scoped modules, sideboxes, index filters, and html-includes via template inheritance.
-- Template asset fallback started: image/template asset fallback now follows the selected template's inheritance chain instead of hardcoded `template_default` substitution.
-- Admin search compatibility started: developer-tool language/template searches now follow template inheritance for template-first and language override directories.
-- Admin module-search compatibility started: developer-tool module and sidebox directory searches now follow template inheritance and plugin-backed override paths.
+- Phase 1 complete: `TemplateResolver` now merges core and plugin-backed selectable template discovery, caches template records via `TemplateDto`, and is covered by unit tests.
+- Phase 2 largely complete: `PageLoader` resolves selected-template, base-template, named-overlay, default-overlay, and `template_default` precedence for template parts and asset enumeration.
+- Bootstrap compatibility landed: catalog and admin template init now resolve the selected template through `TemplateResolver` instead of assuming `includes/templates/<template>/`.
+- Admin discovery landed: `zen_get_catalog_template_directories()` now returns resolver-backed selectable templates instead of scanning only core template folders.
+- Admin selection compatibility landed: `template_select.php` filters plugin-backed templates to installed plugins, validates template keys before save/insert, and resolves `template_init.php`, screenshots, and `template_settings.php` through resolver metadata.
+- Language-override compatibility landed: `BaseLanguageLoader` now walks the selected template inheritance chain for template-specific language files and extra definitions, including plugin-backed template language roots.
+- Sidebox compatibility landed: `SideboxFinder` now resolves inherited and plugin-backed template sidebox directories through the resolver chain.
+- Legacy file-resolution compatibility landed: `functions_files.php` and `functions_templates.php` now resolve template-scoped modules, sideboxes, index filters, html-includes, screenshots, and template init/settings paths through resolver-backed inheritance helpers.
+- Template asset fallback landed: `html_output.php` now falls back through the selected template inheritance chain for template and language assets instead of hardcoded `template_default` substitution.
 - Dogfooding started: `responsive_classic_dogfood` is now packaged under `zc_plugins/ResponsiveClassic/v1.0.0/` as the first distinct selectable template package candidate, keeping it separate from the built-in `responsive_classic` during migration testing.
-- Admin selection compatibility started: `template_select.php` now resolves template init hooks through `TemplateResolver`, so plugin-backed selected templates can provide `template_init.php` from their real filesystem path.
-- Template metadata compatibility started: admin template details now honor resolver-provided `settingsFile` paths, so plugin-backed templates can keep settings metadata outside the default template root when declared in `manifest.php`.
-- Admin preview compatibility started: template preview screenshots now use resolver-provided template web paths, so plugin-backed templates preview from their actual `zc_plugins` location instead of assuming `includes/templates/<key>/images/`.
-- Admin bootstrap compatibility started: admin language initialization now resolves the selected template key through `TemplateResolver`, keeping its fallback behavior aligned with the resolver-based template bootstrap path.
-- Remaining major work: finish storefront/bootstrap compatibility coverage, then complete admin/runtime support for fully selectable plugin-backed templates.
+- Remaining major work: broaden feature-level coverage, finish compatibility sweeps in admin tooling such as layout/developer workflows, and prove full end-to-end storefront/admin rendering with a selected plugin-backed template.
 
 ## Goal
 
@@ -344,12 +339,20 @@ Suggested methods:
 - `getSelectableTemplates(): array`
 - `getTemplateRecord(string $templateKey): ?array`
 - `getTemplateFilesystemPath(string $templateKey): ?string`
+- `getTemplateCatalogPath(string $templateKey): ?string`
 - `getTemplateWebPath(string $templateKey): ?string`
 - `getBaseTemplate(string $templateKey): string`
 - `getTemplateInheritanceChain(string $templateKey): array`
 - `isPluginTemplate(string $templateKey): bool`
 
 This service becomes the seam between old template assumptions and new plugin-backed locations.
+
+Current implementation notes:
+
+- `TemplateResolver` stores the discovered records in `TemplateDto`, so callers reuse a single merged template map during a request.
+- each template record now carries resolver-owned location fields such as `template_path`, `template_catalog_path`, `template_web_path`, and `template_settings_path`
+- plugin-backed records also carry `plugin_key`, `plugin_version`, `template_source`, `manifest`, and `has_template_settings`
+- base-template inheritance is normalized onto `base_template`, with `template_default` appended as the final fallback when available
 
 ### 2. Separate Template Identity from Template Filesystem Root
 
@@ -414,6 +417,7 @@ Suggested behavior:
 
 - overlay-only plugins are not listed in `template_select`
 - plugin-backed templates appear alongside core templates
+- plugin-backed templates are only selectable in admin when their owning plugin package is installed
 - missing plugin-backed templates should still show a useful warning if selected but unavailable
 
 Primary touchpoints:
@@ -491,6 +495,8 @@ Deliverables:
 
 ## Phase 1: Template Resolver Foundation
 
+Status: complete
+
 Tasks:
 
 - add `TemplateResolver`
@@ -500,10 +506,13 @@ Tasks:
 
 Deliverables:
 
-- no user-facing change yet
-- tests for resolver output on existing core templates
+- merged core/plugin selectable-template discovery
+- resolver-backed metadata and path records for template consumers
+- tests for resolver output on existing core and plugin-backed templates
 
 ## Phase 2: Formalize Overlay Plugins
+
+Status: mostly complete
 
 Tasks:
 
@@ -516,6 +525,7 @@ Deliverables:
 
 - plugin authors can target `default` or named templates cleanly
 - existing plugin-provided template assets continue to work
+- inheritance-aware sidebox, helper-path, and HTML asset fallback behavior now uses the same resolver model
 
 Suggested first targets:
 
@@ -523,6 +533,8 @@ Suggested first targets:
 - `includes/classes/template_func.php`
 
 ## Phase 3: Admin Discovery of Plugin Templates
+
+Status: in progress
 
 Tasks:
 
@@ -533,6 +545,7 @@ Tasks:
 Deliverables:
 
 - plugin-backed selectable templates are visible in admin alongside core templates
+- `template_select.php` now validates selectable template keys and uses resolver-backed init/settings/screenshot paths
 
 Suggested first targets:
 
@@ -541,6 +554,8 @@ Suggested first targets:
 - `admin/layout_controller.php`
 
 ## Phase 4: Bootstrap Plugin-Backed Selected Templates
+
+Status: in progress
 
 Tasks:
 
@@ -552,6 +567,7 @@ Tasks:
 Deliverables:
 
 - a plugin-backed template can actually be selected and rendered without changing core-template behavior
+- catalog and admin bootstrap now source `DIR_WS_TEMPLATE*` values from the resolved template record
 
 Suggested first targets:
 
@@ -560,6 +576,8 @@ Suggested first targets:
 - `includes/functions/html_output.php`
 
 ## Phase 5: Compatibility Sweep
+
+Status: in progress
 
 Tasks:
 
@@ -572,6 +590,7 @@ Deliverables:
 
 - reduced hard-coded path assumptions
 - clear follow-up list for any deferred compatibility gaps
+- current sweep includes base language loading, sidebox lookup, helper-directory resolution, and template/language asset fallback
 
 ## Test Strategy
 
@@ -646,11 +665,11 @@ Relevant unit test files:
 Still not fully covered:
 
 - full storefront request rendering using a selected plugin-backed template
-- `template_select.php` selecting a plugin-backed template and persisting it
-- runtime bootstrap constants such as `DIR_WS_TEMPLATE`, `DIR_WS_TEMPLATE_IMAGES`, and `DIR_WS_TEMPLATE_ICONS` across plugin-backed templates
+- `template_select.php` selecting a plugin-backed template and persisting it in a feature-level admin flow
+- runtime bootstrap constants such as `DIR_WS_TEMPLATE`, `DIR_WS_TEMPLATE_IMAGES`, and `DIR_WS_TEMPLATE_ICONS` across plugin-backed templates in full request rendering
 - full CSS/JS loader behavior in real page rendering, including ordering and duplicate handling
 - `template_settings.php` behavior in admin/layout controller beyond path resolution
-- `template_init.php` execution behavior beyond path resolution
+- `template_init.php` execution behavior beyond resolver-backed path resolution
 - page-specific overrides under `templates/`, `common/`, `sideboxes/`, `modalboxes/`, and `menu_templates` in a full request
 - module overrides beyond targeted helper-path tests
 - language override behavior in a full storefront/admin request lifecycle
@@ -731,13 +750,11 @@ If template packages and behavior plugins share too much state, users may end up
 
 ## Recommended First Work Items
 
-1. Add `TemplateResolver` with core-template support only.
-2. Refactor `zen_get_catalog_template_directories` to use the resolver.
-3. Extend `PageLoader` to support plugin overlays for named templates.
-4. Create a tiny proof-of-concept selectable template plugin.
-5. Update storefront bootstrap to resolve selected template root via the resolver while preserving core `template_default`.
-6. Run a compatibility sweep for direct `DIR_WS_TEMPLATE*` consumers.
-7. Migrate `responsive_classic` into `zc_plugins` as the first full reference implementation.
+1. Add feature-level tests that select `responsive_classic_dogfood` and render real storefront/admin flows.
+2. Finish the compatibility sweep for remaining admin tooling, especially layout/developer workflows.
+3. Verify full CSS/JS ordering and duplicate-handling behavior in page rendering.
+4. Create or refine a tiny proof-of-concept selectable child template plugin for inheritance-focused testing.
+5. Migrate `responsive_classic` into `zc_plugins` as the first full reference implementation once feature coverage is in place.
 
 ## Success Criteria
 

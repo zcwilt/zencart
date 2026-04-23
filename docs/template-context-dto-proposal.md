@@ -1,5 +1,15 @@
 # Template Context DTO and Repository Proposal
 
+## Status
+
+Last updated: 2026-04-23
+
+- `TemplateResolver` is already in place and now owns merged core/plugin template discovery, inheritance lookup, and path metadata.
+- `TemplateDto` already exists, but today it acts as a request-local singleton cache of discovered template records, not as a selected-template context object.
+- Catalog and admin bootstrap now both resolve the active template through `TemplateResolver`, but they still duplicate the database selection lookup and pass loose arguments into loaders.
+- `BaseLanguageLoader`, `PageLoader`, `SideboxFinder`, `html_output.php`, and `functions_templates.php` already consume resolver-derived template records and inheritance chains.
+- The main remaining simplification is not "introduce template records" but "introduce one request-level selected-template context object and stop reassembling it in multiple places."
+
 ## Purpose
 
 Template state is currently assembled in several places during bootstrap. This note captures a possible simplification using:
@@ -37,7 +47,7 @@ $languageLoaderFactory->make('catalog', $installedPlugins, $current_page, $templ
 `admin/includes/init_includes/init_languages.php`:
 
 - queries `TABLE_TEMPLATE_SELECT` before admin template setup
-- resolves `$template_dir` so storefront template language overrides can apply to admin module pages
+- resolves `$template_dir` through `zen_resolve_template_key()` so storefront template language overrides can apply to admin module pages
 - creates the language loader using loose arguments:
 
 ```php
@@ -58,6 +68,7 @@ $languageLoaderFactory->make('admin', $installedPlugins, $current_page, $templat
 - plugin manifests with selectable template metadata
 - plugin-provided template paths
 - base-template inheritance
+- resolver-owned metadata such as `template_path`, `template_catalog_path`, `template_web_path`, and `template_settings_path`
 
 It does not own the selected-template database lookup.
 
@@ -75,6 +86,8 @@ It then creates its own `TemplateResolver`.
 `includes/classes/ResourceLoaders/PageLoader.php` receives installed plugins and current page, then lazily creates its own `TemplateResolver`.
 
 `includes/functions/functions_templates.php` also creates new `TemplateResolver` instances unless one is passed in.
+
+`TemplateDto` already caches the discovered template records used by `TemplateResolver`, so the open gap is request-context assembly rather than template-record storage.
 
 ## Main Problem
 
@@ -97,6 +110,16 @@ That makes it easy for catalog, admin, language loading, template loading, and h
 
 ## Proposed Objects
 
+Important distinction:
+
+- keep `TemplateDto` as the cache of available template records discovered by `TemplateResolver`
+- add a separate `TemplateContext` object for the selected template and other request-specific state
+
+Trying to make one object serve both roles would blur two different concerns:
+
+- available template metadata is global to the request and mostly stable across callers
+- selected template, language, preview override, and installed-plugin state are request/bootstrap concerns
+
 ### TemplateContext
 
 `TemplateContext` should be a readonly request-level snapshot.
@@ -114,6 +137,7 @@ final readonly class TemplateContext
         public array $selectedTemplateRecord,
         public array $inheritanceChain,
         public array $installedPlugins,
+        public string $currentPage,
         public int $languageId,
         public string $languageDirectory,
         public ?array $templateSelectRow = null,
@@ -134,10 +158,17 @@ final readonly class TemplateContext
     {
         return $this->selectedTemplateRecord['template_settings_path'] ?? null;
     }
+
+    public function imagesPath(): string
+    {
+        return rtrim($this->webPath(), '/') . '/images/';
+    }
 }
 ```
 
 Readonly is useful because template state should be stable once the resolver/loaders are created. If the selected template changes mid-request, a new context should be built deliberately.
+
+This DTO should represent the active request only. It should not replace the resolver cache currently held in `TemplateDto`.
 
 ### TemplateSelectionRepository
 
@@ -186,7 +217,7 @@ final class TemplateContextFactory
     ) {
     }
 
-    public function forCatalog(array $installedPlugins): TemplateContext
+    public function forCatalog(array $installedPlugins, string $currentPage): TemplateContext
     {
         $row = $this->selectionRepository->findForLanguageId((int)$_SESSION['languages_id']);
         $templateKey = $row['template_dir'] ?? 'template_default';
@@ -203,16 +234,16 @@ final class TemplateContextFactory
             }
         }
 
-        return $this->build('catalog', $templateKey, $installedPlugins, $row);
+        return $this->build('catalog', $templateKey, $installedPlugins, $currentPage, $row);
     }
 
-    public function forAdmin(array $installedPlugins): TemplateContext
+    public function forAdmin(array $installedPlugins, string $currentPage): TemplateContext
     {
         $row = $this->selectionRepository->findForLanguageId((int)$_SESSION['languages_id']);
-        return $this->build('admin', $row['template_dir'] ?? 'template_default', $installedPlugins, $row);
+        return $this->build('admin', $row['template_dir'] ?? 'template_default', $installedPlugins, $currentPage, $row);
     }
 
-    private function build(string $context, string $templateKey, array $installedPlugins, array $row): TemplateContext
+    private function build(string $context, string $templateKey, array $installedPlugins, string $currentPage, array $row): TemplateContext
     {
         $record = $this->templateResolver->getTemplateRecord($templateKey)
             ?? $this->templateResolver->getTemplateRecord('template_default');
@@ -229,6 +260,7 @@ final class TemplateContextFactory
             selectedTemplateRecord: $record,
             inheritanceChain: $this->templateResolver->getTemplateInheritanceChain($selectedTemplateKey),
             installedPlugins: $installedPlugins,
+            currentPage: $currentPage,
             languageId: (int)($_SESSION['languages_id'] ?? 1),
             languageDirectory: (string)($_SESSION['language'] ?? 'english'),
             templateSelectRow: $row,
@@ -251,6 +283,8 @@ final class TemplateContextFactory
 - what is the inheritance chain?
 
 It should not query `TABLE_TEMPLATE_SELECT`.
+
+It should also continue to own the template-record cache through `TemplateDto`, since that cache is about discovered template availability, not selected-template bootstrap state.
 
 ### Move DB Selection Out of Init Scripts
 
@@ -280,18 +314,18 @@ $templateContextFactory = new TemplateContextFactory(
     $templateResolver,
 );
 
-$templateContext = $templateContextFactory->forCatalog($installedPlugins);
+$templateContext = $templateContextFactory->forCatalog($installedPlugins, $current_page);
 $template_dir = $templateContext->selectedTemplateKey;
 
 define('DIR_WS_TEMPLATE', $templateContext->catalogPath());
-define('DIR_WS_TEMPLATE_IMAGES', DIR_WS_TEMPLATE . 'images/');
+define('DIR_WS_TEMPLATE_IMAGES', $templateContext->imagesPath());
 define('DIR_WS_TEMPLATE_ICONS', DIR_WS_TEMPLATE_IMAGES . 'icons/');
 ```
 
 Admin `admin/includes/init_includes/init_languages.php` could use:
 
 ```php
-$templateContext = $templateContextFactory->forAdmin($installedPlugins);
+$templateContext = $templateContextFactory->forAdmin($installedPlugins, $current_page);
 $template_dir = $templateContext->selectedTemplateKey;
 
 $languageLoader = $languageLoaderFactory->make('admin', $templateContext, $current_page);
@@ -303,7 +337,7 @@ Admin `admin/includes/init_includes/init_templates.php` could then reuse the exi
 $template_dir = $templateContext->selectedTemplateKey;
 
 define('DIR_WS_TEMPLATE', $templateContext->catalogPath());
-define('DIR_WS_TEMPLATE_IMAGES', $templateContext->webPath() . 'images/');
+define('DIR_WS_TEMPLATE_IMAGES', $templateContext->imagesPath());
 define('DIR_WS_TEMPLATE_ICONS', DIR_WS_TEMPLATE_IMAGES . 'icons/');
 ```
 
@@ -341,7 +375,7 @@ to:
 public function init(TemplateContext $templateContext, string $mainPage, FileSystem $fileSystem): void
 ```
 
-That lets page and template lookup use the same template key, inheritance chain, and installed plugin list as language loading.
+That lets page and template lookup use the same template key, inheritance chain, current page, and installed plugin list as language loading.
 
 ## Compatibility Surface
 
@@ -360,16 +394,17 @@ That means older templates and plugins continue working while newer internals us
 
 ## Migration Plan
 
-1. Add `TemplateContext`.
-2. Add `TemplateSelectionRepository`.
-3. Add `TemplateContextFactory`.
-4. Update catalog `init_templates.php` to create `$templateContext` and derive existing globals/constants from it.
-5. Update admin `init_languages.php` to create `$templateContext` using the same factory.
-6. Update admin `init_templates.php` to reuse `$templateContext` instead of performing another DB/template resolver lookup.
-7. Update `LanguageLoaderFactory` and `BaseLanguageLoader` to accept `TemplateContext`, while retaining backwards-compatible overload/wrapper behavior if needed.
-8. Update `PageLoader::init()` to accept `TemplateContext`, again preserving compatibility where needed.
-9. Gradually update helper functions in `functions_templates.php` to accept optional `TemplateContext` or reuse a shared resolver/context.
-10. Add focused tests around:
+1. Keep `TemplateDto` as the resolver cache of discovered template records; do not repurpose it into request context.
+2. Add `TemplateContext`.
+3. Add `TemplateSelectionRepository`.
+4. Add `TemplateContextFactory`.
+5. Update catalog `init_templates.php` to create `$templateContext` and derive existing globals/constants from it.
+6. Update admin `init_languages.php` to create `$templateContext` using the same factory.
+7. Update admin `init_templates.php` to reuse `$templateContext` instead of performing another DB/template resolver lookup.
+8. Update `LanguageLoaderFactory` and `BaseLanguageLoader` to accept `TemplateContext`, while retaining backwards-compatible overload/wrapper behavior if needed.
+9. Update `PageLoader::init()` to accept `TemplateContext`, again preserving compatibility where needed.
+10. Gradually update helper functions in `functions_templates.php` and `html_output.php` to accept optional `TemplateContext` or reuse a shared resolver/context.
+11. Add focused tests around:
     - default template fallback
     - language-specific template selection
     - admin language loading using storefront template overrides
@@ -381,12 +416,22 @@ That means older templates and plugins continue working while newer internals us
 ## Expected Benefits
 
 - One place for selected-template DB lookup.
-- Fewer repeated `TemplateResolver` constructions.
+- Clear separation between discovered template records and the request-selected template.
+- Fewer repeated `TemplateResolver` constructions at call sites that currently re-create one only to fetch already-cached data.
 - Fewer loose constructor arguments.
 - Less duplication between catalog/admin bootstrap.
 - Cleaner distinction between selected template state and available template records.
 - Easier tests for template selection and inheritance.
 - Better future path for incorporating more of `template_func` and `PageLoader` resolution behavior into resource-loader classes.
+
+## Current Gaps This Proposal Targets
+
+Even after the resolver work already landed, these gaps remain:
+
+- catalog and admin each still perform their own `TABLE_TEMPLATE_SELECT` lookup logic
+- admin language bootstrap and admin template bootstrap do not yet share one resolved request object
+- loaders still receive loose constructor/init arguments instead of a single selected-template context
+- helper functions still instantiate resolver objects ad hoc instead of receiving shared request state where that would clarify behavior
 
 ## Caution
 
