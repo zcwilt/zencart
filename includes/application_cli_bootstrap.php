@@ -70,6 +70,24 @@ if (!function_exists('zc_cli_get_db_context')) {
             DIR_FS_CATALOG . 'includes/configure.php',
         ];
 
+        $configureFileFound = false;
+        foreach ($configureFiles as $configureFile) {
+            if (file_exists($configureFile)) {
+                $configureFileFound = true;
+                break;
+            }
+        }
+
+        if (!$configureFileFound) {
+            $warnings[] = 'Plugin command discovery disabled: store database configuration is unavailable.';
+            return ['db' => null, 'warnings' => $warnings];
+        }
+
+        if (!function_exists('mysqli_connect')) {
+            $warnings[] = 'Plugin command discovery disabled: the MySQL connector for PHP is unavailable.';
+            return ['db' => null, 'warnings' => $warnings];
+        }
+
         foreach ($configureFiles as $configureFile) {
             if (file_exists($configureFile)) {
                 $previousErrorReporting = error_reporting();
@@ -88,11 +106,6 @@ if (!function_exists('zc_cli_get_db_context')) {
         require_once DIR_FS_INCLUDES . 'database_tables.php';
         require_once DIR_FS_INCLUDES . 'classes/class.base.php';
         require_once DIR_FS_INCLUDES . 'classes/db/' . DB_TYPE . '/query_factory.php';
-
-        if (!function_exists('mysqli_connect')) {
-            $warnings[] = 'Plugin command discovery disabled: the MySQL connector for PHP is unavailable.';
-            return ['db' => null, 'warnings' => $warnings];
-        }
 
         $db = new \queryFactory();
         if (!defined('USE_PCONNECT')) {
