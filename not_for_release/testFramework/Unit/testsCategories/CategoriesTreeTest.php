@@ -16,8 +16,8 @@ class CategoriesTreeTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
-        require DIR_FS_CATALOG . 'includes/functions/functions_general.php';
-        require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'category_tree.php');
+        require_once DIR_FS_CATALOG . 'includes/functions/functions_general.php';
+        require_once DIR_FS_CATALOG . DIR_WS_CLASSES . 'category_tree.php';
     }
 
     public function testBuildsACategoryTreeForTheLegacyCategorySidebox()
