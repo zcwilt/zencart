@@ -873,12 +873,19 @@ class TestFrameworkRunnersTest extends TestCase
     public function testDescribeWorkerRuntimePrintsDefaultDerivedPaths(): void
     {
         $script = $this->rootPath . '/not_for_release/testFramework/describe-worker-runtime.php';
-        $command = sprintf('php %s', escapeshellarg($script));
+        $command = sprintf('IS_DDEV_PROJECT= USER=%s php %s', escapeshellarg('runner'), escapeshellarg($script));
 
         exec($command . ' 2>&1', $output, $exitCode);
 
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Worker Runtime Description', $output);
+        $this->assertContains('Detected shell user: runner', $output);
+        $this->assertContains('Main config profile: runner', $output);
+        $this->assertContains('Main config: ' . $this->rootPath . '/not_for_release/testFramework/Support/configs/runner.main.configure.php', $output);
+        $this->assertContains('Store config profile: runner', $output);
+        $this->assertContains('Store config: ' . $this->rootPath . '/not_for_release/testFramework/Support/configs/runner.store.configure.php', $output);
+        $this->assertContains('Admin config profile: runner', $output);
+        $this->assertContains('Admin config: ' . $this->rootPath . '/not_for_release/testFramework/Support/configs/runner.admin.configure.php', $output);
         $this->assertContains('Worker token: (none)', $output);
         $this->assertContains('Database: db_testing', $output);
         $this->assertContains('Progress file: ' . $this->rootPath . '/progress.json', $output);
@@ -890,7 +897,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/describe-worker-runtime.php';
         $command = sprintf(
-            'ZC_TEST_WORKER=%s ZC_TEST_RUNTIME_ROOT=%s ZC_TEST_RUNTIME_DB_BASE=%s ZC_TEST_RUNTIME_PLUGIN=%s php %s',
+            'IS_DDEV_PROJECT= USER=%s ZC_TEST_WORKER=%s ZC_TEST_RUNTIME_ROOT=%s ZC_TEST_RUNTIME_DB_BASE=%s ZC_TEST_RUNTIME_PLUGIN=%s php %s',
+            escapeshellarg('runner'),
             escapeshellarg('2'),
             escapeshellarg('/tmp/zc-runtime'),
             escapeshellarg('db_ci'),
@@ -901,6 +909,10 @@ class TestFrameworkRunnersTest extends TestCase
         exec($command . ' 2>&1', $output, $exitCode);
 
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+        $this->assertContains('Detected shell user: runner', $output);
+        $this->assertContains('Main config profile: runner', $output);
+        $this->assertContains('Store config profile: runner', $output);
+        $this->assertContains('Admin config profile: runner', $output);
         $this->assertContains('Worker token: 2', $output);
         $this->assertContains('Database: db_ci_2', $output);
         $this->assertContains('Progress file: /tmp/zc-runtime/progress_2.json', $output);
