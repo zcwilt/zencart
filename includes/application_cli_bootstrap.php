@@ -57,4 +57,93 @@ $psr4Autoloader->register();
 
 require DIR_FS_INCLUDES . 'psr4Autoload.php';
 
+if (!function_exists('zc_cli_get_db_context')) {
+    /**
+     * @return array{db: null|\queryFactory, warnings: string[]}
+     */
+    function zc_cli_get_db_context(): array
+    {
+        $warnings = [];
+
+        $configureFiles = [
+            DIR_FS_CATALOG . 'includes/local/configure.php',
+            DIR_FS_CATALOG . 'includes/configure.php',
+        ];
+
+        foreach ($configureFiles as $configureFile) {
+            if (file_exists($configureFile)) {
+                $previousErrorReporting = error_reporting();
+                error_reporting($previousErrorReporting & ~E_WARNING);
+                require_once $configureFile;
+                error_reporting($previousErrorReporting);
+                break;
+            }
+        }
+
+        if (!defined('DB_TYPE') || !defined('DB_SERVER') || !defined('DB_SERVER_USERNAME') || !defined('DB_SERVER_PASSWORD') || !defined('DB_DATABASE')) {
+            $warnings[] = 'Plugin command discovery disabled: store database configuration is unavailable.';
+            return ['db' => null, 'warnings' => $warnings];
+        }
+
+        require_once DIR_FS_INCLUDES . 'database_tables.php';
+        require_once DIR_FS_INCLUDES . 'classes/class.base.php';
+        require_once DIR_FS_INCLUDES . 'classes/db/' . DB_TYPE . '/query_factory.php';
+
+        if (!function_exists('mysqli_connect')) {
+            $warnings[] = 'Plugin command discovery disabled: the MySQL connector for PHP is unavailable.';
+            return ['db' => null, 'warnings' => $warnings];
+        }
+
+        $db = new \queryFactory();
+        if (!defined('USE_PCONNECT')) {
+            define('USE_PCONNECT', 'false');
+        }
+
+        if (!$db->connect(DB_SERVER, DB_SERVER_USERNAME, DB_SERVER_PASSWORD, DB_DATABASE, USE_PCONNECT, false)) {
+            $warnings[] = 'Plugin command discovery disabled: unable to connect to the store database.';
+            return ['db' => null, 'warnings' => $warnings];
+        }
+
+        return ['db' => $db, 'warnings' => $warnings];
+    }
+}
+
+if (!function_exists('zc_cli_get_plugin_repository_context')) {
+    /**
+     * @return array{repository: null|\Zencart\DbRepositories\PluginControlRepository, warnings: string[]}
+     */
+    function zc_cli_get_plugin_repository_context(): array
+    {
+        $context = zc_cli_get_db_context();
+
+        return [
+            'repository' => $context['db'] === null ? null : new \Zencart\DbRepositories\PluginControlRepository($context['db']),
+            'warnings' => $context['warnings'],
+        ];
+    }
+}
+
+if (!function_exists('zc_cli_resolve_trusted_plugin_versions')) {
+    /**
+     * @return array{plugins: array<string, string>, warnings: string[]}
+     */
+    function zc_cli_resolve_trusted_plugin_versions(?\Zencart\DbRepositories\PluginControlRepository $repository = null, array $warnings = []): array
+    {
+        if ($repository === null) {
+            $context = zc_cli_get_plugin_repository_context();
+            $repository = $context['repository'];
+            $warnings = $context['warnings'];
+        }
+
+        if ($repository === null) {
+            return ['plugins' => [], 'warnings' => $warnings];
+        }
+
+        return [
+            'plugins' => (new \Zencart\Console\TrustedPluginVersionResolver($repository))->resolveEnabledPluginVersions(),
+            'warnings' => $warnings,
+        ];
+    }
+}
+
 return $psr4Autoloader;

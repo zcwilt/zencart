@@ -18,7 +18,8 @@ class PluginCommandDiscovery
 
     public function __construct(
         private string $pluginRootPath,
-        private ?\Aura\Autoload\Loader $autoloader = null
+        private ?\Aura\Autoload\Loader $autoloader = null,
+        private ?array $allowedPluginVersions = null
     ) {
     }
 
@@ -49,8 +50,19 @@ class PluginCommandDiscovery
                     continue;
                 }
 
+                if (!$this->isAllowedPluginVersion($pluginDirectory->getFilename(), $versionDirectory->getFilename())) {
+                    continue;
+                }
+
                 $this->registerPluginConsoleNamespace($pluginDirectory->getFilename(), $versionPath);
-                $commands = array_merge($commands, $this->loadCommandsFromVersion($versionPath));
+                $commands = array_merge(
+                    $commands,
+                    $this->loadCommandsFromVersion(
+                        $pluginDirectory->getFilename(),
+                        $versionDirectory->getFilename(),
+                        $versionPath
+                    )
+                );
             }
         }
 
@@ -83,26 +95,28 @@ class PluginCommandDiscovery
     /**
      * @return ConsoleCommand[]
      */
-    private function loadCommandsFromVersion(string $versionPath): array
+    private function loadCommandsFromVersion(string $pluginKey, string $pluginVersion, string $versionPath): array
     {
         $commandFile = $versionPath . '/Console/commands.php';
         if (!file_exists($commandFile)) {
             return [];
         }
 
+        $definitionReference = $pluginKey . '/' . $pluginVersion . '/Console/commands.php';
+
         try {
             $definitions = require $commandFile;
         } catch (Throwable $exception) {
             $this->errors[] = sprintf(
                 'Failed loading plugin commands from %s: %s',
-                $commandFile,
+                $definitionReference,
                 $exception->getMessage()
             );
             return [];
         }
 
         if (!is_array($definitions)) {
-            $this->errors[] = 'Plugin command definition file must return an array: ' . $commandFile;
+            $this->errors[] = 'Plugin command definition file must return an array: ' . $definitionReference;
             return [];
         }
 
@@ -113,13 +127,22 @@ class PluginCommandDiscovery
             } catch (Throwable $exception) {
                 $this->errors[] = sprintf(
                     'Invalid plugin command definition in %s: %s',
-                    $commandFile,
+                    $definitionReference,
                     $exception->getMessage()
                 );
             }
         }
 
         return $commands;
+    }
+
+    private function isAllowedPluginVersion(string $pluginKey, string $pluginVersion): bool
+    {
+        if ($this->allowedPluginVersions === null) {
+            return true;
+        }
+
+        return ($this->allowedPluginVersions[$pluginKey] ?? null) === $pluginVersion;
     }
 
     private function resolveCommandDefinition(mixed $definition): ConsoleCommand

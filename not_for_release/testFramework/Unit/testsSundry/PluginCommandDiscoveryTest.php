@@ -59,6 +59,36 @@ class PluginCommandDiscoveryTest extends TestCase
         $this->assertSame([], $discovery->getErrors());
     }
 
+    public function testIgnoresPluginsThatAreNotInTrustedAllowlist(): void
+    {
+        $discovery = new PluginCommandDiscovery(
+            $this->catalogPath . '/zc_plugins',
+            $this->autoloader,
+            ['someOtherPlugin' => 'v1.0.0']
+        );
+
+        $commands = $discovery->discover();
+
+        $this->assertSame([], $commands);
+        $this->assertSame([], $discovery->getErrors());
+    }
+
+    public function testErrorsUsePluginRelativePathInsteadOfAbsoluteFilesystemPath(): void
+    {
+        file_put_contents(
+            $this->catalogPath . '/zc_plugins/zenTestPlugin/v1.0.0/Console/commands.php',
+            "<?php\nthrow new RuntimeException('boom');\n"
+        );
+
+        $discovery = new PluginCommandDiscovery($this->catalogPath . '/zc_plugins', $this->autoloader);
+        $commands = $discovery->discover();
+
+        $this->assertSame([], $commands);
+        $this->assertCount(1, $discovery->getErrors());
+        $this->assertStringContainsString('zenTestPlugin/v1.0.0/Console/commands.php', $discovery->getErrors()[0]);
+        $this->assertStringNotContainsString($this->catalogPath, $discovery->getErrors()[0]);
+    }
+
     private function removeDirectory(string $path): void
     {
         if (!is_dir($path)) {

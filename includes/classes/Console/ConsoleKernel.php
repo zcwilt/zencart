@@ -8,6 +8,9 @@ namespace Zencart\Console;
 
 use Zencart\Console\Commands\HelpCommand;
 use Zencart\Console\Commands\ListCommand;
+use Zencart\Console\Commands\ConfigGetCommand;
+use Zencart\Console\Commands\PluginListCommand;
+use Zencart\Console\Commands\VersionShowCommand;
 
 class ConsoleKernel
 {
@@ -22,11 +25,16 @@ class ConsoleKernel
 
     public function __construct(
         ?CommandRegistry $registry = null,
-        ?PluginCommandDiscovery $pluginDiscovery = null
+        ?PluginCommandDiscovery $pluginDiscovery = null,
+        array $bootWarnings = [],
+        private $pluginListProvider = null,
+        private $versionProvider = null,
+        private $configurationProvider = null
     ) {
         $this->registry = $registry ?? new CommandRegistry();
         $this->resolver = new CommandResolver($this->registry);
         $this->pluginDiscovery = $pluginDiscovery;
+        $this->bootWarnings = $bootWarnings;
     }
 
     public function boot(): void
@@ -57,16 +65,16 @@ class ConsoleKernel
         }
 
         if ($input->getCommandName() === null && $input->isHelpRequested()) {
-            return $command->handle($input, $output);
+            return $this->executeCommand($command, $input, $output);
         }
 
         if ($input->isHelpRequested() && $command->getName() !== 'help') {
             $helpInput = new ConsoleInput([$input->getScriptName(), 'help', $command->getName()]);
             $helpCommand = $this->registry->find('help');
-            return $helpCommand?->handle($helpInput, $output) ?? 1;
+            return $helpCommand === null ? 1 : $this->executeCommand($helpCommand, $helpInput, $output);
         }
 
-        return $command->handle($input, $output);
+        return $this->executeCommand($command, $input, $output);
     }
 
     public function getRegistry(): CommandRegistry
@@ -81,6 +89,9 @@ class ConsoleKernel
     {
         $this->registry->register(new ListCommand($this->registry));
         $this->registry->register(new HelpCommand($this->registry));
+        $this->registry->register(new PluginListCommand($this->pluginListProvider));
+        $this->registry->register(new VersionShowCommand($this->versionProvider));
+        $this->registry->register(new ConfigGetCommand($this->configurationProvider));
     }
 
     private function registerPluginCommands(): void
@@ -98,5 +109,22 @@ class ConsoleKernel
         }
 
         $this->bootWarnings = array_merge($this->bootWarnings, $this->pluginDiscovery->getErrors());
+    }
+
+    private function executeCommand(ConsoleCommand $command, ConsoleInput $input, ConsoleOutput $output): int
+    {
+        try {
+            return $command->handle($input, $output);
+        } catch (\Throwable $exception) {
+            $output->errorln('Command failed: ' . $command->getName());
+
+            if ($input->isVerboseRequested()) {
+                $output->errorln(get_class($exception) . ': ' . $exception->getMessage());
+            } else {
+                $output->errorln('Re-run with --verbose for more detail.');
+            }
+
+            return 1;
+        }
     }
 }

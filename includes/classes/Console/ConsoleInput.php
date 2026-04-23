@@ -88,6 +88,11 @@ class ConsoleInput
         return $this->hasOption('help') || $this->hasOption('h');
     }
 
+    public function isVerboseRequested(): bool
+    {
+        return $this->hasOption('verbose') || $this->hasOption('v');
+    }
+
     private function parse(): void
     {
         $tokens = $this->rawTokens;
