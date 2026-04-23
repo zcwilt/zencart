@@ -7,6 +7,7 @@ FAIL_ON_UNTAGGED=0
 SUMMARY_ONLY=0
 invalid_grouping_count=0
 
+TEST_FILES=()
 parallel_serial_conflict_files=()
 plugin_without_serial_files=()
 
@@ -44,7 +45,9 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-mapfile -t TEST_FILES < <(
+while IFS= read -r test_file; do
+    TEST_FILES+=("$test_file")
+done < <(
     find "$ROOT_DIR/not_for_release/testFramework/FeatureStore" "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" \
         -type f -name '*Test.php' | sort
     if [ -d "$ROOT_DIR/zc_plugins" ]; then

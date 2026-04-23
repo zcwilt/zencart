@@ -12,15 +12,15 @@ source_test_framework_env_file() {
 load_test_framework_env() {
     local root_dir="$1"
     local env_file="${ZC_TEST_ENV_FILE:-}"
-    local -a preserved_names=()
-    local -A preserved_values=()
+    local -a preserved_assignments=()
     local variable_name=""
+    local variable_value=""
 
     while IFS= read -r variable_name; do
         case "$variable_name" in
             ZC_TEST_*|ZC_FEATURE_*|ZC_PARALLEL_*)
-                preserved_names+=("$variable_name")
-                preserved_values["$variable_name"]="${!variable_name}"
+                variable_value="${!variable_name}"
+                preserved_assignments+=("$variable_name=$variable_value")
                 ;;
         esac
     done < <(compgen -v)
@@ -32,9 +32,11 @@ load_test_framework_env() {
         fi
 
         source_test_framework_env_file "$env_file"
-        for variable_name in "${preserved_names[@]}"; do
-            export "$variable_name=${preserved_values[$variable_name]}"
-        done
+        if [ "${#preserved_assignments[@]}" -gt 0 ]; then
+            for variable_name in "${preserved_assignments[@]}"; do
+                export "$variable_name"
+            done
+        fi
         return 0
     fi
 
@@ -51,7 +53,9 @@ load_test_framework_env() {
         source_test_framework_env_file "$env_file"
     done
 
-    for variable_name in "${preserved_names[@]}"; do
-        export "$variable_name=${preserved_values[$variable_name]}"
-    done
+    if [ "${#preserved_assignments[@]}" -gt 0 ]; then
+        for variable_name in "${preserved_assignments[@]}"; do
+            export "$variable_name"
+        done
+    fi
 }
