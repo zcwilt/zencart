@@ -7,7 +7,11 @@
  * @since ZC v1.5.7
  */
 
-function zen_get_zcversion()
+/**
+ * Determine the Zen Cart version currently installed.
+ * @return string in format "major.minor" (eg: "2.0.0", "3.1.0")
+ */
+function zen_get_zcversion(): string
 {
     return PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 }
