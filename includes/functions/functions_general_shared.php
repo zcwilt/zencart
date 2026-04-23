@@ -4,12 +4,13 @@
  * @copyright Portions Copyright 2003 osCommerce
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2026 Feb 26 Modified in v2.2.1 $
- * @since ZC v1.5.7
  */
 
 /**
  * Determine the Zen Cart version currently installed.
  * @return string in format "major.minor" (eg: "2.0.0", "3.1.0")
+ *
+ * @since ZC v1.5.7
  */
 function zen_get_zcversion(): string
 {
