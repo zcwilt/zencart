@@ -50,7 +50,7 @@ if (!empty($new_version)) { ?>
     <script>
         jQuery(function($){
             let newVersion = <?php echo json_encode($new_version); ?>;
-            let versionInfo = <?php echo json_encode('(' . TEXT_CURRENT_VER_IS . ' v' . PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR . (PROJECT_VERSION_PATCH1 != '' ? 'p' . PROJECT_VERSION_PATCH1 : '') . ')'); ?>;
+            let versionInfo = <?php echo json_encode('(' . TEXT_CURRENT_VER_IS . ' v' . PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR . ')'); ?>;
             let $target1 = $('#versionCheckAlert');
             if ($target1.length) {
                 $target1.html(newVersion);
