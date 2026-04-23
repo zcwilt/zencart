@@ -247,3 +247,7 @@ zc_plugins/zenTestPlugin
 # ignore ppr handler files:
 ppr_listener.php
 ppr_webhook.php
+
+# ignore phpunit cache file
+.phpunit.cache/
+
