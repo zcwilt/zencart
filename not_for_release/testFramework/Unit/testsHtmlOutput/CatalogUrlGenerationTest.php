@@ -18,12 +18,12 @@ class CatalogUrlGenerationTest extends zcUnitTestCase
     {
         parent::setUp();
 
-        require_once(TESTCWD . 'Support/zcURLTestObserver.php');
+        require_once TESTCWD . 'Support/zcURLTestObserver.php';
         $GLOBALS['zcURLTestObserver'] = new zcURLTestObserver();
-        require DIR_FS_CATALOG . 'includes/functions/functions_general.php';
-        require DIR_FS_CATALOG . 'includes/functions/functions_urls.php';
-        require DIR_FS_CATALOG . 'includes/functions/functions_strings.php';
-        require DIR_FS_CATALOG . 'includes/functions/html_output.php';
+        require_once DIR_FS_CATALOG . 'includes/functions/functions_general.php';
+        require_once DIR_FS_CATALOG . 'includes/functions/functions_urls.php';
+        require_once DIR_FS_CATALOG . 'includes/functions/functions_strings.php';
+        require_once DIR_FS_CATALOG . 'includes/functions/html_output.php';
         if (!array_key_exists('https_domain', $GLOBALS)) {
             $GLOBALS['https_domain'] = zen_get_top_level_domain(HTTPS_SERVER);
         }
