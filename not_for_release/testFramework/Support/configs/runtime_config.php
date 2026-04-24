@@ -41,6 +41,11 @@ if (!function_exists('zc_test_config_database_name')) {
             return $override;
         }
 
+        $baseName = getenv('ZC_TEST_DB_BASE_NAME');
+        if (is_string($baseName) && $baseName !== '') {
+            $defaultDatabase = $baseName;
+        }
+
         $workerToken = zc_test_config_worker_token();
         if ($workerToken === null) {
             return $defaultDatabase;
