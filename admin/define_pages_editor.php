@@ -22,9 +22,8 @@ $no_html_editor_on_these_pages = [
  * Returns an array of file names from the directories specified in $check_directory
  * @since ZC v1.2.0d
  */
-function zen_display_files(): array
+function zen_display_files(array $check_directory): array
 {
-    global $check_directory;
     $directory_array = [];
 
     foreach ($check_directory as $dir_check) {
@@ -52,7 +51,7 @@ if ($action === 'edit') {
 
     $check_directory = [];
     $check_directory[] = DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/';
-    $directory_files = zen_display_files();
+    $directory_files = zen_display_files($check_directory);
 
     $za_lookup = [];
     for ($i = 0, $n = count($directory_files); $i < $n; $i++) {
@@ -118,7 +117,7 @@ switch ($action) {
             <?php
             $check_directory = [];
             $check_directory[] = DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/';
-            $directory_files = zen_display_files();
+            $directory_files = zen_display_files($check_directory);
 
             $za_lookup = [];
             $za_lookup[] = ['id' => -1, 'text' => TEXT_INFO_SELECT_FILE];
