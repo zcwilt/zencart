@@ -857,7 +857,7 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $this->assertContains('Running 1 unit test files in parallel with 4 worker(s).', $output);
         $this->assertContains('Env filter narrowed file selection using substring: RuntimeConfigTest', $output);
-        $this->assertContains('Parallel unit test summary: 0 failing file(s), 21 test(s), 24 assertion(s).', $output);
+        $this->assertContains('Parallel unit test summary: 0 failing file(s), 23 test(s), 26 assertion(s).', $output);
         $this->assertContains('Feature Test Group Report', $output);
         $this->assertContains('DRY   [admin-plugin] not_for_release/testFramework/FeatureAdmin/PluginTests/BasicPluginInstallTest.php', $output);
     }

@@ -14,6 +14,7 @@ class RuntimeConfigTest extends TestCase
     {
         parent::setUp();
 
+        putenv('ZC_TEST_DB_BASE_NAME');
         require_once dirname(__DIR__, 2) . '/Support/configs/runtime_config.php';
     }
 
