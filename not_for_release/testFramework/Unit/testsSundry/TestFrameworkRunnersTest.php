@@ -753,6 +753,7 @@ class TestFrameworkRunnersTest extends TestCase
         exec($command . ' 2>&1', $output, $exitCode);
 
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+        $this->assertContains('Database: db', $output);
         $this->assertContains('Dry run for 2 planned test database(s) on 127.0.0.1:3306 for user root.', $output);
         $this->assertContains('Dry run for 1 storefront parallel-candidate feature test file(s) with 2 worker(s).', $output);
         $this->assertContains('DRY   [worker 1] not_for_release/testFramework/FeatureStore/StoreEndpoints/SearchInProcessTest.php', $output);
@@ -775,11 +776,55 @@ class TestFrameworkRunnersTest extends TestCase
         exec($command . ' 2>&1', $output, $exitCode);
 
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+        $this->assertContains('Database: db', $output);
         $this->assertContains('Dry run for 2 planned test database(s) on 127.0.0.1:3306 for user root.', $output);
         $this->assertContains('SKIP  [admin] no matching admin parallel-candidate files', $output);
         $this->assertContains('RUN   [admin-plugin] tests-feature-admin-plugin-filesystem (dry run)', $output);
         $this->assertContains('DRY   [admin-plugin] not_for_release/testFramework/FeatureAdmin/PluginTests/BasicPluginInstallTest.php', $output);
         $this->assertStringNotContainsString('PluginsLFITest.php', implode(PHP_EOL, $output));
+    }
+
+    public function testPrepareWorkerDatabasesAllowsExplicitBlankPassword(): void
+    {
+        $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
+        $binDir = sys_get_temp_dir() . '/zc-mysql-stub-' . uniqid('', true);
+        $argsFile = $binDir . '/mysql-args.txt';
+        mkdir($binDir, 0777, true);
+        file_put_contents(
+            $binDir . '/mysql',
+            "#!/usr/bin/env bash\nprintf '%s\n' \"\$@\" > " . escapeshellarg($argsFile) . "\nexit 0\n"
+        );
+        chmod($binDir . '/mysql', 0755);
+
+        try {
+            $command = sprintf(
+                'PATH=%s:$PATH ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s ZC_TEST_DB_PASSWORD= bash %s',
+                escapeshellarg($binDir),
+                escapeshellarg('/dev/null'),
+                escapeshellarg('db'),
+                escapeshellarg('1'),
+                escapeshellarg('0'),
+                escapeshellarg($script)
+            );
+
+            exec($command . ' 2>&1', $output, $exitCode);
+
+            $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+            $this->assertFileExists($argsFile);
+            $mysqlArgs = file($argsFile, FILE_IGNORE_NEW_LINES) ?: [];
+            $this->assertContains('--password=', $mysqlArgs);
+            $this->assertNotContains('--password=root', $mysqlArgs);
+        } finally {
+            if (is_file($argsFile)) {
+                unlink($argsFile);
+            }
+            if (is_file($binDir . '/mysql')) {
+                unlink($binDir . '/mysql');
+            }
+            if (is_dir($binDir)) {
+                rmdir($binDir);
+            }
+        }
     }
 
     public function testTestsCiRunnerHelpPrintsUsage(): void

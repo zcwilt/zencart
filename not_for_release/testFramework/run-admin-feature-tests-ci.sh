@@ -3,6 +3,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=/dev/null
+. "$ROOT_DIR/not_for_release/testFramework/load-test-environment.sh"
+load_test_framework_env "$ROOT_DIR"
 DRY_RUN=0
 declare -a FEATURE_ARGS=()
 CLI_FILTER=""
