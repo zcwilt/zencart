@@ -14,6 +14,9 @@ if (!is_string($catalogRoot) || $catalogRoot === '') {
 
 $databaseBase = getenv('ZC_TEST_RUNTIME_DB_BASE');
 if (!is_string($databaseBase) || $databaseBase === '') {
+    $databaseBase = getenv('ZC_TEST_DB_BASE_NAME');
+}
+if (!is_string($databaseBase) || $databaseBase === '') {
     $databaseBase = 'db_testing';
 }
 

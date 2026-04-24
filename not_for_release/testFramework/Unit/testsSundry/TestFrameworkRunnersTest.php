@@ -254,6 +254,27 @@ class TestFrameworkRunnersTest extends TestCase
         }
     }
 
+    public function testRunFeatureTestsCiLocalPromotesBaseCliOptionToEnvironment(): void
+    {
+        $script = $this->rootPath . '/not_for_release/testFramework/run-feature-tests-ci-local.sh';
+        $command = sprintf(
+            'ZC_TEST_ENV_FILE=%s USER=%s IS_DDEV_PROJECT= bash %s --dry-run --base %s --workers %s',
+            escapeshellarg('/dev/null'),
+            escapeshellarg('runner'),
+            escapeshellarg($script),
+            escapeshellarg('db_local'),
+            escapeshellarg('2')
+        );
+
+        exec($command . ' 2>&1', $output, $exitCode);
+
+        $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+        $this->assertContains('Database: db_local', $output);
+        $this->assertFalse(in_array('RESET db_local', $output, true));
+        $this->assertContains('RESET db_local_1', $output);
+        $this->assertContains('RESET db_local_2', $output);
+    }
+
     public function testPrepareWorkerDatabasesDryRunLoadsOverridesFromEnvironmentFile(): void
     {
         $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
@@ -920,5 +941,21 @@ class TestFrameworkRunnersTest extends TestCase
         $this->assertContains('Store artifacts: /tmp/zc-runtime/not_for_release/testFramework/logs/console/store/2/', $output);
         $this->assertContains('Admin artifacts: /tmp/zc-runtime/not_for_release/testFramework/logs/console/admin/2/', $output);
         $this->assertContains('Plugin directory: /tmp/zc-runtime/zc_plugins/2/WorkerPlugin', $output);
+    }
+
+    public function testDescribeWorkerRuntimeUsesTestDatabaseBaseEnvironmentFallback(): void
+    {
+        $script = $this->rootPath . '/not_for_release/testFramework/describe-worker-runtime.php';
+        $command = sprintf(
+            'IS_DDEV_PROJECT= USER=%s ZC_TEST_DB_BASE_NAME=%s php %s',
+            escapeshellarg('runner'),
+            escapeshellarg('db_local'),
+            escapeshellarg($script)
+        );
+
+        exec($command . ' 2>&1', $output, $exitCode);
+
+        $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+        $this->assertContains('Database: db_local', $output);
     }
 }
