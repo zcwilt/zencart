@@ -48,4 +48,4 @@ else
     bash "$ROOT_DIR/not_for_release/testFramework/prepare-worker-databases.sh"
 fi
 
-bash "$ROOT_DIR/not_for_release/testFramework/run-parallel-storefront-feature-tests.sh" "${FEATURE_ARGS[@]}"
+bash "$ROOT_DIR/not_for_release/testFramework/run-parallel-storefront-feature-tests.sh" "${FEATURE_ARGS[@]+"${FEATURE_ARGS[@]}"}"

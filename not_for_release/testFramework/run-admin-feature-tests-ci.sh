@@ -122,7 +122,7 @@ else
 fi
 
 if suite_has_matches "$ROOT_DIR/not_for_release/testFramework/FeatureAdmin" "parallel-candidate" "$CLI_FILTER"; then
-    bash "$ROOT_DIR/not_for_release/testFramework/run-parallel-admin-feature-tests.sh" "${FEATURE_ARGS[@]}"
+    bash "$ROOT_DIR/not_for_release/testFramework/run-parallel-admin-feature-tests.sh" "${FEATURE_ARGS[@]+"${FEATURE_ARGS[@]}"}"
 else
     echo "SKIP  [admin] no matching admin parallel-candidate files"
 fi
@@ -157,9 +157,9 @@ fi
 
 if plugin_local_suite_has_matches "$CLI_FILTER"; then
     if [ "$DRY_RUN" -eq 1 ]; then
-        bash "$ROOT_DIR/not_for_release/testFramework/run-plugin-tests.sh" --dry-run --suite FeatureAdmin --require-group plugin-filesystem --group plugin-filesystem "${FEATURE_ARGS[@]}"
+        bash "$ROOT_DIR/not_for_release/testFramework/run-plugin-tests.sh" --dry-run --suite FeatureAdmin --require-group plugin-filesystem --group plugin-filesystem "${FEATURE_ARGS[@]+"${FEATURE_ARGS[@]}"}"
     else
-        bash "$ROOT_DIR/not_for_release/testFramework/run-plugin-tests.sh" --suite FeatureAdmin --require-group plugin-filesystem --group plugin-filesystem "${FEATURE_ARGS[@]}"
+        bash "$ROOT_DIR/not_for_release/testFramework/run-plugin-tests.sh" --suite FeatureAdmin --require-group plugin-filesystem --group plugin-filesystem "${FEATURE_ARGS[@]+"${FEATURE_ARGS[@]}"}"
     fi
 else
     echo "SKIP  [plugin-local] no matching plugin-local plugin-filesystem files"

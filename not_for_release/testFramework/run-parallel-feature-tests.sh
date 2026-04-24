@@ -78,7 +78,7 @@ run_script_suite() {
     local script="$2"
 
     echo "RUN   [$label] $(basename "$script")"
-    bash "$script" "${EXTRA_ARGS[@]}"
+    bash "$script" "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
 }
 
 list_plugin_suite_matches() {
@@ -129,14 +129,24 @@ plugin_local_suite_has_matches() {
     [ -n "$first_match" ]
 }
 
+print_plugin_suite_dry_run_matches() {
+    while IFS= read -r file; do
+        [ -n "$file" ] || continue
+        echo "DRY   [admin-plugin] ${file#$ROOT_DIR/}"
+    done < <(list_plugin_suite_matches "$1")
+}
+
+print_plugin_local_dry_run_matches() {
+    while IFS= read -r file; do
+        [ -n "$file" ] || continue
+        echo "DRY   [plugin-local] ${file#$ROOT_DIR/}"
+    done < <(list_plugin_local_suite_matches "$1")
+}
+
 run_plugin_suite() {
     if [ "$DRY_RUN" -eq 1 ]; then
-        mapfile -t plugin_matches < <(list_plugin_suite_matches "$effective_filter")
-
         echo "RUN   [admin-plugin] tests-feature-admin-plugin-filesystem (dry run)"
-        for file in "${plugin_matches[@]}"; do
-            echo "DRY   [admin-plugin] ${file#$ROOT_DIR/}"
-        done
+        print_plugin_suite_dry_run_matches "$effective_filter"
         return 0
     fi
 
@@ -154,12 +164,8 @@ run_plugin_suite() {
 
 run_plugin_local_suite() {
     if [ "$DRY_RUN" -eq 1 ]; then
-        mapfile -t plugin_matches < <(list_plugin_local_suite_matches "$effective_filter")
-
         echo "RUN   [plugin-local] tests-plugin plugin-filesystem (dry run)"
-        for file in "${plugin_matches[@]}"; do
-            echo "DRY   [plugin-local] ${file#$ROOT_DIR/}"
-        done
+        print_plugin_local_dry_run_matches "$effective_filter"
         return 0
     fi
 
