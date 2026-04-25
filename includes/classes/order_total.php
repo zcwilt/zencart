@@ -252,7 +252,7 @@ class order_total
      *
      * @since ZC v1.0.3
      */
-    public function pre_confirmation_check(bool|string $returnOrderTotalOnly = false)
+    public function pre_confirmation_check(bool|string $returnOrderTotalOnly = false): array|string|null
     {
         global $order, $credit_covers;
 
@@ -278,6 +278,7 @@ class order_total
                 return $reCalculatedOrderTotal;
             }
         }
+        return null;
     }
 
     /**
