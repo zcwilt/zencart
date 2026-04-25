@@ -74,6 +74,8 @@ Creating a New Storefront Page
 5. Add a link to the new page from an existing page, using `zen_href_link(FILENAME_MY_PAGE)` to generate the URL.
 6. If the page requires new database tables or configuration, consider creating a plugin to encapsulate that functionality, following the plugin development patterns. The installer script for plugins can handle database insertions and system configuration-entries during installation.
 
+To create an Admin page, make a plugin, as described below. It's easier to contain an admin page within a plugin.
+
 Plugin development (quick reference)
 -----------------------------------
 Short Summary:
@@ -100,16 +102,20 @@ Minimal plugin file structure layout (example)
 - zc_plugins/myplugin/1.0.0/filenames.php
 - zc_plugins/myplugin/1.0.0/Installer/ScriptedInstaller.php
 - zc_plugins/myplugin/1.0.0/Installer/languages/english/main.php
+# for catalog-side pages, use the following:
 - zc_plugins/myplugin/1.0.0/catalog/includes/classes/observers/auto_MyClass.php
 - zc_plugins/myplugin/1.0.0/catalog/includes/languages/english/lang.my_page.php
 - zc_plugins/myplugin/1.0.0/catalog/includes/modules/pages/my_page/header_php.php
 - zc_plugins/myplugin/1.0.0/catalog/includes/templates/template_default/tpl_my_page.php
+# for admin pages, use the following: 
 - zc_plugins/myplugin/1.0.0/admin/admin_page_name.php
 - zc_plugins/myplugin/1.0.0/admin/includes/languages/english/lang.admin_page_name.php
+- zc_plugins/myplugin/1.0.0/admin/includes/classes/observers/auto_MyAdminClass.php
 ```
+
 Quick tips for agents that create plugins
 - Add any filename constants via a plugin's `filenames.php` if you need new FILENAME_* constants — `FileSystem` loader will include plugin `filenames.php` files during bootstrap.
-- If you add PSR-4 namespaced classes, follow the `Zencart\Plugins\Catalog\<UniqueKey>` namespace root so runtime autoloader registration in `application_top.php` points to your plugin `catalog/includes/classes/` path.
+- If you add PSR-4 namespaced classes, note that `Zencart\Plugins\Catalog\<UniqueKey>` namespace will be auto-applied when plugin classes are enumerated and registered for autoloading.
 - Test by enabling the plugin via admin `Plugin Manager` (or insert a `plugin_control` DB record in tests), then exercise plugin pages (storefront/admin) and run relevant PHPUnit feature tests.
 
 Official docs
@@ -155,8 +161,8 @@ If your plugin introduces new page entrypoints, add a `filenames.php` under the 
 Similarly, if your plugin introduces new constants that need to be defined early, add them in an `includes/extra_configures/some_filename.php` file, under either the `admin/` or `catalog/` directory as needed.
 
 
-Where to find tests & how the test bootstrap works
---------------------------------------------------
+Test Suite: Where to find tests & how the test bootstrap works
+--------------------------------------------------------------
 - PHPUnit configuration: `phpunit.xml` uses `vendor/autoload.php` and sets APP_ENV=testing and reduced bcrypt rounds.
 - Tests live in `not_for_release/testFramework/` grouped into Unit, FeatureStore, FeatureAdmin. The test autoloading is configured in `composer.json` under `autoload-dev`.
 - There is a test-support bootstrap at `not_for_release/testFramework/Support/application_testing.php` that will be loaded if present by `application_top.php`.
@@ -165,7 +171,7 @@ Where to find tests & how the test bootstrap works
   - composer run-script feature-tests
 - Developer documentation for tests: https://docs.zen-cart.com/dev/testframework/testing/
 
-Actionable examples for agents (copy-paste)
+Actionable examples for agents
 -----------------------------------------
 - Install deps and run unit tests:
   - composer install
@@ -175,17 +181,28 @@ Actionable examples for agents (copy-paste)
     - composer run-script feature-tests-store
 - Run feature tests for only the Admin side:
     - composer run-script feature-tests-admin
-- Quick bootstrap for ad-hoc PHP scripts/tests (but the app doesn't have any intended CLI entrypoints.):
+
+NOTE: the app doesn't have any intended CLI entrypoints. 
+
+However, if you need to run ad-hoc PHP scripts that require the app bootstrap (for example, for debugging or one-off data fixes), you can use the following pattern to leverage the existing bootstrap and service container:
+
+Quick bootstrap for ad-hoc PHP scripts/tests:
   - <?php
     require 'includes/application_top.php';
     // ... run logic that depends on DB and bootstrapped services
-    require DIR_WS_INCLUDES . 'application_bottom.php';
+    require DIR_WS_INCLUDES . 'application_bottom.php'; // required to properly close session and do any necessary cleanup
 
 Quick pointers for common tasks
 ------------------------------
 - Adding a new page/module: create files under `includes/modules/pages/<page_name>/` (`header_php.php`, optional `main_template_vars.php`, optional jscript-related files) and register any new filename constants via `filenames.php` pattern.
 - Adding plugin code: place under `zc_plugins/<unique_key>/<version>/` with relevant `/catalog` and/or `/admin` folders, and ensure PluginControl entries reflect installation; use PluginManager FileSystem helpers to mirror existing patterns.
-- Debugging: enable `STRICT_ERROR_REPORTING` which turns `display_errors` on, or `DEBUG_AUTOLOAD` (for troubleshooting autoload config array load-order) in a local `includes/local/configure.php`. Logs are in `logs/`.
+
+Troubleshooting & debugging
+---------------------------
+- Debugging: 
+  - Enable `STRICT_ERROR_REPORTING` which turns `display_errors` on.
+  - Logs are in `logs/`.
+  - For troubleshooting autoload config array load-order, set `DEBUG_AUTOLOAD=true` in a local `includes/local/configure.php`. This will display a lot of debug information to the screen to help trace an issue.
 
 Files to inspect next (for humans and automated extractors)
 ------------------------------------------------------
@@ -214,8 +231,8 @@ Test suite:
 - not_for_release/testFramework/Support/application_testing.php
 ```
 
-Contacts & references
----------------------
+References
+----------
 - Developer docs: https://docs.zen-cart.com/dev/
 - Project README: `README.md`
 
