@@ -172,7 +172,13 @@ PHP
             zen_get_template_screenshot_web_path('child_theme', $resolver)
         );
     }
-
+/*
+ * Removing for now (PR #12), since these tests look only at the file system, but
+ * the zen_resolve_template_key now takes only a single, optional parameter of the
+ * TemplateResolver class and returns either the discovered, selected template or
+ * template_default if that template's not found in the file system.
+ */
+/*
     public function testResolveTemplateKeyFallsBackToTemplateDefaultForMissingTemplate(): void
     {
         $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
@@ -184,7 +190,7 @@ PHP
         $this->assertSame('child_theme', zen_resolve_template_key('child_theme', $resolver));
         $this->assertSame('template_default', zen_resolve_template_key('missing_theme', $resolver));
     }
-
+*/
     private function writeTemplateInfo(string $path, string $templateName): void
     {
         file_put_contents(

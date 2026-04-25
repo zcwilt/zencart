@@ -17,6 +17,8 @@ class TemplateResolver
     private string $coreTemplatesPath;
     private string $pluginsRoot;
 
+    private static array $templateRecords;
+
     /**
      * @since ZC v3.0.0
      */
@@ -46,9 +48,8 @@ class TemplateResolver
      */
     public function getTemplateRecord(string $templateKey): ?array
     {
-        if (TemplateDto::getInstance()->getAllTemplates() === []) {
-            $this->getTemplateRecords();
-        }
+        $this->getTemplateRecords();
+
         return TemplateDto::getInstance()->getTemplate($templateKey);
     }
 
@@ -57,7 +58,11 @@ class TemplateResolver
      */
     public function getTemplateFilesystemPath(string $templateKey): ?string
     {
-        return $this->getTemplateRecord($templateKey)['template_path'] ?? null;
+        $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return null;
+        }
+        return $record['template_path'];
     }
 
     /**
@@ -65,7 +70,11 @@ class TemplateResolver
      */
     public function getTemplateCatalogPath(string $templateKey): ?string
     {
-        return $this->getTemplateRecord($templateKey)['template_catalog_path'] ?? null;
+        $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return null;
+        }
+        return $record['template_catalog_path'];
     }
 
     /**
@@ -74,7 +83,10 @@ class TemplateResolver
     public function getTemplateWebPath(string $templateKey): ?string
     {
         $record = $this->getTemplateRecord($templateKey);
-        return $record['template_web_path'] ?? null;
+        if ($record === null) {
+            return null;
+        }
+        return $record['template_web_path'];
     }
 
     /**
@@ -129,6 +141,9 @@ class TemplateResolver
     public function isPluginTemplate(string $templateKey): bool
     {
         $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return false;
+        }
         return !empty($record['is_plugin_template']);
     }
 
@@ -137,19 +152,19 @@ class TemplateResolver
      */
     private function getTemplateRecords(): array
     {
-        $templateRecords = TemplateDto::getInstance()->getAllTemplates();
-        if ($templateRecords === []) {
-            $templateRecords = array_merge(
+        $templateDto = TemplateDto::getInstance();
+        if (!isset(self::$templateRecords)) {
+            self::$templateRecords = array_merge(
                 $this->loadCoreTemplates(),
                 $this->loadPluginTemplates()
             );
 
-            foreach ($templateRecords as $templateKey => $templateProperties) {
-                TemplateDto::getInstance()->updateTemplate($templateKey, $templateProperties);
+            foreach (self::$templateRecords as $templateKey => $templateProperties) {
+                $templateDto->updateTemplate($templateKey, $templateProperties);
             }
         }
 
-        return $templateRecords;
+        return $templateDto->getAllTemplates();
     }
 
     /**
