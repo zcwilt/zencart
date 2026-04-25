@@ -89,7 +89,7 @@ function zen_get_template_catalog_override_directories(
 
     foreach (zen_get_template_inheritance_chain($templateKey, $includeTemplateDefault, $resolver) as $chainTemplateKey) {
         $record = $resolver->getTemplateRecord($chainTemplateKey);
-        if (!empty($record['is_plugin_template']) && !empty($record['plugin_key']) && !empty($record['plugin_version'])) {
+        if ($record !== null && !empty($record['is_plugin_template']) && !empty($record['plugin_key']) && !empty($record['plugin_version'])) {
             $directories[] = 'zc_plugins/' . $record['plugin_key'] . '/' . $record['plugin_version'] . '/catalog/' . $catalogBasePath . '/' . $chainTemplateKey . '/';
             continue;
         }
@@ -190,12 +190,16 @@ function zen_get_template_screenshot_web_path(
 /**
  * @since ZC v3.0.0
  */
-function zen_resolve_template_key(
-    string $templateKey,
-    ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
-): string {
+function zen_resolve_template_key(?\Zencart\ResourceLoaders\TemplateResolver $resolver = null): string
+{
+    $templateSelect = new \Zencart\Templates\TemplateSelect();
+    $templateKey = $templateSelect->getActiveTemplateDir() ?? '';
+
     $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
-    $record = $resolver->getTemplateRecord($templateKey) ?? $resolver->getTemplateRecord('template_default');
+    $record = $resolver->getTemplateRecord($templateKey);
+    if ($record === null) {
+        return 'template_default';
+    }
     return $record['template_key'] ?? 'template_default';
 }
 
@@ -204,25 +208,8 @@ function zen_resolve_template_key(
  */
 function zen_register_new_template(string $template_dir, int|string $language_id): false|int|string
 {
-    global $db;
-    if (empty($template_dir) || empty($language_id)) {
-        return false;
-    }
-    // check if template already registered for this language
-    $sql = "SELECT *
-            FROM " . TABLE_TEMPLATE_SELECT . "
-            WHERE template_language = :lang:";
-    $sql = $db->bindVars($sql, ':lang:', $language_id, 'integer');
-    $check_query = $db->Execute($sql);
-    if ($check_query->RecordCount() < 1) {
-        $sql = "INSERT INTO " . TABLE_TEMPLATE_SELECT . " (template_dir, template_language)
-                VALUES (:tpl:, :lang:)";
-        $sql = $db->bindVars($sql, ':tpl:', $template_dir, 'string');
-        $sql = $db->bindVars($sql, ':lang:', $language_id, 'integer');
-        $db->Execute($sql);
-        return $db->insert_ID();
-    }
-    return false;
+    $templateSelect = new \Zencart\Templates\TemplateSelect();
+    return $templateSelect->registerNewTemplate($template_dir, (int)$language_id);
 }
 
 /**
@@ -231,16 +218,8 @@ function zen_register_new_template(string $template_dir, int|string $language_id
  */
 function zen_get_template_languages_not_registered(): array
 {
-    global $db;
-    $templates = [];
-    $sql = "SELECT lng.name as language_name, lng.languages_id as language_id
-            FROM " . TABLE_LANGUAGES . " lng
-            WHERE lng.languages_id NOT IN (SELECT template_language FROM " . TABLE_TEMPLATE_SELECT . ")";
-    $results = $db->Execute($sql);
-    foreach ($results as $result) {
-        $templates[] = $result;
-    }
-    return $templates;
+    $templateSelect = new \Zencart\Templates\TemplateSelect();
+    return $templateSelect->getUnregisteredTemplateLanguages();
 }
 
 /**
@@ -250,13 +229,8 @@ function zen_get_template_languages_not_registered(): array
  */
 function zen_update_template_name_for_id(int|string $id, string $template_dir): void
 {
-    global $db;
-    $sql = "UPDATE " . TABLE_TEMPLATE_SELECT . "
-            SET template_dir = :tpl:
-            WHERE template_id = :id:";
-    $sql = $db->bindVars($sql, ':tpl:', $template_dir, 'string');
-    $sql = $db->bindVars($sql, ':id:', $id, 'integer');
-    $db->Execute($sql);
+    $templateSelect = new \Zencart\Templates\TemplateSelect();
+    $templateSelect->updateTemplateNameForId((int)$id, $template_dir);
 }
 
 /**
@@ -266,14 +240,6 @@ function zen_update_template_name_for_id(int|string $id, string $template_dir): 
  */
 function zen_deregister_template_id(int|string $id): bool
 {
-    global $db;
-    $check_query = $db->Execute("SELECT template_language
-                                 FROM " . TABLE_TEMPLATE_SELECT . "
-                                 WHERE template_id = " . (int)$id);
-    if ($check_query->RecordCount() && $check_query->fields['template_language'] != '0') {
-        $db->Execute("DELETE FROM " . TABLE_TEMPLATE_SELECT . "
-                      WHERE template_id = " . (int)$id);
-        return true;
-    }
-    return false;
+    $templateSelect = new \Zencart\Templates\TemplateSelect();
+    return $templateSelect->deregisterTemplateId((int)$id);
 }

@@ -14,6 +14,7 @@
 
 use Zencart\LanguageLoader\LanguageLoaderFactory;
 use Zencart\ResourceLoaders\TemplateResolver;
+use Zencart\Templates\TemplateSelect;
 
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -23,13 +24,9 @@ if (!defined('IS_ADMIN_FLAG')) {
  * Lookup the template for the current language
  * The 'choice' aliases help with weighting for fallback to default selection
  */
-$template_dir = 'template_default';
 $templateResolver = new TemplateResolver();
-$sql = "SELECT *, template_language=" . (int)$_SESSION['languages_id'] . " AS choice1, template_language=0 AS choice2
-        FROM " . TABLE_TEMPLATE_SELECT . "
-        ORDER BY choice1 DESC, choice2 DESC, template_language";
-$result = $db->Execute($sql);
-$template_dir = $result->fields['template_dir'];
+$templateSelect = new TemplateSelect();
+$template_dir = $templateSelect->getActiveTemplateDir();
 
 /**
  * Allow admins to switch templates using &t= URL parameter
@@ -60,17 +57,17 @@ $template_dir = $templateRecord['template_key'];
 /**
  * The actual template directory to use
  */
-define('DIR_WS_TEMPLATE', $templateRecord['template_catalog_path']);
+zen_define_default('DIR_WS_TEMPLATE', $templateRecord['template_catalog_path']);
 
 /**
  * The actual template images directory to use
  */
-define('DIR_WS_TEMPLATE_IMAGES', DIR_WS_TEMPLATE . 'images/');
+zen_define_default('DIR_WS_TEMPLATE_IMAGES', DIR_WS_TEMPLATE . 'images/');
 
 /**
  * The actual template icons directory to use
  */
-define('DIR_WS_TEMPLATE_ICONS', DIR_WS_TEMPLATE_IMAGES . 'icons/');
+zen_define_default('DIR_WS_TEMPLATE_ICONS', DIR_WS_TEMPLATE_IMAGES . 'icons/');
 
 if (empty($tpl_settings) || !is_array($tpl_settings)) {
     $tpl_settings = [];
@@ -96,8 +93,8 @@ if (empty($tpl_settings) || !is_array($tpl_settings)) {
 /**
  * Load any template override settings from db
  */
-if (!empty($result->fields['template_settings'])) {
-    $tmp = json_decode($result->fields['template_settings'], true);
+if (!empty($templateSelect->getActiveTemplateSettings())) {
+    $tmp = json_decode($templateSelect->getActiveTemplateSettings(), true);
     if (is_array($tmp)) {
         $tpl_settings = array_merge($tmp, $tpl_settings);
     }
