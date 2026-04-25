@@ -57,6 +57,23 @@ Integration points and external dependencies
 - (There are some 3rd-party libraries included directly in `includes/classes/vendors/` that are not managed by composer; these are bundled directly to avoid end-users needing to use composer.)
 - Payment/webhook listeners at repo root: The following PayPal-related listeners are processor-specific: `ipn_main_handler.php`, `ppr_listener.php`, `ppr_webhook.php`.
 
+Creating a New Storefront Page
+-----------------------------------
+1. Create filename constant in `includes/extra_datafiles/my_filenames.php` (or for a plugin, use its `filenames.php` file):
+   ```php
+   define('FILENAME_MY_PAGE', 'my_page.php');
+    ```
+2. Create page module files under `includes/modules/pages/my_page/`:
+   - `header_php.php` (for backend logic to run before output is generated)
+   - `main_template_vars.php` (for creating output data and passing those variables to the template)
+   - `jscript_mypage.js` (for standalone javascript specific to this page)
+   - `jscript_mypage.php` (for PHP-generated javascript specific to this page)
+3. Create template file under `includes/templates/template_default/` (or preferably in your active template dir) named `tpl_my_page.php` that will be used to render the page content.
+   - Remember to use `zen_output_string_protected()` for any user-generated content that is output on the page, to ensure XSS protection.
+4. Test the new page by navigating to it in the storefront and ensuring it loads correctly.
+5. Add a link to the new page from an existing page, using `zen_href_link(FILENAME_MY_PAGE)` to generate the URL.
+6. If the page requires new database tables or configuration, consider creating a plugin to encapsulate that functionality, following the plugin development patterns. The installer script for plugins can handle database insertions and system configuration-entries during installation.
+
 Plugin development (quick reference)
 -----------------------------------
 Short Summary:
