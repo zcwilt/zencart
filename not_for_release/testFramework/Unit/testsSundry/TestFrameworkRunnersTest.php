@@ -116,7 +116,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s env -u ZC_TEST_DB_BASE_NAME -u ZC_TEST_DB_WORKERS -u ZC_TEST_DB_INCLUDE_BASE -u ZC_FEATURE_PARALLEL_PROCESSES bash %s --dry-run --base %s --workers %d',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s env -u ZC_TEST_DB_BASE_NAME -u ZC_TEST_DB_WORKERS -u ZC_TEST_DB_INCLUDE_BASE -u ZC_FEATURE_PARALLEL_PROCESSES bash %s --dry-run --base %s --workers %d',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg($script),
             escapeshellarg('db_testing'),
@@ -137,7 +138,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s bash %s --dry-run --skip-base --base %s --workers %d',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s bash %s --dry-run --skip-base --base %s --workers %d',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg($script),
             escapeshellarg('db_testing'),
@@ -456,7 +458,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-parallel-storefront-feature-tests.sh';
         $command = sprintf(
-            'ZC_FEATURE_TEST_FILTER=%s ZC_FEATURE_PARALLEL_PROCESSES=%s bash %s --dry-run --filter %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_FEATURE_TEST_FILTER=%s ZC_FEATURE_PARALLEL_PROCESSES=%s bash %s --dry-run --filter %s',
+            escapeshellarg('runner'),
             escapeshellarg('StoreEndpoints'),
             escapeshellarg('2'),
             escapeshellarg($script),
@@ -504,7 +507,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-parallel-storefront-feature-tests.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s bash %s --dry-run --prepare-databases --filter %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s bash %s --dry-run --prepare-databases --filter %s',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg('db_local'),
             escapeshellarg('2'),
@@ -527,7 +531,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s ZC_FEATURE_PARALLEL_PROCESSES=%s ZC_TEST_DB_INCLUDE_BASE=%s env -u ZC_TEST_DB_WORKERS bash %s --dry-run --base %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s ZC_FEATURE_PARALLEL_PROCESSES=%s ZC_TEST_DB_INCLUDE_BASE=%s env -u ZC_TEST_DB_WORKERS bash %s --dry-run --base %s',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg('3'),
             escapeshellarg('0'),
@@ -594,7 +599,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-parallel-admin-feature-tests.sh';
         $command = sprintf(
-            'ZC_FEATURE_TEST_FILTER=%s ZC_FEATURE_PARALLEL_PROCESSES=%s bash %s --dry-run --filter %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_FEATURE_TEST_FILTER=%s ZC_FEATURE_PARALLEL_PROCESSES=%s bash %s --dry-run --filter %s',
+            escapeshellarg('runner'),
             escapeshellarg('AdminEndpointsTest'),
             escapeshellarg('2'),
             escapeshellarg($script),
@@ -616,7 +622,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-parallel-admin-feature-tests.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s bash %s --dry-run --prepare-databases --filter %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s bash %s --dry-run --prepare-databases --filter %s',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg('db_admin'),
             escapeshellarg('2'),
@@ -722,7 +729,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-feature-tests-ci.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s --dry-run --filter %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s --dry-run --filter %s',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg('db'),
             escapeshellarg('2'),
@@ -765,7 +773,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-store-feature-tests-ci.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s --dry-run --filter %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s --dry-run --filter %s',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg('db'),
             escapeshellarg('2'),
@@ -788,7 +797,8 @@ class TestFrameworkRunnersTest extends TestCase
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-admin-feature-tests-ci.sh';
         $command = sprintf(
-            'ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s --dry-run --filter %s',
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s --dry-run --filter %s',
+            escapeshellarg('runner'),
             escapeshellarg('/dev/null'),
             escapeshellarg('db'),
             escapeshellarg('2'),
