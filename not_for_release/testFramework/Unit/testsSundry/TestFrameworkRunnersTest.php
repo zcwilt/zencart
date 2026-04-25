@@ -361,6 +361,30 @@ class TestFrameworkRunnersTest extends TestCase
         }
     }
 
+    public function testTestEnvironmentLoaderFallsBackToProfileDatabaseSettings(): void
+    {
+        $loader = $this->rootPath . '/not_for_release/testFramework/load-test-environment.sh';
+        $command = sprintf(
+            'USER=%s IS_DDEV_PROJECT= ZC_TEST_ENV_FILE=%s bash -c %s bash %s %s',
+            escapeshellarg('runner'),
+            escapeshellarg('/dev/null'),
+            escapeshellarg('. "$1"; load_test_framework_env "$2"; printf "HOST=%s\n" "$ZC_TEST_DB_HOST"; printf "PORT=%s\n" "${ZC_TEST_DB_PORT-}"; printf "USER=%s\n" "$ZC_TEST_DB_USER"; printf "PASSWORD=%s\n" "$ZC_TEST_DB_PASSWORD"; printf "BASE=%s\n" "$ZC_TEST_DB_BASE_NAME"'),
+            escapeshellarg($loader),
+            escapeshellarg($this->rootPath)
+        );
+
+        exec($command . ' 2>&1', $output, $exitCode);
+
+        $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+        $this->assertSame([
+            'HOST=127.0.0.1',
+            'PORT=',
+            'USER=root',
+            'PASSWORD=root',
+            'BASE=db',
+        ], $output);
+    }
+
     public function testParallelUnitRunnerHelpPrintsUsage(): void
     {
         $script = $this->rootPath . '/not_for_release/testFramework/run-parallel-unit-tests.sh';
@@ -818,6 +842,134 @@ class TestFrameworkRunnersTest extends TestCase
             if (is_file($argsFile)) {
                 unlink($argsFile);
             }
+            if (is_file($binDir . '/mysql')) {
+                unlink($binDir . '/mysql');
+            }
+            if (is_dir($binDir)) {
+                rmdir($binDir);
+            }
+        }
+    }
+
+    public function testPrepareWorkerDatabasesWarnsAndContinuesWhenRecreateIsDeniedButDatabasesExist(): void
+    {
+        $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
+        $binDir = sys_get_temp_dir() . '/zc-mysql-stub-' . uniqid('', true);
+        mkdir($binDir, 0777, true);
+        file_put_contents(
+            $binDir . '/mysql',
+            <<<'BASH'
+#!/usr/bin/env bash
+sql=""
+next_is_sql=0
+for arg in "$@"; do
+  if [ "$next_is_sql" = "1" ]; then
+    sql="$arg"
+    break
+  fi
+  if [ "$arg" = "-e" ]; then
+    next_is_sql=1
+  fi
+done
+
+if [[ "$sql" == DROP\ DATABASE* ]]; then
+  echo "ERROR 1044 (42000): Access denied for user 'app'@'localhost' to database 'db_testing'" >&2
+  exit 1
+fi
+
+if [[ "$sql" =~ SCHEMA_NAME\ =\ \'([A-Za-z0-9_]+)\' ]]; then
+  db_name="${BASH_REMATCH[1]}"
+  if [[ ",${EXISTING_DATABASES}," == *",$db_name,"* ]]; then
+    echo "$db_name"
+  fi
+fi
+BASH
+        );
+        chmod($binDir . '/mysql', 0755);
+
+        try {
+            $command = sprintf(
+                'PATH=%s:$PATH EXISTING_DATABASES=%s ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s',
+                escapeshellarg($binDir),
+                escapeshellarg('db_testing_1,db_testing_2'),
+                escapeshellarg('/dev/null'),
+                escapeshellarg('db_testing'),
+                escapeshellarg('2'),
+                escapeshellarg('0'),
+                escapeshellarg($script)
+            );
+
+            exec($command . ' 2>&1', $output, $exitCode);
+
+            $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
+            $this->assertStringContainsString('does not have permission to recreate test databases.', implode(PHP_EOL, $output));
+            $this->assertContains('Existing worker databases detected; continuing without resetting them.', $output);
+            $this->assertContains('Existing databases:', $output);
+        } finally {
+            if (is_file($binDir . '/mysql')) {
+                unlink($binDir . '/mysql');
+            }
+            if (is_dir($binDir)) {
+                rmdir($binDir);
+            }
+        }
+    }
+
+    public function testPrepareWorkerDatabasesFailsWhenRecreateIsDeniedAndDatabasesAreMissing(): void
+    {
+        $script = $this->rootPath . '/not_for_release/testFramework/prepare-worker-databases.sh';
+        $binDir = sys_get_temp_dir() . '/zc-mysql-stub-' . uniqid('', true);
+        mkdir($binDir, 0777, true);
+        file_put_contents(
+            $binDir . '/mysql',
+            <<<'BASH'
+#!/usr/bin/env bash
+sql=""
+next_is_sql=0
+for arg in "$@"; do
+  if [ "$next_is_sql" = "1" ]; then
+    sql="$arg"
+    break
+  fi
+  if [ "$arg" = "-e" ]; then
+    next_is_sql=1
+  fi
+done
+
+if [[ "$sql" == DROP\ DATABASE* ]]; then
+  echo "ERROR 1044 (42000): Access denied for user 'app'@'localhost' to database 'db_testing'" >&2
+  exit 1
+fi
+
+if [[ "$sql" =~ SCHEMA_NAME\ =\ \'([A-Za-z0-9_]+)\' ]]; then
+  db_name="${BASH_REMATCH[1]}"
+  if [[ ",${EXISTING_DATABASES}," == *",$db_name,"* ]]; then
+    echo "$db_name"
+  fi
+fi
+BASH
+        );
+        chmod($binDir . '/mysql', 0755);
+
+        try {
+            $command = sprintf(
+                'PATH=%s:$PATH EXISTING_DATABASES=%s ZC_TEST_ENV_FILE=%s ZC_TEST_DB_BASE_NAME=%s ZC_TEST_DB_WORKERS=%s ZC_TEST_DB_INCLUDE_BASE=%s bash %s',
+                escapeshellarg($binDir),
+                escapeshellarg('db_testing_1'),
+                escapeshellarg('/dev/null'),
+                escapeshellarg('db_testing'),
+                escapeshellarg('2'),
+                escapeshellarg('0'),
+                escapeshellarg($script)
+            );
+
+            exec($command . ' 2>&1', $output, $exitCode);
+
+            $this->assertSame(1, $exitCode, implode(PHP_EOL, $output));
+            $this->assertStringContainsString('does not have permission to recreate test databases.', implode(PHP_EOL, $output));
+            $this->assertContains('Missing worker databases: db_testing_2', $output);
+            $this->assertContains('Pre-create them with a privileged MySQL user, or rerun with a user that can CREATE/DROP databases.', $output);
+        } finally {
             if (is_file($binDir . '/mysql')) {
                 unlink($binDir . '/mysql');
             }
