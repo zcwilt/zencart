@@ -173,8 +173,17 @@ class PageLoader
      */
     public function getBodyCode(): string
     {
-        if (file_exists(DIR_WS_MODULES . 'pages/' . $this->mainPage . '/main_template_vars.php')) {
-            return DIR_WS_MODULES . 'pages/' . $this->mainPage . '/main_template_vars.php';
+        // -----
+        // Determine where, if anywhere, the current-page's main_template_vars.php
+        // file resides.
+        //
+        // listModulePagesFiles returns all locations and the first-found file is used. That'll
+        // be the file in /includes/modules/pages/{current_page} or (searching all active
+        // plugins alphanumerically) the first-found in any zc_plugins.
+        //
+        $template_vars_locations = $this->listModulePagesFiles('main_template_vars');
+        if (count($template_vars_locations) !== 0) {
+            return $template_vars_locations[0];
         }
         return $this->getTemplateDirectory('tpl_' . preg_replace('/.php/', '', $this->mainPage) . '_default.php', DIR_WS_TEMPLATE, $this->mainPage, 'templates') . '/tpl_' . $this->mainPage . '_default.php';
     }
