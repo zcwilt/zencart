@@ -10,7 +10,12 @@
  */
 
 if (PHP_SAPI !== 'cli') {
-    fwrite(STDERR, "This entry point is only available from the command line.\n");
+    if (!headers_sent()) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=UTF-8');
+    }
+
+    echo "Not found.\n";
     exit(1);
 }
 
