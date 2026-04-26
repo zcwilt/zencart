@@ -21,6 +21,7 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateDto.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_templates.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_files.php';
