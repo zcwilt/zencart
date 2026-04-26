@@ -6,6 +6,9 @@
 
 namespace Zencart\ResourceLoaders;
 
+use Zencart\DbRepositories\PluginControlRepository;
+use Zencart\DbRepositories\PluginControlVersionRepository;
+use Zencart\PluginManager\PluginManager;
 use Zencart\Templates\TemplateDto;
 
 /**
@@ -16,6 +19,7 @@ class TemplateResolver
     private string $catalogRoot;
     private string $coreTemplatesPath;
     private string $pluginsRoot;
+    private PluginManager $pluginManager;
 
     private static array $templateRecords;
 
@@ -27,6 +31,9 @@ class TemplateResolver
         $this->catalogRoot = $this->normalizeDirectory($catalogRoot ?? (defined('DIR_FS_CATALOG') ? DIR_FS_CATALOG : dirname(__DIR__, 2)));
         $this->coreTemplatesPath = $this->normalizeDirectory($coreTemplatesPath ?? $this->catalogRoot . '/includes/templates');
         $this->pluginsRoot = $this->normalizeDirectory($pluginsRoot ?? $this->catalogRoot . '/zc_plugins');
+
+        global $db;
+        $this->pluginManager = new PluginManager(new PluginControlRepository($db), new PluginControlVersionRepository($db));
     }
 
     /**
@@ -215,43 +222,26 @@ class TemplateResolver
             return $templates;
         }
 
-        $pluginsDir = new \DirectoryIterator($this->pluginsRoot);
-        foreach ($pluginsDir as $pluginDir) {
-            if ($pluginDir->isDot() || !$pluginDir->isDir()) {
+        $installedPlugins = $this->pluginManager->getInstalledPlugins();
+        foreach ($installedPlugins as $unique_key => $plugin_info) {
+            $version = $plugin_info['version'];
+            $versionPath = $this->pluginsRoot . '/' . $unique_key . '/' . $version;
+            $manifestFile = $versionPath . '/manifest.php';
+            if (!is_file($manifestFile)) {
+                continue;
+            }
+            $manifest = require $manifestFile;
+            if (!$this->isSelectableTemplateManifest($manifest)) {
                 continue;
             }
 
-            $versionsDir = new \DirectoryIterator($pluginDir->getPathname());
-            foreach ($versionsDir as $versionDir) {
-                if ($versionDir->isDot() || !$versionDir->isDir()) {
-                    continue;
-                }
-
-                $manifestFile = $versionDir->getPathname() . '/manifest.php';
-                if (!file_exists($manifestFile)) {
-                    continue;
-                }
-
-                $manifest = require $manifestFile;
-                if (!$this->isSelectableTemplateManifest($manifest)) {
-                    continue;
-                }
-
-                $templateRecord = $this->buildPluginTemplateRecord(
-                    $pluginDir->getFilename(),
-                    $versionDir->getFilename(),
-                    $versionDir->getPathname(),
-                    $manifest
-                );
-
-                if ($templateRecord === null) {
-                    continue;
-                }
-
-                $templates[$templateRecord['template_key']] = $templateRecord;
+            $templateRecord = $this->buildPluginTemplateRecord($unique_key, $version, $versionPath, $manifest);
+            if ($templateRecord === null) {
+                continue;
             }
-        }
 
+            $templates[$templateRecord['template_key']] = $templateRecord;
+        }
         return $templates;
     }
 
