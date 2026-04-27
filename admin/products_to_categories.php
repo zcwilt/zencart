@@ -673,9 +673,8 @@ if (empty($_SESSION['hide_linked_categories'])) {
                             }
                         </script>
                     </div>
-                    <?php
-                    echo zen_draw_form('update', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=update_product&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id . '&target_category_id=' . $target_category_id, 'post');
-                    zen_draw_hidden_field('current_master_categories_id', $product_to_copy->fields['master_categories_id']); ?>
+                    <?= zen_draw_form('update', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=update_product&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id . '&target_category_id=' . $target_category_id, 'post') ?>
+                    <?= zen_draw_hidden_field('current_master_categories_id', $product_to_copy->fields['master_categories_id']) ?>
                     <table class="table-bordered">
                         <thead>
                         <?php $cnt_columns = 0; ?>
