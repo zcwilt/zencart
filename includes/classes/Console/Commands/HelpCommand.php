@@ -13,20 +13,32 @@ use Zencart\Console\ConsoleOutput;
 
 class HelpCommand extends ConsoleCommand
 {
+    /**
+     * @since ZC v3.0.0
+     */
     public function __construct(private CommandRegistry $registry)
     {
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getName(): string
     {
         return 'help';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getDescription(): string
     {
         return 'Display help for a console command.';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getUsageLines(): array
     {
         return [
@@ -35,6 +47,9 @@ class HelpCommand extends ConsoleCommand
         ];
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function handle(ConsoleInput $input, ConsoleOutput $output): int
     {
         $targetName = $input->getArgument(0);

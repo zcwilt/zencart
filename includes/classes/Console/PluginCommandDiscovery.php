@@ -16,6 +16,9 @@ class PluginCommandDiscovery
      */
     private array $errors = [];
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function __construct(
         private string $pluginRootPath,
         private ?\Aura\Autoload\Loader $autoloader = null,
@@ -24,6 +27,8 @@ class PluginCommandDiscovery
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return ConsoleCommand[]
      */
     public function discover(): array
@@ -70,6 +75,8 @@ class PluginCommandDiscovery
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return string[]
      */
     public function getErrors(): array
@@ -77,6 +84,9 @@ class PluginCommandDiscovery
         return $this->errors;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function registerPluginConsoleNamespace(string $pluginKey, string $versionPath): void
     {
         if ($this->autoloader === null) {
@@ -93,6 +103,8 @@ class PluginCommandDiscovery
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return ConsoleCommand[]
      */
     private function loadCommandsFromVersion(string $pluginKey, string $pluginVersion, string $versionPath): array
@@ -136,6 +148,9 @@ class PluginCommandDiscovery
         return $commands;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function isAllowedPluginVersion(string $pluginKey, string $pluginVersion): bool
     {
         if ($this->allowedPluginVersions === null) {
@@ -145,6 +160,9 @@ class PluginCommandDiscovery
         return ($this->allowedPluginVersions[$pluginKey] ?? null) === $pluginVersion;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function resolveCommandDefinition(mixed $definition): ConsoleCommand
     {
         if ($definition instanceof ConsoleCommand) {
@@ -158,6 +176,9 @@ class PluginCommandDiscovery
         throw new \InvalidArgumentException('Definitions must be ConsoleCommand instances or ConsoleCommand class names.');
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function normalizePluginNamespace(string $pluginKey): string
     {
         $segments = preg_split('/[^a-zA-Z0-9]+/', $pluginKey) ?: [];

@@ -13,22 +13,33 @@ use Zencart\Console\ConsoleOutput;
 class ConfigGetCommand extends ConsoleCommand
 {
     /**
+     * @since ZC v3.0.0
+     *
      * @param null|callable(string): ?array<string, mixed> $configurationProvider
      */
     public function __construct(private $configurationProvider = null)
     {
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getName(): string
     {
         return 'config:get';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getDescription(): string
     {
         return 'Show a single configuration value by key.';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getUsageLines(): array
     {
         return [
@@ -36,6 +47,9 @@ class ConfigGetCommand extends ConsoleCommand
         ];
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function handle(ConsoleInput $input, ConsoleOutput $output): int
     {
         $key = strtoupper(trim((string)$input->getArgument(0, '')));

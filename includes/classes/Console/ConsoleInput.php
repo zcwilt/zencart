@@ -26,6 +26,8 @@ class ConsoleInput
     private array $options = [];
 
     /**
+     * @since ZC v3.0.0
+     *
      * @param string[] $argv
      */
     public function __construct(private array $argv)
@@ -34,17 +36,25 @@ class ConsoleInput
         $this->parse();
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getScriptName(): string
     {
         return $this->argv[0] ?? 'zc_cli.php';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getCommandName(): ?string
     {
         return $this->commandName;
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return string[]
      */
     public function getArguments(): array
@@ -52,12 +62,17 @@ class ConsoleInput
         return $this->arguments;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getArgument(int $index, ?string $default = null): ?string
     {
         return $this->arguments[$index] ?? $default;
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return array<string, mixed>
      */
     public function getOptions(): array
@@ -65,17 +80,25 @@ class ConsoleInput
         return $this->options;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getOption(string $name, mixed $default = null): mixed
     {
         return $this->options[$name] ?? $default;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function hasOption(string $name): bool
     {
         return array_key_exists($name, $this->options);
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return string[]
      */
     public function getRawTokens(): array
@@ -83,16 +106,25 @@ class ConsoleInput
         return $this->rawTokens;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function isHelpRequested(): bool
     {
         return $this->hasOption('help') || $this->hasOption('h');
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function isVerboseRequested(): bool
     {
         return $this->hasOption('verbose') || $this->hasOption('v');
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function parse(): void
     {
         $tokens = $this->rawTokens;
@@ -110,6 +142,8 @@ class ConsoleInput
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @param string[] $tokens
      */
     private function parseTokens(array $tokens): void
@@ -145,6 +179,8 @@ class ConsoleInput
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @param string[] $tokens
      */
     private function parseLongOption(string $token, array $tokens, int &$index): void
@@ -171,6 +207,8 @@ class ConsoleInput
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @param string[] $tokens
      */
     private function parseShortOption(string $token, array $tokens, int &$index): void
@@ -197,6 +235,9 @@ class ConsoleInput
         $this->options[$flags] = true;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function looksLikeOption(string $token): bool
     {
         return $token !== '-' && str_starts_with($token, '-');

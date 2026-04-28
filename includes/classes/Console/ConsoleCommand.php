@@ -8,11 +8,19 @@ namespace Zencart\Console;
 
 abstract class ConsoleCommand
 {
+    /**
+     * @since ZC v3.0.0
+     */
     abstract public function getName(): string;
 
+    /**
+     * @since ZC v3.0.0
+     */
     abstract public function getDescription(): string;
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return string[]
      */
     public function getAliases(): array
@@ -21,6 +29,8 @@ abstract class ConsoleCommand
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return string[]
      */
     public function getUsageLines(): array
@@ -28,5 +38,8 @@ abstract class ConsoleCommand
         return ['php zc_cli.php ' . $this->getName()];
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     abstract public function handle(ConsoleInput $input, ConsoleOutput $output): int;
 }

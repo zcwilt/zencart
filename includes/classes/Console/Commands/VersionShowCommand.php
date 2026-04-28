@@ -13,22 +13,33 @@ use Zencart\Console\ConsoleOutput;
 class VersionShowCommand extends ConsoleCommand
 {
     /**
+     * @since ZC v3.0.0
+     *
      * @param null|callable(): array<string, ?array<string, mixed>> $versionProvider
      */
     public function __construct(private $versionProvider = null)
     {
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getName(): string
     {
         return 'version:show';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getDescription(): string
     {
         return 'Show project and database version information.';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getUsageLines(): array
     {
         return [
@@ -36,6 +47,9 @@ class VersionShowCommand extends ConsoleCommand
         ];
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function handle(ConsoleInput $input, ConsoleOutput $output): int
     {
         $rows = $this->versionProvider !== null ? ($this->versionProvider)() : [];
@@ -51,6 +65,9 @@ class VersionShowCommand extends ConsoleCommand
         return 0;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function formatVersion(?array $version): string
     {
         if ($version === null) {

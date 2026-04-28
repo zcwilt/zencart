@@ -20,6 +20,9 @@ class CommandRegistry
      */
     private array $aliases = [];
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function register(ConsoleCommand $command): void
     {
         $name = $command->getName();
@@ -48,6 +51,9 @@ class CommandRegistry
         }
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function find(string $name): ?ConsoleCommand
     {
         if (isset($this->commands[$name])) {
@@ -62,6 +68,8 @@ class CommandRegistry
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return array<string, ConsoleCommand>
      */
     public function all(): array

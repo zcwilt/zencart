@@ -14,22 +14,33 @@ use Zencart\PluginSupport\PluginStatus;
 class PluginListCommand extends ConsoleCommand
 {
     /**
+     * @since ZC v3.0.0
+     *
      * @param null|callable(): ?array<int|string, array<string, mixed>> $pluginProvider
      */
     public function __construct(private $pluginProvider = null)
     {
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getName(): string
     {
         return 'plugin:list';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getDescription(): string
     {
         return 'List plugins known to plugin manager state.';
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getUsageLines(): array
     {
         return [
@@ -37,6 +48,9 @@ class PluginListCommand extends ConsoleCommand
         ];
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function handle(ConsoleInput $input, ConsoleOutput $output): int
     {
         $rows = $this->pluginProvider !== null ? ($this->pluginProvider)() : null;
@@ -74,6 +88,9 @@ class PluginListCommand extends ConsoleCommand
         return 0;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function formatStatus(int $status): string
     {
         return match ($status) {

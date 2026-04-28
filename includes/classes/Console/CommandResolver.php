@@ -8,10 +8,16 @@ namespace Zencart\Console;
 
 class CommandResolver
 {
+    /**
+     * @since ZC v3.0.0
+     */
     public function __construct(private CommandRegistry $registry)
     {
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function resolve(ConsoleInput $input): ?ConsoleCommand
     {
         $commandName = $input->getCommandName();

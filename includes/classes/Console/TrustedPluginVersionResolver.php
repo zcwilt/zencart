@@ -11,11 +11,16 @@ use Zencart\PluginSupport\PluginStatus;
 
 class TrustedPluginVersionResolver
 {
+    /**
+     * @since ZC v3.0.0
+     */
     public function __construct(private PluginControlRepository $repository)
     {
     }
 
     /**
+     * @since ZC v3.0.0
+     *
      * @return array<string, string>
      */
     public function resolveEnabledPluginVersions(): array

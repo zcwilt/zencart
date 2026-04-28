@@ -19,10 +19,15 @@ class ConsoleKernel
     private bool $booted = false;
 
     /**
+     * @since ZC v3.0.0
+     *
      * @var string[]
      */
     private array $bootWarnings = [];
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function __construct(
         ?CommandRegistry $registry = null,
         ?PluginCommandDiscovery $pluginDiscovery = null,
@@ -37,6 +42,9 @@ class ConsoleKernel
         $this->bootWarnings = $bootWarnings;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function boot(): void
     {
         if ($this->booted) {
@@ -48,6 +56,9 @@ class ConsoleKernel
         $this->booted = true;
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function run(ConsoleInput $input, ConsoleOutput $output): int
     {
         $this->boot();
@@ -77,6 +88,9 @@ class ConsoleKernel
         return $this->executeCommand($command, $input, $output);
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     public function getRegistry(): CommandRegistry
     {
         $this->boot();
@@ -85,6 +99,9 @@ class ConsoleKernel
 
     private ?PluginCommandDiscovery $pluginDiscovery = null;
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function registerCoreCommands(): void
     {
         $this->registry->register(new ListCommand($this->registry));
@@ -94,6 +111,9 @@ class ConsoleKernel
         $this->registry->register(new ConfigGetCommand($this->configurationProvider));
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function registerPluginCommands(): void
     {
         if ($this->pluginDiscovery === null) {
@@ -111,6 +131,9 @@ class ConsoleKernel
         $this->bootWarnings = array_merge($this->bootWarnings, $this->pluginDiscovery->getErrors());
     }
 
+    /**
+     * @since ZC v3.0.0
+     */
     private function executeCommand(ConsoleCommand $command, ConsoleInput $input, ConsoleOutput $output): int
     {
         try {
