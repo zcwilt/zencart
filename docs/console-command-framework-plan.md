@@ -1,21 +1,22 @@
-# Console Command Framework Plan
+# Console Command Framework Status
 
 ## Status
 
-Last updated: 2026-04-23
+Last updated: 2026-04-28
 
 - Core console runtime is implemented and reachable through both `zc_cli.php` and `bin/zencart`.
 - Core framework classes now exist under `includes/classes/Console/`.
-- Built-in `list` and `help` commands are implemented and executable.
+- Built-in `list`, `help`, `plugin:list`, `version:show`, and `config:get` commands are implemented and executable.
 - Convention-based plugin discovery from `zc_plugins/<Plugin>/<Version>/Console/commands.php` is implemented.
 - A proof plugin command exists in the test framework (`zen-test:demo`) and is exercised through the kernel in unit tests.
 - Security hardening is now partially implemented: plugin discovery is restricted to enabled plugins from plugin-control state, command exceptions are wrapped in a top-level kernel boundary, and discovery warnings use plugin-relative paths.
 - Coverage now includes input parsing, kernel routing, built-in help/list behavior, plugin discovery policy, duplicate-name handling, broken plugin definitions, safe exception handling, external-process invocation of `zc_cli.php` and `bin/zencart`, and degraded bootstrap coverage for missing DB config, missing MySQL extension, and DB connection failure.
-- Remaining major work is around broadening command metadata/schema and expanding the command surface beyond the initial business command set.
+- Console methods introduced by this framework are documented with `@since ZC v3.0.0` docblocks.
+- Remaining work is mainly follow-up refinement: richer command metadata/schema, broader built-in command coverage, and final documentation cleanup.
 
 ## Goal
 
-Create a core console-command framework for Zen Cart that:
+This framework provides a core console-command runtime for Zen Cart that:
 
 - provides a stable CLI runtime and command-discovery system
 - supports both core commands and plugin-provided commands
@@ -27,9 +28,9 @@ The framework itself should live in core.
 
 Plugin commands should extend the framework, not provide it.
 
-## Non-Goal
+## Non-Goals
 
-This framework should not depend on third-party console tooling.
+This framework does not depend on third-party console tooling.
 
 That means:
 
@@ -37,13 +38,11 @@ That means:
 - no Laravel Artisan-style dependency
 - no external CLI parsing package as the foundation
 
-The runtime, command registry, discovery layer, input parsing, and output helpers should all be implemented in Zen Cart core.
-
-This is a design constraint, not a temporary preference.
+The runtime, command registry, discovery layer, input parsing, and output helpers are implemented in Zen Cart core.
 
 ## Why Core, Not Plugin
 
-The base command system is infrastructure. It needs to exist before any plugin can participate.
+The base command system is infrastructure. It exists in core before any plugin can participate.
 
 Reasons to keep the framework in core:
 
@@ -52,15 +51,11 @@ Reasons to keep the framework in core:
 - input/output handling and exit codes should be consistent across all commands
 - one plugin should not define the runtime that every other plugin depends on
 
-Plugins should be able to register commands into the core runtime through a documented convention.
+Plugins register commands into the core runtime through a documented convention.
 
-## High-Level Architecture
+## Current Architecture
 
-The first version should be intentionally small and boring.
-
-It should also be fully first-party.
-
-Suggested core pieces:
+Core pieces:
 
 - `bin/zencart` or `zc_cli.php`
   - CLI entrypoint
@@ -78,8 +73,10 @@ Suggested core pieces:
   - stdout/stderr helpers
 - `includes/classes/Console/PluginCommandDiscovery.php`
   - discovers commands from installed plugins
+- `includes/classes/Console/TrustedPluginVersionResolver.php`
+  - resolves enabled plugin/version pairs allowed to expose commands
 
-Current implementation notes:
+Implementation notes:
 
 - the actual entrypoint is `zc_cli.php`, while `bin/zencart` is a thin wrapper that requires it
 - CLI bootstrap is isolated in `includes/application_cli_bootstrap.php`
@@ -88,8 +85,6 @@ Current implementation notes:
 - command definitions currently support `ConsoleCommand` instances or `ConsoleCommand` class names returned from `commands.php`
 
 ## Command Contract
-
-The first command API should be minimal.
 
 Each command should define:
 
@@ -101,11 +96,9 @@ Each command should define:
 
 The return value should be the shell exit code.
 
-Argument parsing and output formatting should stay lightweight and homegrown in version 1.
+Argument parsing and output formatting remain lightweight and first-party.
 
-This plan assumes they remain first-party in later iterations too.
-
-Current implementation notes:
+Implementation notes:
 
 - `ConsoleCommand` currently requires `getName()`, `getDescription()`, and `handle(...)`
 - optional aliases are supported through `getAliases(): array`
@@ -114,58 +107,48 @@ Current implementation notes:
 
 ## Command Discovery
 
-The framework should support two sources of commands:
+The framework supports two sources of commands:
 
 - core commands
 - plugin commands
 
 ### Core Commands
 
-Core commands should live in a known namespace and directory, for example:
+Core commands live in:
 
 - `includes/classes/Console/Commands/`
 
-These should be registered directly by the kernel.
+These are registered directly by the kernel.
 
 ### Plugin Commands
 
-Plugin command discovery should use a convention first, with optional metadata later.
-
-Recommended first convention:
+Plugin command discovery uses this convention:
 
 - `zc_plugins/<Plugin>/<Version>/Console/commands.php`
 
 That file returns an array of command classes or command-definition objects.
 
-This keeps plugin support simple and avoids forcing immediate changes to plugin manifests.
-
-Current implementation notes:
+Implementation notes:
 
 - discovery currently requires `manifest.php` to be present for the plugin version directory before it will attempt to load `Console/commands.php`
 - discovery is now filtered to the enabled plugin/version pairs returned by `TrustedPluginVersionResolver`
 - one broken plugin definition does not abort discovery; discovery collects errors and the kernel surfaces them as warnings on stderr during boot
 
-## Plugin Integration Strategy
-
-Version 1 should not require manifest changes.
-
-Instead:
+## Plugin Integration
 
 - core loads installed plugins
 - discovery checks for `Console/commands.php`
 - any commands found there are registered
 
-Later, if useful, plugin manifests can optionally support fields like:
+Possible future metadata additions, if needed:
 
 - `consoleCommands`
 - `consoleNamespace`
 - `consoleBootstrap`
 
-Those should be phase-2 enhancements, not first-version requirements.
-
 ## Runtime Flow
 
-The expected execution path is:
+Execution path:
 
 1. CLI entrypoint boots Zen Cart in command mode.
 2. Kernel registers built-in commands.
@@ -175,23 +158,22 @@ The expected execution path is:
 6. Command returns an exit code.
 7. The runtime exits with that code.
 
-## Built-In Commands For First Version
-
-The first useful core commands should be:
+## Implemented Commands
 
 - `list`
   - show available commands
 - `help <command>`
   - show command usage/details
-
-Useful follow-up built-ins:
-
 - `plugin:list`
+  - list plugin-manager state available to the CLI runtime
 - `version:show`
+  - show application and database version information
 - `config:get`
-- a safe demo command for framework validation
+  - show a single configuration value by key
+- `zen-test:demo`
+  - proof plugin command in the test framework used to validate plugin command discovery
 
-Current implementation notes:
+Implementation notes:
 
 - `list`
 - `help <command>`
@@ -200,20 +182,35 @@ Current implementation notes:
 - `config:get`
 - plugin proof command: `zen-test:demo` in `not_for_release/testFramework/Support/plugins/zenTestPlugin/v1.0.0/Console/`
 
+## Cron And Automation Use
+
+The CLI runtime is intended for shell execution, including cron jobs and maintenance automation.
+
+Typical invocation patterns:
+
+- `php /path/to/zc_cli.php list`
+- `php /path/to/zc_cli.php config:get STORE_NAME`
+- `/path/to/bin/zencart version:show`
+
+Operational notes:
+
+- cron should invoke the CLI entrypoint directly, not a web URL
+- DB-backed commands require store configuration and a working DB connection
+- command exit codes are suitable for shell scripting and scheduled jobs
+
 ## Error Handling
 
-The runtime should be defensive.
+The runtime is defensive.
 
-Requirements:
+Requirements and current behavior:
 
 - one broken plugin command should not break all console usage
 - duplicate command names should be detected clearly
 - registration failures should be visible in error output
 - command exceptions should produce a non-zero exit code
+- the `list` command should still work even if some plugin commands fail to load, while surfacing those failures clearly
 
-The `list` command should still work even if some plugin commands fail to load, though it should surface those failures clearly.
-
-Current implementation notes:
+Implementation notes:
 
 - the kernel now wraps command execution in a top-level exception boundary and returns exit code `1` for uncaught command failures
 - default exception output is intentionally terse and prompts the operator to re-run with `--verbose`
@@ -238,7 +235,7 @@ Current status:
 - further addressed: process-level CLI coverage now exists for normal `zc_cli.php` and `bin/zencart` invocation, plus degraded paths for missing DB config and for running PHP without the MySQL extension
 - addressed: DB connection failure coverage is now exercised in the intended DDEV runtime where the MySQL connector is present
 
-Recommended follow-up constraints:
+Ongoing constraints:
 
 - keep plugin command discovery restricted to trusted plugin-control state and treat enabled-only discovery as the current policy
 - keep command failures behind a controlled top-level exception boundary with safe default output
@@ -258,10 +255,13 @@ Recommended follow-up constraints:
 9. Completed: replace absolute-path discovery warnings with safer plugin-relative identifiers.
 10. Completed: add unit tests for uninstalled-plugin directories being ignored.
 11. Completed: add unit tests for the chosen disabled-plugin policy.
-12. Completed: add unit tests for broken `Console/commands.php` files producing safe warnings.
-13. Completed: add unit tests for uncaught command exceptions returning controlled non-zero exits without raw traces by default.
-14. Completed: add process-level tests for real CLI bootstrap behavior.
-15. Completed: cover degraded bootstrap behavior for missing DB config, missing MySQL extension, and DB connection failure.
+
+## Follow-Up Work
+
+- add richer command metadata for arguments and options if command surface area grows
+- decide whether command help should eventually expose structured option definitions instead of usage strings alone
+- expand built-in command coverage only where there is a clear operational need
+- fold any remaining implementation notes into permanent developer documentation once the framework shape stabilizes
 
 ## Command Authoring Principles
 
@@ -277,7 +277,7 @@ Commands should be small wrappers over domain logic where possible, not giant pr
 
 ## Testing Strategy
 
-The first framework rollout should include unit coverage for:
+Coverage priorities for the framework are:
 
 - command registration
 - command resolution by name and alias
@@ -305,122 +305,8 @@ Still missing:
 
 - broader feature-level coverage for additional core commands beyond `plugin:list`, `version:show`, and `config:get`
 
-## Phased Rollout
+## Remaining Considerations
 
-### Phase 1
-
-Status: complete
-
-Build the core runtime:
-
-- CLI entrypoint
-- kernel
-- registry
-- resolver
-- input/output wrappers
-- `list` and `help`
-
-### Phase 2
-
-Status: complete for convention-based discovery with enabled-plugin filtering
-
-Add plugin command discovery:
-
-- load installed plugins
-- scan for `Console/commands.php`
-- register plugin commands
-
-Implemented shape:
-
-- resolve an enabled plugin/version allowlist from plugin-control state
-- scan plugin directories directly under `zc_plugins/*/*` only for that trusted allowlist
-- require `manifest.php` to identify valid plugin versions
-- register plugin console namespaces for class-based definitions
-- load `Console/commands.php` and resolve `ConsoleCommand` instances or class names
-
-Remaining gap:
-
-- no broader feature-level command coverage exists yet beyond `plugin:list`, `version:show`, and `config:get`
-
-### Phase 3
-
-Status: complete with initial core business commands
-
-Add one core proof command and one plugin proof command.
-
-This validates:
-
-- end-to-end execution
-- plugin registration
-- collision/error handling
-
-Implemented proofs:
-
-- core proofs: `list`, `help`
-- first core business command: `plugin:list`
-- second core business command: `version:show`
-- third core business command: `config:get`
-- plugin proof: `zen-test:demo`
-
-Remaining gap:
-
-- no fourth core business command exists yet beyond `plugin:list`, `version:show`, and `config:get`
-
-### Phase 4
-
-Status: not started
-
-Consider optional manifest metadata and richer argument/option schemas if the first version proves useful.
-
-### Phase 5
-
-Status: partially complete
-
-Security hardening:
-
-- completed: restrict plugin command discovery to trusted plugin-manager state instead of every plugin directory on disk
-- completed: disabled plugins do not expose console commands
-- completed: add a top-level exception boundary around command execution
-- completed: reduce absolute-path leakage in discovery and boot warnings
-- completed: add focused unit-level negative-path security tests for discovery and execution failures
-- completed: add process-level tests for normal external CLI invocation plus degraded paths for missing MySQL extension, missing DB config, and DB connection failure
-
-## Open Questions
-
-- Should command discovery continue to read directly from plugin directories, or should it be filtered through plugin-manager state only?
-- How much argument parsing should version 1 support before bringing in more structure?
-- Should command registration use only classes, or support lightweight array definitions too?
-
-Question explicitly settled:
-
-- the framework should remain first-party and should not be built on a third-party CLI package
-- both `zc_cli.php` and `bin/zencart` now exist, with `bin/zencart` delegating to `zc_cli.php`
-
-## Recommended First Implementation
-
-The first build target should be:
-
-- `bin/zencart`
-- `zc_cli.php`
-- `ConsoleKernel`
-- `ConsoleCommand`
-- `CommandRegistry`
-- `CommandResolver`
-- `ConsoleInput`
-- `ConsoleOutput`
-- core `list` command
-- core `help` command
-- plugin discovery from `zc_plugins/*/*/Console/commands.php`
-
-That gives Zen Cart a practical, extensible CLI foundation without overcommitting to a large framework up front.
-
-## Current Follow-Up Work
-
-- decide whether command metadata should grow beyond `getUsageLines()` into richer argument/option definitions
-- add a fourth core business command that exercises a different repository or service path
-
-## Recommended Delivery Order
-
-1. Keep the current framework stable: preserve `zc_cli.php`, `bin/zencart`, `list`, `help`, and convention-based plugin discovery while expanding the command set carefully.
-2. Add a fourth core business command that exercises a different repository or service path.
-3. Revisit richer command metadata and optional manifest integration only after the hardened runtime and initial business command set are stable.
+- keep plugin discovery filtered through trusted plugin-manager state rather than treating any on-disk plugin as active
+- decide whether command metadata should grow beyond `getUsageLines()` into richer argument and option definitions
+- prefer adding new built-in commands only where they cover a clear operational or maintenance need
