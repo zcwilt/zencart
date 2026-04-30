@@ -4,9 +4,9 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
 
-use Tests\Support\zcUnitTestCase;
+use Tests\Support\zcTemplateResolverTest;
 
-class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
+class HtmlOutputTemplateAssetFallbackTest extends zcTemplateResolverTest
 {
     private const BASE_THEME_PLUGIN = 'UnitTestHtmlOutputBaseTheme';
     private const CHILD_THEME_PLUGIN = 'UnitTestHtmlOutputChildTheme';
@@ -23,7 +23,9 @@ class HtmlOutputTemplateAssetFallbackTest extends zcUnitTestCase
     {
         parent::setUp();
         require_once DIR_FS_CATALOG . 'includes/classes/TemplateDto.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateSelect.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/db/mysql/query_factory.php';
         require_once DIR_FS_CATALOG . 'includes/functions/html_output.php';
 
         $this->baseThemePluginRoot = DIR_FS_CATALOG . 'zc_plugins/' . self::BASE_THEME_PLUGIN . '/v1.0.0/';
@@ -102,6 +104,13 @@ PHP
         file_put_contents($this->baseImage, 'base');
         file_put_contents($this->baseThemePluginImage, 'base-plugin');
         file_put_contents($this->templateDogfoodLanguageImage, 'lang');
+
+        $this->instantiateQfr([
+            'template_id' => '1',
+            'template_dir' => self::CHILD_TEMPLATE_KEY,
+            'template_language' => 0,
+            'template_settings' => null,
+        ]);
     }
 
     public function tearDown(): void

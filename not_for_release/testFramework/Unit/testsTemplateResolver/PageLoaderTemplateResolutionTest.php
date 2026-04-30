@@ -6,11 +6,11 @@
 
 namespace Tests\Unit\testsTemplateResolver;
 
-use Tests\Support\zcUnitTestCase;
+use Tests\Support\zcTemplateResolverTest;
 use Zencart\FileSystem\FileSystem;
 use Zencart\PageLoader\PageLoader;
 
-class PageLoaderTemplateResolutionTest extends zcUnitTestCase
+class PageLoaderTemplateResolutionTest extends zcTemplateResolverTest
 {
     private const BASE_THEME_PLUGIN = 'UnitTestPageLoaderBaseTheme';
     private const CHILD_THEME_PLUGIN = 'UnitTestPageLoaderChildTheme';
@@ -28,7 +28,9 @@ class PageLoaderTemplateResolutionTest extends zcUnitTestCase
         parent::setUp();
         require_once DIR_FS_CATALOG . 'includes/classes/FileSystem.php';
         require_once DIR_FS_CATALOG . 'includes/classes/TemplateDto.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateSelect.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/db/mysql/query_factory.php';
         require_once DIR_FS_CATALOG . 'includes/classes/traits/Singleton.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/PageLoader.php';
 
@@ -122,6 +124,12 @@ PHP
             '/* overlay */'
         );
         file_put_contents($this->baseThemeCssFixture, '/* base */');
+        $this->instantiateQfr([
+            'template_id' => '1',
+            'template_dir' => self::BASE_THEME_PLUGIN,
+            'template_language' => 0,
+            'template_settings' => null,
+        ]);
     }
 
     public function tearDown(): void

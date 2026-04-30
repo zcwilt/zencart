@@ -6,12 +6,12 @@
 
 namespace Tests\Unit\testsTemplateResolver;
 
-use Tests\Support\zcUnitTestCase;
+use Tests\Support\zcTemplateResolverTest;
 use Zencart\FileSystem\FileSystem;
 use Zencart\ResourceLoaders\SideboxFinder;
 use Zencart\ResourceLoaders\TemplateResolver;
 
-class SideboxFinderTemplateResolutionTest extends zcUnitTestCase
+class SideboxFinderTemplateResolutionTest extends zcTemplateResolverTest
 {
     private string $fixtureRoot;
 
@@ -20,7 +20,9 @@ class SideboxFinderTemplateResolutionTest extends zcUnitTestCase
         parent::setUp();
         require_once DIR_FS_CATALOG . 'includes/classes/FileSystem.php';
         require_once DIR_FS_CATALOG . 'includes/classes/TemplateDto.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateSelect.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/db/mysql/query_factory.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/SideboxFinder.php';
 
         $this->fixtureRoot = sys_get_temp_dir() . '/zencart-sidebox-finder-' . uniqid('', true);
@@ -54,6 +56,13 @@ PHP
         file_put_contents($this->fixtureRoot . '/includes/modules/sideboxes/template_default/base_box.php', "<?php\n");
         file_put_contents($this->fixtureRoot . '/includes/modules/sideboxes/responsive_classic/base_override_box.php', "<?php\n");
         file_put_contents($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/modules/sideboxes/child_theme/child_box.php', "<?php\n");
+
+        $this->instantiateQfr([
+            'template_id' => '1',
+            'template_dir' => 'child_theme',
+            'template_language' => 0,
+            'template_settings' => null,
+        ]);
     }
 
     public function tearDown(): void
