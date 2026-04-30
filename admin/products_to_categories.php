@@ -742,7 +742,7 @@ if (empty($_SESSION['hide_linked_categories'])) {
                     </table>
                     <div class="form-group text-center">
                         <button type="submit" class="btn btn-primary floatButton" title="<?= BUTTON_UPDATE_CATEGORY_LINKS . " - " . $product_to_copy->fields['products_name'] ?>">
-                            <?= BUTTON_UPDATE_CATEGORY_LINKS . '<br><span>' . $product_to_copy->fields['products_model'] . '<br>' . $product_to_copy->fields['products_name'] . '<br>(#' . $products_filter . ')' ?></span>
+                            <?= BUTTON_UPDATE_CATEGORY_LINKS ?><br><span><?= $product_to_copy->fields['products_model'] ?><br><?= $product_to_copy->fields['products_name'] ?><br>(#<?= $products_filter ?>)</span>
                         </button>
                     </div>
                     <?= '</form>' ?>
