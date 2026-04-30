@@ -157,6 +157,30 @@ class TemplateResolver
     /**
      * @since ZC v3.0.0
      */
+    public function isActiveTemplate(string $templateKey): bool
+    {
+        $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return false;
+        }
+        return !empty($record['is_active']);
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
+    public function getTemplateBasePath(string $templateKey): string
+    {
+        $record = $this->getTemplateRecord($templateKey);
+        if ($record === null) {
+            return '';
+        }
+        return $record['template_base_fs'];
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
     private function getTemplateRecords(): array
     {
         $templateDto = TemplateDto::getInstance();
@@ -198,6 +222,7 @@ class TemplateResolver
             }
 
             $templates[$templateKey] = array_merge($templateInfo, [
+                'template_base_fs' => $this->normalizeDirectory(DIR_FS_CATALOG) . '/',
                 'template_key' => $templateKey,
                 'template_path' => $templatePath . '/',
                 'template_catalog_path' => 'includes/templates/' . $templateKey . '/',
@@ -280,6 +305,7 @@ class TemplateResolver
             : $templatePath . 'template_settings.php';
 
         return array_merge($templateInfo, [
+            'template_base_fs' => $this->normalizeDirectory($versionPath . '/catalog/') . '/',
             'template_key' => $templateKey,
             'template_path' => $templatePath,
             'template_catalog_path' => $templateCatalogPath,
