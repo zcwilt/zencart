@@ -218,9 +218,14 @@ class CatalogArraysLanguageLoader extends ArraysLanguageLoader
         //
         $defineListTemplate = [];
         foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
+            if ($templateKey === 'template_default') {
+                continue;
+            }
+
+            $languageMainDir = $this->templateResolver->getTemplateBasePath($templateKey) . DIR_WS_LANGUAGES;
             $defineListTemplate = array_merge(
                 $defineListTemplate,
-                $this->loadArraysFromDirectory(DIR_WS_LANGUAGES, $_SESSION['language'], '/extra_definitions/' . $templateKey)
+                $this->loadArraysFromDirectory($languageMainDir, $_SESSION['language'], '/extra_definitions/' . $templateKey)
             );
         }
 

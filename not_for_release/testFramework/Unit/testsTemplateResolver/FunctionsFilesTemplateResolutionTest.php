@@ -4,9 +4,9 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
 
-use Tests\Support\zcUnitTestCase;
+use Tests\Support\zcTemplateResolverTest;
 
-class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
+class FunctionsFilesTemplateResolutionTest extends zcTemplateResolverTest
 {
     private const CHILD_THEME_PLUGIN = 'UnitTestFunctionsChildTheme';
     private const CHILD_TEMPLATE_KEY = 'functions_child_theme';
@@ -21,7 +21,10 @@ class FunctionsFilesTemplateResolutionTest extends zcUnitTestCase
     public function setUp(): void
     {
         parent::setUp();
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateDto.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateSelect.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/db/mysql/query_factory.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_templates.php';
         require_once DIR_FS_CATALOG . 'includes/functions/functions_files.php';
 
@@ -84,6 +87,13 @@ PHP
                 'version' => 'v1.0.0',
             ],
         ];
+
+        $this->instantiateQfr([
+            'template_id' => '1',
+            'template_dir' => self::CHILD_TEMPLATE_KEY,
+            'template_language' => 0,
+            'template_settings' => null,
+        ]);
     }
 
     public function tearDown(): void

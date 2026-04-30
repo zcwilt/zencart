@@ -6,17 +6,20 @@
 
 namespace Tests\Unit\testsTemplateResolver;
 
-use Tests\Support\zcUnitTestCase;
+use Tests\Support\zcTemplateResolverTest;
 use Zencart\LanguageLoader\BaseLanguageLoader;
 
-class BaseLanguageLoaderTemplateChainTest extends zcUnitTestCase
+class BaseLanguageLoaderTemplateChainTest extends zcTemplateResolverTest
 {
     private string $fixtureRoot;
 
     public function setUp(): void
     {
         parent::setUp();
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateDto.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateSelect.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/db/mysql/query_factory.php';
         require_once DIR_FS_CATALOG . 'includes/classes/FileSystem.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/BaseLanguageLoader.php';
 
@@ -53,6 +56,13 @@ PHP
         file_put_contents($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme/lang.example.php', "<?php\nreturn ['A' => 'plugin child'];\n");
         file_put_contents($this->fixtureRoot . '/includes/languages/template_default/lang.english.php', "<?php\nreturn ['A' => 'default main'];\n");
         file_put_contents($this->fixtureRoot . '/includes/languages/responsive_classic/lang.english.php', "<?php\nreturn ['A' => 'base main'];\n");
+
+        $this->instantiateQfr([
+            'template_id' => '1',
+            'template_dir' => 'child_theme',
+            'template_language' => 0,
+            'template_settings' => null,
+        ]);
     }
 
     public function tearDown(): void

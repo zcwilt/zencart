@@ -6,10 +6,10 @@
 
 namespace Tests\Unit\testsTemplateResolver;
 
-use Tests\Support\zcUnitTestCase;
+use Tests\Support\zcTemplateResolverTest;
 use Zencart\ResourceLoaders\TemplateResolver;
 
-class TemplateResolverTest extends zcUnitTestCase
+class TemplateResolverTest extends zcTemplateResolverTest
 {
     private string $fixtureRoot;
 
@@ -17,7 +17,9 @@ class TemplateResolverTest extends zcUnitTestCase
     {
         parent::setUp();
         require_once DIR_FS_CATALOG . 'includes/classes/TemplateDto.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/TemplateSelect.php';
         require_once DIR_FS_CATALOG . 'includes/classes/ResourceLoaders/TemplateResolver.php';
+        require_once DIR_FS_CATALOG . 'includes/classes/db/mysql/query_factory.php';
         $this->fixtureRoot = sys_get_temp_dir() . '/zencart-template-resolver-' . uniqid('', true);
         mkdir($this->fixtureRoot . '/includes/templates/template_default', 0777, true);
         mkdir($this->fixtureRoot . '/includes/templates/responsive_classic', 0777, true);
@@ -51,6 +53,12 @@ return [
 ];
 PHP
         );
+        $this->instantiateQfr([
+            'template_id' => '1',
+            'template_dir' => 'child_theme',
+            'template_language' => 0,
+            'template_settings' => null,
+        ]);
     }
 
     public function tearDown(): void

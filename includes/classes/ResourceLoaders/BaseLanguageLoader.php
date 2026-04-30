@@ -134,12 +134,16 @@ class BaseLanguageLoader
     /**
      * @since ZC v2.2.1
      */
-    protected function getTemplateFirstLanguageFiles(string $rootPath, string $fileName): array
+    protected function getTemplateFirstLanguageFiles(string $languageDir, string $fileName): array
     {
-        $rootPath = rtrim($rootPath, '/') . '/';
+        $languageDir = rtrim($languageDir, '/') . '/';
         $files = [];
         foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
-            $path = $rootPath . $templateKey . '/' . $fileName;
+            $path = $this->templateResolver->getTemplateBasePath($templateKey) . $languageDir;
+            if ($templateKey !== 'template_default') {
+                $path .= $templateKey . '/';
+            }
+            $path .= $fileName;
             if (is_file($path)) {
                 $files[] = $path;
             }
@@ -178,12 +182,19 @@ class BaseLanguageLoader
     {
         $roots = [];
         $templateRecord = $this->templateResolver->getTemplateRecord($templateKey);
-        if (!empty($templateRecord['is_plugin_template']) && !empty($templateRecord['plugin_key']) && !empty($templateRecord['plugin_version'])) {
+
+        // -----
+        // If the specified template is a plugin and it's active, make sure it's at
+        // the top of the template's "roots" directories.
+        //
+        // @TODO: Rework will be needed for the 'child' template implementation.
+        //
+        if ($this->templateResolver->isPluginTemplate($templateKey) && $this->templateResolver->isActiveTemplate($templateKey)) {
             $roots[] = $this->zcPluginsDir . $templateRecord['plugin_key'] . '/' . $templateRecord['plugin_version'] . '/catalog/includes/languages/';
         }
 
         foreach ($this->pluginList as $plugin) {
-            if (empty($plugin['unique_key']) || empty($plugin['version'])) {
+            if (empty($plugin['unique_key']) || empty($plugin['version']) || $plugin['type'] === 'template') {
                 continue;
             }
             $roots[] = $this->zcPluginsDir . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/languages/';
