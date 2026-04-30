@@ -106,7 +106,8 @@ PHP
         $resolver = new TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
-            $this->fixtureRoot . '/zc_plugins'
+            $this->fixtureRoot . '/zc_plugins',
+            $this->getInstalledPlugins()
         );
 
         return new SideboxFinder(new FileSystem(), $resolver, $this->fixtureRoot);
@@ -125,6 +126,13 @@ PHP
 \$template_screenshot = 'screenshot.png';
 PHP
         );
+    }
+
+    private function getInstalledPlugins(): array
+    {
+        return [
+            ['unique_key' => 'ChildTheme', 'version' => 'v1.0.0'],
+        ];
     }
 
     private function removeDirectory(string $directory): void

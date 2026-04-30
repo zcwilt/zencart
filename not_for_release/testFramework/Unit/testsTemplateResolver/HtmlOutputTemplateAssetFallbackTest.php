@@ -105,12 +105,25 @@ PHP
         file_put_contents($this->baseThemePluginImage, 'base-plugin');
         file_put_contents($this->templateDogfoodLanguageImage, 'lang');
 
+<<<<<<< main-template-vars-override
         $this->instantiateQfr([
             'template_id' => '1',
             'template_dir' => self::CHILD_TEMPLATE_KEY,
             'template_language' => 0,
             'template_settings' => null,
         ]);
+=======
+        $GLOBALS['installedPlugins'] = [
+            [
+                'unique_key' => self::BASE_THEME_PLUGIN,
+                'version' => 'v1.0.0',
+            ],
+            [
+                'unique_key' => self::CHILD_THEME_PLUGIN,
+                'version' => 'v1.0.0',
+            ],
+        ];
+>>>>>>> feature/encapsulated-template-plugin-plan
     }
 
     public function tearDown(): void
@@ -119,6 +132,7 @@ PHP
         @unlink($this->templateDogfoodLanguageImage);
         $this->removeDirectory($this->baseThemePluginRoot);
         $this->removeDirectory($this->pluginRoot);
+        unset($GLOBALS['installedPlugins']);
         parent::tearDown();
     }
 

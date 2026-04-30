@@ -27,11 +27,17 @@ class PageLoader
     /**
      * @since ZC v1.5.8
      */
-    public function init(array $installedPlugins, string $mainPage, FileSystem $fileSystem): void
+    public function init(
+        array $installedPlugins,
+        string $mainPage,
+        FileSystem $fileSystem,
+        ?TemplateResolver $templateResolver = null
+    ): void
     {
         $this->installedPlugins = $installedPlugins;
         $this->mainPage = $mainPage;
         $this->fileSystem = $fileSystem;
+        $this->templateResolver = $templateResolver;
     }
 
     /**

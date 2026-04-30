@@ -9,6 +9,7 @@ namespace Tests\Unit\testsTemplateResolver;
 use Tests\Support\zcTemplateResolverTest;
 use Zencart\FileSystem\FileSystem;
 use Zencart\PageLoader\PageLoader;
+use Zencart\ResourceLoaders\TemplateResolver;
 
 class PageLoaderTemplateResolutionTest extends zcTemplateResolverTest
 {
@@ -143,7 +144,7 @@ PHP
     public function testGetTemplateDirectoryFallsBackToBaseTemplateForChildTheme(): void
     {
         $pageLoader = PageLoader::getInstance();
-        $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem());
+        $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem(), $this->makeTemplateResolver());
 
         $directory = $pageLoader->getTemplateDirectory('html_header.php', self::CHILD_TEMPLATE_KEY, 'index', 'common');
 
@@ -156,7 +157,7 @@ PHP
     public function testGetTemplateDirectoryFindsNamedOverlayBeforeDefaultFallback(): void
     {
         $pageLoader = PageLoader::getInstance();
-        $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem());
+        $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem(), $this->makeTemplateResolver());
 
         $directory = $pageLoader->getTemplateDirectory('tpl_overlay_unit_test.php', DIR_WS_TEMPLATES . self::BASE_TEMPLATE_KEY . '/', 'index', 'common');
 
@@ -169,7 +170,7 @@ PHP
     public function testGetTemplatePartMergesChildBaseAndOverlayAssets(): void
     {
         $pageLoader = PageLoader::getInstance();
-        $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem());
+        $pageLoader->init($this->getInstalledPlugins(), 'index', new FileSystem(), $this->makeTemplateResolver());
 
         $files = $pageLoader->getTemplatePart('includes/templates/' . self::CHILD_TEMPLATE_KEY . '/css', '/^zz_test_/', '.css');
 
@@ -186,6 +187,16 @@ PHP
             ['unique_key' => self::CHILD_THEME_PLUGIN, 'version' => 'v1.0.0'],
             ['unique_key' => self::OVERLAY_PLUGIN, 'version' => 'v1.0.0'],
         ];
+    }
+
+    private function makeTemplateResolver(): TemplateResolver
+    {
+        return new TemplateResolver(
+            DIR_FS_CATALOG,
+            DIR_FS_CATALOG . 'includes/templates',
+            DIR_FS_CATALOG . 'zc_plugins',
+            $this->getInstalledPlugins()
+        );
     }
 
     private function ensureDirectoryExists(string $directory): void

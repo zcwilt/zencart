@@ -9,13 +9,33 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 
 /**
+ * @since ZC v3.0.0
+ */
+function zen_get_template_resolver_with_installed_plugins(
+    ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
+): \Zencart\ResourceLoaders\TemplateResolver {
+    global $installedPlugins;
+
+    if ($resolver !== null) {
+        return $resolver;
+    }
+
+    return new \Zencart\ResourceLoaders\TemplateResolver(
+        null,
+        null,
+        null,
+        $installedPlugins ?? null
+    );
+}
+
+/**
  * Get all template directories found in catalog folder structure
  *
  * @since ZC v1.5.8
  */
 function zen_get_catalog_template_directories(bool $include_template_default = false): array
 {
-    $resolver = new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins();
     return $resolver->getSelectableTemplates((bool)$include_template_default);
 }
 
@@ -29,7 +49,7 @@ function zen_get_template_search_directories(
     ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
 ): array
 {
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $chain = $resolver->getTemplateInheritanceChain($templateKey);
     if ($includeTemplateDefault !== true) {
         $chain = array_values(array_filter($chain, static fn(string $item): bool => $item !== 'template_default'));
@@ -63,7 +83,7 @@ function zen_get_template_inheritance_chain(
     bool $includeTemplateDefault = true,
     ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
 ): array {
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $chain = $resolver->getTemplateInheritanceChain($templateKey);
     if ($includeTemplateDefault !== true) {
         $chain = array_values(array_filter($chain, static fn(string $item): bool => $item !== 'template_default'));
@@ -83,7 +103,7 @@ function zen_get_template_catalog_override_directories(
 ): array {
     global $installedPlugins;
 
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $catalogBasePath = trim($catalogBasePath, '/');
     $directories = [];
 
@@ -118,7 +138,7 @@ function zen_get_template_language_override_directories(
     bool $includeTemplateDefault = true,
     ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
 ): array {
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $languageRootPath = rtrim($languageRootPath, '/') . '/';
     $extraPath = trim($extraPath, '/');
     $directories = [];
@@ -144,7 +164,7 @@ function zen_get_template_first_language_directories(
     bool $includeTemplateDefault = true,
     ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
 ): array {
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $languageRootPath = rtrim($languageRootPath, '/') . '/';
     $directories = [];
 
@@ -162,7 +182,7 @@ function zen_get_template_init_file_path(
     string $templateKey,
     ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
 ): ?string {
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $templatePath = $resolver->getTemplateFilesystemPath($templateKey);
     if ($templatePath === null) {
         return null;
@@ -178,7 +198,7 @@ function zen_get_template_screenshot_web_path(
     string $templateKey,
     ?\Zencart\ResourceLoaders\TemplateResolver $resolver = null
 ): ?string {
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $record = $resolver->getTemplateRecord($templateKey);
     if ($record === null || empty($record['screenshot']) || empty($record['template_web_path'])) {
         return null;
@@ -195,7 +215,7 @@ function zen_resolve_template_key(?\Zencart\ResourceLoaders\TemplateResolver $re
     $templateSelect = new \Zencart\Templates\TemplateSelect();
     $templateKey = $templateSelect->getActiveTemplateDir() ?? '';
 
-    $resolver = $resolver ?? new \Zencart\ResourceLoaders\TemplateResolver();
+    $resolver = zen_get_template_resolver_with_installed_plugins($resolver);
     $record = $resolver->getTemplateRecord($templateKey);
     if ($record === null) {
         return 'template_default';
