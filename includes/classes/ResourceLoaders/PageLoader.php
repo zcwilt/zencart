@@ -34,12 +34,11 @@ class PageLoader
         $this->fileSystem = $fileSystem;
     }
 
-    // -----
-    // This method locates the 'base' module-page directory, either in the
-    // storefront's /includes/modules/pages or in an encapsulated plugin's
-    // /catalog/includes/modules/pages directory.
-    //
     /**
+     * This method locates the 'base' module-page directory, either in the
+     * storefront's /includes/modules/pages or in an encapsulated plugin's
+     * /catalog/includes/modules/pages directory.
+     *
      * @since ZC v1.5.7
      */
     public function findModulePageDirectory(string $context = 'catalog'): bool|string
@@ -326,7 +325,7 @@ class PageLoader
      */
     private function getPluginOverlayDirectories(array $plugin, string $templateDir, ?array $targets = null): array
     {
-        $templatesRoot = 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/templates/';
+        $templatesRoot = 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/templates/default/';
         if (!is_dir(DIR_FS_CATALOG . $templatesRoot)) {
             return [];
         }
