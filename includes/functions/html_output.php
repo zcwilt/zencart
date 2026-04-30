@@ -122,7 +122,16 @@ function zen_resolve_template_fallback_asset_path(string $src, string $template_
         return $src;
     }
 
-    $resolver = new \Zencart\ResourceLoaders\TemplateResolver();
+    global $installedPlugins;
+
+    $resolver = function_exists('zen_get_template_resolver_with_installed_plugins')
+        ? zen_get_template_resolver_with_installed_plugins()
+        : new \Zencart\ResourceLoaders\TemplateResolver(
+            null,
+            null,
+            null,
+            $installedPlugins ?? null
+        );
     $chain = $resolver->getTemplateInheritanceChain($template_dir);
     if ($chain === []) {
         return $src;

@@ -19,21 +19,37 @@ class TemplateResolver
     private string $catalogRoot;
     private string $coreTemplatesPath;
     private string $pluginsRoot;
-    private PluginManager $pluginManager;
+    private ?PluginManager $pluginManager = null;
+    private ?array $installedPlugins = null;
 
-    private static array $templateRecords;
+    private static array $templateRecords = [];
+    private static ?string $loadedContext = null;
 
     /**
      * @since ZC v3.0.0
      */
-    public function __construct(?string $catalogRoot = null, ?string $coreTemplatesPath = null, ?string $pluginsRoot = null)
+    public function __construct(
+        ?string $catalogRoot = null,
+        ?string $coreTemplatesPath = null,
+        ?string $pluginsRoot = null,
+        ?array $installedPlugins = null,
+        ?PluginManager $pluginManager = null
+    )
     {
         $this->catalogRoot = $this->normalizeDirectory($catalogRoot ?? (defined('DIR_FS_CATALOG') ? DIR_FS_CATALOG : dirname(__DIR__, 2)));
         $this->coreTemplatesPath = $this->normalizeDirectory($coreTemplatesPath ?? $this->catalogRoot . '/includes/templates');
         $this->pluginsRoot = $this->normalizeDirectory($pluginsRoot ?? $this->catalogRoot . '/zc_plugins');
+        $this->installedPlugins = $installedPlugins;
+
+        if ($pluginManager !== null) {
+            $this->pluginManager = $pluginManager;
+            return;
+        }
 
         global $db;
-        $this->pluginManager = new PluginManager(new PluginControlRepository($db), new PluginControlVersionRepository($db));
+        if ($this->installedPlugins === null && is_object($db) && method_exists($db, 'Execute')) {
+            $this->pluginManager = new PluginManager(new PluginControlRepository($db), new PluginControlVersionRepository($db));
+        }
     }
 
     /**
@@ -160,15 +176,25 @@ class TemplateResolver
     private function getTemplateRecords(): array
     {
         $templateDto = TemplateDto::getInstance();
-        if (!isset(self::$templateRecords)) {
-            self::$templateRecords = array_merge(
+        $contextKey = $this->getContextCacheKey();
+
+        if (self::$loadedContext !== $contextKey) {
+            foreach (array_keys($templateDto->getAllTemplates()) as $templateKey) {
+                $templateDto->removeTemplate($templateKey);
+            }
+
+            if (!isset(self::$templateRecords[$contextKey])) {
+                self::$templateRecords[$contextKey] = array_merge(
                 $this->loadCoreTemplates(),
                 $this->loadPluginTemplates()
             );
+            }
 
-            foreach (self::$templateRecords as $templateKey => $templateProperties) {
+            foreach (self::$templateRecords[$contextKey] as $templateKey => $templateProperties) {
                 $templateDto->updateTemplate($templateKey, $templateProperties);
             }
+
+            self::$loadedContext = $contextKey;
         }
 
         return $templateDto->getAllTemplates();
@@ -222,7 +248,7 @@ class TemplateResolver
             return $templates;
         }
 
-        $installedPlugins = $this->pluginManager->getInstalledPlugins();
+        $installedPlugins = $this->getInstalledPlugins();
         foreach ($installedPlugins as $unique_key => $plugin_info) {
             $version = $plugin_info['version'];
             $versionPath = $this->pluginsRoot . '/' . $unique_key . '/' . $version;
@@ -243,6 +269,22 @@ class TemplateResolver
             $templates[$templateRecord['template_key']] = $templateRecord;
         }
         return $templates;
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
+    private function getInstalledPlugins(): array
+    {
+        if ($this->installedPlugins !== null) {
+            return $this->normalizeInstalledPlugins($this->installedPlugins);
+        }
+
+        if ($this->pluginManager !== null) {
+            return $this->pluginManager->getInstalledPlugins();
+        }
+
+        return [];
     }
 
     /**
@@ -362,5 +404,43 @@ class TemplateResolver
     private function normalizeDirectory(string $path): string
     {
         return rtrim(str_replace('\\', '/', $path), '/');
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
+    private function getContextCacheKey(): string
+    {
+        return implode('|', [
+            $this->catalogRoot,
+            $this->coreTemplatesPath,
+            $this->pluginsRoot,
+            md5(json_encode($this->normalizeInstalledPlugins($this->installedPlugins ?? [])) ?: '[]'),
+        ]);
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
+    private function normalizeInstalledPlugins(array $installedPlugins): array
+    {
+        $normalized = [];
+        foreach ($installedPlugins as $key => $plugin) {
+            if (!is_array($plugin)) {
+                continue;
+            }
+
+            $uniqueKey = $plugin['unique_key'] ?? (is_string($key) ? $key : null);
+            $version = $plugin['version'] ?? null;
+            if (empty($uniqueKey) || empty($version)) {
+                continue;
+            }
+
+            $plugin['unique_key'] = $uniqueKey;
+            $plugin['version'] = $version;
+            $normalized[$uniqueKey] = $plugin;
+        }
+
+        return $normalized;
     }
 }

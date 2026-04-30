@@ -62,7 +62,8 @@ PHP
         $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
-            $this->fixtureRoot . '/zc_plugins'
+            $this->fixtureRoot . '/zc_plugins',
+            $this->getInstalledPlugins()
         );
         $directories = zen_get_template_search_directories('child_theme', ['templates'], true, $resolver);
 
@@ -78,7 +79,8 @@ PHP
         $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
-            $this->fixtureRoot . '/zc_plugins'
+            $this->fixtureRoot . '/zc_plugins',
+            $this->getInstalledPlugins()
         );
 
         $directories = zen_get_template_language_override_directories(
@@ -102,7 +104,8 @@ PHP
         $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
-            $this->fixtureRoot . '/zc_plugins'
+            $this->fixtureRoot . '/zc_plugins',
+            $this->getInstalledPlugins()
         );
 
         $directories = zen_get_template_first_language_directories(
@@ -124,7 +127,8 @@ PHP
         $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
-            $this->fixtureRoot . '/zc_plugins'
+            $this->fixtureRoot . '/zc_plugins',
+            $this->getInstalledPlugins()
         );
 
         $directories = zen_get_template_catalog_override_directories(
@@ -151,7 +155,8 @@ PHP
         $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
-            $this->fixtureRoot . '/zc_plugins'
+            $this->fixtureRoot . '/zc_plugins',
+            $this->getInstalledPlugins()
         );
 
         $this->assertSame(
@@ -165,7 +170,8 @@ PHP
         $resolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $this->fixtureRoot,
             $this->fixtureRoot . '/includes/templates',
-            $this->fixtureRoot . '/zc_plugins'
+            $this->fixtureRoot . '/zc_plugins',
+            $this->getInstalledPlugins()
         );
 
         $this->assertSame(
@@ -205,6 +211,13 @@ PHP
 \$template_screenshot = 'screenshot.png';
 PHP
         );
+    }
+
+    private function getInstalledPlugins(): array
+    {
+        return [
+            ['unique_key' => 'ChildTheme', 'version' => 'v1.0.0'],
+        ];
     }
 
     private function removeDirectory(string $directory): void

@@ -101,6 +101,17 @@ PHP
         file_put_contents($this->baseImage, 'base');
         file_put_contents($this->baseThemePluginImage, 'base-plugin');
         file_put_contents($this->templateDogfoodLanguageImage, 'lang');
+
+        $GLOBALS['installedPlugins'] = [
+            [
+                'unique_key' => self::BASE_THEME_PLUGIN,
+                'version' => 'v1.0.0',
+            ],
+            [
+                'unique_key' => self::CHILD_THEME_PLUGIN,
+                'version' => 'v1.0.0',
+            ],
+        ];
     }
 
     public function tearDown(): void
@@ -109,6 +120,7 @@ PHP
         @unlink($this->templateDogfoodLanguageImage);
         $this->removeDirectory($this->baseThemePluginRoot);
         $this->removeDirectory($this->pluginRoot);
+        unset($GLOBALS['installedPlugins']);
         parent::tearDown();
     }
 

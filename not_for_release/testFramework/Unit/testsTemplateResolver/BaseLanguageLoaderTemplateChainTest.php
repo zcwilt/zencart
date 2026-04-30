@@ -147,17 +147,22 @@ PHP
 
 class TestableBaseLanguageLoader extends BaseLanguageLoader
 {
+    private const INSTALLED_PLUGINS = [
+        ['unique_key' => 'ChildTheme', 'version' => 'v1.0.0'],
+    ];
+
     public function __construct(string $catalogRoot, string $templateDir)
     {
         if (!defined('DIR_FS_CATALOG')) {
             define('DIR_FS_CATALOG', $catalogRoot . '/');
         }
-        parent::__construct([], 'index', $templateDir, 'english');
+        parent::__construct(self::INSTALLED_PLUGINS, 'index', $templateDir, 'english');
         $this->zcPluginsDir = $catalogRoot . '/zc_plugins/';
         $this->templateResolver = new \Zencart\ResourceLoaders\TemplateResolver(
             $catalogRoot,
             $catalogRoot . '/includes/templates',
-            $catalogRoot . '/zc_plugins'
+            $catalogRoot . '/zc_plugins',
+            self::INSTALLED_PLUGINS
         );
     }
 
