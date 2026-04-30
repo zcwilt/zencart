@@ -87,10 +87,7 @@ trait PluginLocalTestConcerns
 
         if ($db === null) {
             $db = new \queryFactory();
-            if (!defined('USE_PCONNECT')) {
-                define('USE_PCONNECT', 'false');
-            }
-            $db->connect(DB_SERVER, DB_SERVER_USERNAME, DB_SERVER_PASSWORD, DB_DATABASE, USE_PCONNECT, false);
+            $db->connect(DB_SERVER, DB_SERVER_USERNAME, DB_SERVER_PASSWORD, DB_DATABASE, 'unused', false);
         }
 
         require_once ROOTCWD . 'includes/functions/database.php';

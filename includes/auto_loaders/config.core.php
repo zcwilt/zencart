@@ -10,9 +10,6 @@
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-if (!defined('USE_PCONNECT')) {
-    define('USE_PCONNECT', 'false');
-}
 /**
  *
  * require DIR_WS_INCLUDES . 'version.php';
