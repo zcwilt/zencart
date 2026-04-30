@@ -374,10 +374,11 @@ if (!is_writable(DIR_FS_CATALOG_IMAGES)) {
                                 </td>
                             </tr>
                             <tr>
-                                    <td></td>
-                                    <td><input type="button" id="imageView" class="btn btn-info btn-xs" value="<?= $buttonText ?>">
-                                    </td>
-                                    <td colspan="3"></td>
+                                <td></td>
+                                <td>
+                                    <input type="button" id="imageView" class="btn btn-info btn-xs hidden-sm hidden-xs" value="<?= $buttonText ?>">
+                                </td>
+                                <td colspan="3"></td>
                             </tr>
                         </tbody>
                     </table>
