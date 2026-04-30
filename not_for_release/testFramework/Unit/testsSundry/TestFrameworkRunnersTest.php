@@ -11,6 +11,60 @@ use Tests\Services\MigrationsRunner;
 use Tests\Services\SeederRunner;
 use Tests\Services\TestFrameworkRunnerException;
 
+function exec(string $command, array &$output = null, int &$resultCode = null): ?string
+{
+    return TestFrameworkCommandExecutor::run($command, $output, $resultCode);
+}
+
+final class TestFrameworkCommandExecutor
+{
+    public static function run(string $command, array &$output = null, int &$resultCode = null): ?string
+    {
+        $environment = getenv();
+        if (!is_array($environment)) {
+            $environment = [];
+        }
+
+        $process = proc_open(
+            ['bash', '-lc', $command],
+            [
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ],
+            $pipes,
+            null,
+            $environment
+        );
+
+        if (!is_resource($process)) {
+            $output = [];
+            $resultCode = 1;
+
+            return null;
+        }
+
+        $stdout = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+
+        $resultCode = proc_close($process);
+        $combinedOutput = (string)$stdout . (string)$stderr;
+        $trimmedOutput = rtrim($combinedOutput, "\r\n");
+        $output = $trimmedOutput === ''
+            ? []
+            : (preg_split('/\r\n|\n|\r/', $trimmedOutput) ?: []);
+
+        if ($output === []) {
+            return null;
+        }
+
+        $lastLine = end($output);
+        return $lastLine === false ? null : $lastLine;
+    }
+}
+
 class TestFrameworkRunnersTest extends TestCase
 {
     private string $rootPath;

@@ -10,7 +10,9 @@ class TestConfigResolver
     {
         $server ??= $_SERVER;
 
-        return $server['USER'] ?? $server['MY_USER'] ?? getenv('USER') ?: getenv('MY_USER') ?: 'runner';
+        return $server['USER']
+            ?? $server['MY_USER']
+            ?? (getenv('USER') ?: (getenv('MY_USER') ?: 'runner'));
     }
 
     public static function detectUser(?array $server = null): string
