@@ -144,17 +144,17 @@ class PageLoader
     }
 
     /**
-     * Locates a specified file ($templateCode) within a specified directory ($currentTemplate), which
+     * Locates a specified file ($fileName) within a specified directory ($currentTemplateDir), which
      * is normally specified as TEMPLATE_DEFAULT).
      *
      * File location search order; first found is returned:
      *
-     * 1. $currentTemplate / $currentPage
-     * 2. zc_plugins default / $currentPage (first-found, alphanumerically sorted)
-     * 3. template_default / $currentPage
-     * 4. $currentTemplate / $templateDir
-     * 5. zc_plugins default / $templateDir (first-found, alphanumerically sorted)
-     * 6. template_default / $templateDir
+     * 1. $currentTemplateDir / $currentPage, e.g. includes/templates/responsive_classic/popup_image/tpl_main_page.php
+     * 2. zc_plugins default / $currentPage (first-found, alphanumerically sorted), e.g. zc_plugins/k/v2/catalog/includes/templates/default/popup_image/tpl_main_page.php
+     * 3. template_default / $currentPage, e.g. includes/templates/template_default/popup_image/tpl_main_page.php
+     * 4. $currentTemplateDir / $templateSubDir, e.g. includes/templates/responsive_classic/common/tpl_main_page.php
+     * 5. zc_plugins default / $templateSubDir (first-found, alphanumerically sorted), e.g. zc_plugins/k/v2/catalog/includes/templates/default/common/tpl_main_page.php
+     * 6. template_default / $templateSubDir, e.g. includes/templates/template_default/common/tpl_main_page.php
      *
      * For example, assuming that the selected template is 'responsive_classic':
      *
@@ -165,21 +165,21 @@ class PageLoader
      *
      * @since ZC v1.5.8
      */
-    public function getTemplateDirectory(string $templateCode, string $currentTemplate, string $currentPage, string $templateDir): string
+    public function getTemplateDirectory(string $fileName, string $currentTemplateDir, string $currentPage, string $templateSubDir): string
     {
-        $templateCode = str_replace("/", '', $templateCode);
-        foreach ($this->getTemplateSearchDirectories($this->getCurrentTemplateKey($currentTemplate), $currentPage, $templateDir) as $directory) {
-            if ($this->fileSystem->fileExistsInDirectory($directory, $templateCode)) {
+        $fileName = str_replace("/", '', $fileName);
+        foreach ($this->getTemplateSearchDirectories($this->getcurrentTemplateKey($currentTemplateDir), $currentPage, $templateSubDir) as $directory) {
+            if ($this->fileSystem->fileExistsInDirectory($directory, $fileName)) {
                 return rtrim($directory, '/');
             }
         }
-        return DIR_WS_TEMPLATES . 'template_default/' . trim($templateDir, '/');
+        return DIR_WS_TEMPLATES . 'template_default/' . trim($templateSubDir, '/');
     }
 
     /**
      * @since ZC v1.5.7
      */
-    public function getTemplatePluginDir(string $templateCode, string $templateDir, ?string $whichPlugin = ''): bool|string
+    public function getTemplatePluginDir(string $fileName, string $templateDir, ?string $whichPlugin = ''): bool|string
     {
         foreach ($this->installedPlugins as $plugin) {
             if (!empty($whichPlugin) && $plugin['unique_key'] !== $whichPlugin) {
@@ -187,7 +187,7 @@ class PageLoader
             }
 
             foreach ($this->getPluginOverlayDirectories($plugin, $templateDir) as $checkDir) {
-                if ($this->fileSystem->fileExistsInDirectory($checkDir, preg_replace('/\//', '', $templateCode))) {
+                if ($this->fileSystem->fileExistsInDirectory($checkDir, preg_replace('/\//', '', $fileName))) {
                     return $checkDir;
                 }
             }
@@ -221,23 +221,23 @@ class PageLoader
      *
      * File locations' returned in this array/precedence order:
      *
-     * 1. $templateKey directory / $currentPage
-     * 2. zc_plugins default / $currentPage (alphanumerically sorted)
-     * 3. template_default / $currentPage
-     * 4. $templateKey directory / $templateDir
-     * 5. zc_plugins default / $templateDir (alphanumerically sorted)
-     * 6. template_default / $templateDir
+     * 1. $templateKey's directory / $currentPage, e.g. includes/templates/responsive_classic/popup_image/
+     * 2. zc_plugins default / $currentPage (first-found, alphanumerically sorted), e.g. zc_plugins/k/v2/catalog/includes/templates/default/popup_image/
+     * 3. template_default / $currentPage, e.g. includes/templates/template_default/popup_image/
+     * 4. $templateKey's directory / $templateSubDir, e.g. includes/templates/responsive_classic/common/
+     * 5. zc_plugins default / $templateSubDir (first-found, alphanumerically sorted), e.g. zc_plugins/k/v2/catalog/includes/templates/default/common/
+     * 6. template_default / $templateSubDir, e.g. includes/templates/template_default/common/
      *
      * @since ZC v3.0.0
      */
-    private function getTemplateSearchDirectories(string $templateKey, string $currentPage, string $templateDir): array
+    private function getTemplateSearchDirectories(string $templateKey, string $currentPage, string $templateSubDir): array
     {
         // -----
         // If there was a previous request for the same information, return the
         // cached array.
         //
-        if (isset($this->templateSearchDirectories[$templateKey][$currentPage][$templateDir])) {
-            return $this->templateSearchDirectories[$templateKey][$currentPage][$templateDir];
+        if (isset($this->templateSearchDirectories[$templateKey][$currentPage][$templateSubDir])) {
+            return $this->templateSearchDirectories[$templateKey][$currentPage][$templateSubDir];
         }
 
         $directories = [];
@@ -257,16 +257,16 @@ class PageLoader
         foreach ($inheritanceChain as $chainTemplateKey) {
             $directories = array_merge(
                 $directories,
-                $this->getTemplateSubDirectory($chainTemplateKey, $templateDir)
+                $this->getTemplateSubDirectory($chainTemplateKey, $templateSubDir)
             );
         }
         $directories = array_merge(
             $directories,
-            $this->getDefaultTemplateSubDirectories($templateDir)
+            $this->getDefaultTemplateSubDirectories($templateSubDir)
         );
 
         $directories = array_values(array_unique(array_filter($directories)));
-        $this->templateSearchDirectories[$templateKey][$currentPage][$templateDir] = $directories;
+        $this->templateSearchDirectories[$templateKey][$currentPage][$templateSubDir] = $directories;
 
         return $directories;
     }
@@ -282,8 +282,8 @@ class PageLoader
         }
 
         $templateKey = $matches[1];
-        $templateDir = trim($matches[2], '/');
-        return $this->getTemplateSearchDirectories($templateKey, $this->mainPage, $templateDir);
+        $templateSubDir = trim($matches[2], '/');
+        return $this->getTemplateSearchDirectories($templateKey, $this->mainPage, $templateSubDir);
     }
 
     /**
@@ -329,7 +329,7 @@ class PageLoader
     /**
      * @since ZC v3.0.0
      */
-    private function getPluginOverlayDirectories(array $plugin, string $templateDir, ?array $targets = null): array
+    private function getPluginOverlayDirectories(array $plugin, string $templateSubDir, ?array $targets = null): array
     {
         $templatesRoot = 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/templates/default/';
         if (!is_dir(DIR_FS_CATALOG . $templatesRoot)) {
@@ -339,7 +339,7 @@ class PageLoader
         $availableTargets = $targets ?? $this->getPluginTemplateTargets($templatesRoot);
         $directories = [];
         foreach ($availableTargets as $target) {
-            $directory = $templatesRoot . trim($target, '/') . '/' . trim($templateDir, '/') . '/';
+            $directory = $templatesRoot . trim($target, '/') . '/';
             if (is_dir(DIR_FS_CATALOG . $directory)) {
                 $directories[] = $directory;
             }
@@ -381,9 +381,9 @@ class PageLoader
     /**
      * @since ZC v3.0.0
      */
-    private function getCurrentTemplateKey(string $currentTemplate): string
+    private function getCurrentTemplateKey(string $currentTemplateDir): string
     {
-        $normalized = trim($this->normalizeDirectory($currentTemplate), '/');
+        $normalized = trim($this->normalizeDirectory($currentTemplateDir), '/');
         if ($normalized === '' || $normalized === 'template_default') {
             return 'template_default';
         }

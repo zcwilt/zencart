@@ -6,16 +6,18 @@
  */
 namespace Zencart\ResourceLoaders;
 
+use Zencart\FileSystem\FileSystem as FileSystem;
+
 /**
  * @since ZC v1.5.8
  */
 class SideboxFinder
 {
-    private $filesystem;
+    private FileSystem $filesystem;
     private TemplateResolver $templateResolver;
     private string $catalogRoot;
 
-    public function __construct($filesystem, ?TemplateResolver $templateResolver = null, ?string $catalogRoot = null)
+    public function __construct(FileSystem $filesystem, ?TemplateResolver $templateResolver = null, ?string $catalogRoot = null)
     {
         $this->filesystem = $filesystem;
         $this->templateResolver = $templateResolver ?? new TemplateResolver();
@@ -51,10 +53,29 @@ class SideboxFinder
     }
 
     /**
+     * Determine the location of the specified sidebox; the sidebox file-name is present
+     * in $sideboxInfo['layout_box_name'].
+     *
+     * Uses this directory precedence search order (first found is returned):
+     *
+     * 1) The current template's override directory
+     *    a) If the template's a plugin-package: zc_plugins/{plugin-key}/{plugin-version}/catalog/includes/modules/sideboxes/$templateDir.
+     *    b) Otherwise, includes/modules/sideboxes/$templateDir
+     * 2) A non-template-specific plugin directory:
+     *    - zc_plugins/{plugin-key}/{plugin-version}/catalog/includes/modules/sideboxes
+     * 3) The 'base' file system
+     *    - includes/modules/sideboxes
+     *
      * @since ZC v1.5.8
      */
-    public function sideboxPath($sideboxInfo, string $templateDir, bool $withFullPath = false): bool|string
+    public function sideboxPath(array $sideboxInfo, string $templateDir, bool $withFullPath = false): bool|string
     {
+        foreach ($this->getTemplateSpecificSideboxDirectories($templateDir) as $templateSpecificDir) {
+            if (is_file($templateSpecificDir['full_path'] . $sideboxInfo['layout_box_name'])) {
+                return $withFullPath ? $templateSpecificDir['full_path'] : $templateSpecificDir['relative_path'];
+            }
+        }
+
         if (!empty($sideboxInfo['plugin_details'])) {
             $path = $this->sideboxPathInPlugin($sideboxInfo);
             if ($path !== false) {
@@ -62,27 +83,21 @@ class SideboxFinder
             }
         }
 
-        foreach ($this->getTemplateSpecificSideboxDirectories($templateDir) as $templateSpecificDir) {
-            if (file_exists($templateSpecificDir['full_path'] . $sideboxInfo['layout_box_name'])) {
-                return $withFullPath ? $templateSpecificDir['full_path'] : $templateSpecificDir['relative_path'];
-            }
-        }
-
         $baseDir = $this->catalogRoot . DIR_WS_MODULES . 'sideboxes/';
         $rootPath = ($withFullPath) ? $this->catalogRoot . DIR_WS_MODULES : '';
-        if (file_exists($baseDir . $sideboxInfo['layout_box_name'])) {
+        if (is_file($baseDir . $sideboxInfo['layout_box_name'])) {
             return $rootPath . 'sideboxes/';
         }
         return false;
     }
 
     /**
-     * @since ZC v1.5.8
+     * @since ZC v1.5.8 (was public, and unused externally, prior to ZC v3.0.0)
      */
-    public function sideboxPathInPlugin($sideboxInfo): bool|string
+    protected function sideboxPathInPlugin(array $sideboxInfo): bool|string
     {
-        $baseDir = $this->catalogRoot . 'zc_plugins/' . $sideboxInfo['plugin_details'] . '/'  . 'catalog/includes/modules/sideboxes/';
-        if (file_exists($baseDir . $sideboxInfo['layout_box_name'])) {
+        $baseDir = $this->catalogRoot . 'zc_plugins/' . $sideboxInfo['plugin_details'] . '/catalog/includes/modules/sideboxes/';
+        if (is_file($baseDir . $sideboxInfo['layout_box_name'])) {
             return $sideboxInfo['plugin_details'];
         }
         return false;
