@@ -107,22 +107,25 @@
       $processing_message = TEXT_INFO_OPTIMIZING_DATABASE_TABLES;
       $processing_action_url = zen_href_link(FILENAME_STORE_MANAGER, 'action=optimize_db_do');
     break;
+
     case ('optimize_db_do'):
-    // clean out unused space in database
-        $sql = "SHOW TABLE STATUS FROM `" . DB_DATABASE ."`";
+        // clean out unused space in database
+        $sql = "SHOW TABLE STATUS FROM `" . DB_DATABASE . "`";
         $tables = $db->Execute($sql);
-        while(!$tables->EOF) {
-          // skip tables not matching prefixes
-          if (DB_PREFIX != '' && substr($tables->fields['Name'], 0, strlen(DB_PREFIX)) != DB_PREFIX) {
-            $tables->MoveNext();
-            continue;
-          }
-          zen_set_time_limit(600);
-          $db->Execute("OPTIMIZE TABLE `" . $tables->fields['Name'] . "`");
-          $i++;
-          if ($i/7 == (int)($i/7)) sleep(2);
-          $tables->MoveNext();
+        $i = 0;
+        foreach ($tables as $table) {
+            // skip tables not matching prefixes
+            if (DB_PREFIX != '' && !str_starts_with($table['Name'], DB_PREFIX)) {
+                continue;
+            }
+            zen_set_time_limit(600);
+            $db->Execute("OPTIMIZE TABLE `" . $table['Name'] . "`");
+            $i++;
+            if ($i / 7 == (int)($i / 7)) {
+                sleep(2);
+            }
         }
+
         $messageStack->add_session(SUCCESS_DB_OPTIMIZE . ' ' . $i, 'success');
         zen_record_admin_activity('Store Manager executed [optimize database tables]', 'info');
         $action='';
