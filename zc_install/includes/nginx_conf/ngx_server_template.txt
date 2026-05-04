@@ -34,8 +34,24 @@
 ####################################################################################################
 ####################################################################################################
 ####################################################################################################
-	
-	
+	#############################################################################################
+    # RFC 8615 ".well-known" URIs
+    #############################################################################################
+    ## Serve standards-based ".well-known" resources directly from disk.
+    ## Examples include ACME/Let's Encrypt challenges, security.txt, assetlinks.json,
+    ## apple-app-site-association, and change-password.
+    ##
+    ## Important:
+    ## - This block must be before any generic rewrite/catchall locations.
+    ## - If a hosting panel or Certbot provides its own ACME challenge location using
+    ##   alias/root, keep that more specific ACME block and ensure it uses ^~.
+    location ^~ /.well-known/ {
+        allow all;
+        auth_basic off;
+        default_type application/octet-stream;
+        try_files $uri =404;
+    }
+
 	#############################################################################################
 	# Zen Cart PHP Handler
 	#############################################################################################
@@ -318,7 +334,8 @@
 	# Zen Cart Catchall
 	#############################################################################################
 	## Redirect any request not previously explicitly handled to main Zen Cart index.php file
-	location ~ %%slash_folder%% {
+	## Do not rewrite standards-based /.well-known/ URIs, including ACME/Let's Encrypt.
+	location ~ ^(?!/\.well-known(?:/|$))%%slash_folder%% {
 		rewrite ^ %%store_folder%%/index.php? redirect;
 	}
 
