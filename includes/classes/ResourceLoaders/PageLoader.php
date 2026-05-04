@@ -168,7 +168,7 @@ class PageLoader
     public function getTemplateDirectory(string $fileName, string $currentTemplateDir, string $currentPage, string $templateSubDir): string
     {
         $fileName = str_replace("/", '', $fileName);
-        foreach ($this->getTemplateSearchDirectories($this->getcurrentTemplateKey($currentTemplateDir), $currentPage, $templateSubDir) as $directory) {
+        foreach ($this->getTemplateSearchDirectories($this->getCurrentTemplateKey($currentTemplateDir), $currentPage, $templateSubDir) as $directory) {
             if ($this->fileSystem->fileExistsInDirectory($directory, $fileName)) {
                 return rtrim($directory, '/');
             }
