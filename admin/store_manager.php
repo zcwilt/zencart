@@ -318,7 +318,10 @@ if ($processing_message != '') {
                 <table>
                     <tr>
                         <td class="main">
-                            <?= TEXT_INFO_SET_NEXT_ORDER_NUMBER ?><br>
+                            <?php
+                            $result = $db->Execute('SELECT MAX(orders_id) as last_order_id FROM ' . TABLE_ORDERS);
+                            ?>
+                            <?= sprintf(TEXT_INFO_SET_NEXT_ORDER_NUMBER, $result->fields['last_order_id']) ?><br>
                             <?= TEXT_NEW_ORDERS_ID . '&nbsp;' . zen_draw_input_field('new_orders_id', ($new_orders_id ?? '')) ?>
                             <button type="submit" class="btn btn-default btn-sm"><?= IMAGE_UPDATE ?></button>
                         </td>
