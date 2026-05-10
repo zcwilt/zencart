@@ -22,7 +22,7 @@ if ($messageStack->size('order_status') > 0) {
 if (isset($order)) {
 ?>
     <fieldset>
-        <h2 id="orderHistoryDetailedOrder"><?= SUB_HEADING_TITLE . ORDER_HEADING_DIVIDER . sprintf(HEADING_ORDER_NUMBER, $orderID) ?></h2>
+        <h2 id="orderHistoryDetailedOrder"><?= SUB_HEADING_TITLE . ORDER_HEADING_DIVIDER . sprintf(HEADING_ORDER_NUMBER, $_POST['order_id']) ?></h2>
         <div class="forward"><?= HEADING_ORDER_DATE . ' ' . zen_date_long($order->info['date_purchased']) ?></div>
 <?php
     if ($display_products === true) {
