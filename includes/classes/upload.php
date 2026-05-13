@@ -77,6 +77,7 @@ class upload extends base
                 'type'     => $_FILES[$this->file]['type'][$key],
                 'size'     => $_FILES[$this->file]['size'][$key],
                 'tmp_name' => $_FILES[$this->file]['tmp_name'][$key],
+                'error'    => $_FILES[$this->file]['error'][$key] ?? UPLOAD_ERR_OK,
             );
         } else {
             $file = array(
@@ -84,7 +85,14 @@ class upload extends base
                 'type'     => $_FILES[$this->file]['type'],
                 'size'     => $_FILES[$this->file]['size'],
                 'tmp_name' => $_FILES[$this->file]['tmp_name'],
+                'error'    => $_FILES[$this->file]['error'] ?? UPLOAD_ERR_OK,
             );
+        }
+
+        if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+            $this->handleUploadError((int) $file['error']);
+
+            return false;
         }
 
         if (!zen_not_null($file['tmp_name'])) return false;
@@ -120,6 +128,25 @@ class upload extends base
             $this->message_stack(WARNING_NO_FILE_UPLOADED, 'warning');
 
             return false;
+        }
+    }
+
+    /**
+     * @since ZC v3.0.0
+     */
+    protected function handleUploadError(int $errorCode): void
+    {
+        switch ($errorCode) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $this->message_stack(ERROR_FILE_TOO_BIG, 'error');
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $this->message_stack(WARNING_NO_FILE_UPLOADED, 'warning');
+                break;
+            default:
+                $this->message_stack(ERROR_FILE_NOT_SAVED, 'error');
+                break;
         }
     }
 

@@ -47,6 +47,22 @@ $session_started = true;
 if (!isset($_SESSION ['securityToken'])) {
     $_SESSION ['securityToken'] = \bin2hex(\random_bytes(16));
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST) && empty($_FILES) && adminPostExceededMaxSize()) {
+    $_SESSION['messageToStack'][] = [
+        'class' => 'default',
+        'text' => 'Warning: File is larger than allowed sizes. See "Maximum Values" settings.',
+        'type' => 'error',
+    ];
+
+    $redirectTarget = adminPostTooLargeRedirectTarget();
+    if ($redirectTarget !== '') {
+        zen_redirect($redirectTarget);
+    }
+
+    zen_redirect(zen_href_link(FILENAME_DEFAULT, '', 'SSL'));
+}
+
 if ((isset($_GET['action']) || isset($_POST['action']) || isset($_GET['act'], $_GET['method'])) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!zen_request_has_valid_csrf_token()) {
             if (function_exists('ajaxAbort')) {
@@ -59,4 +75,56 @@ if ((isset($_GET['action']) || isset($_POST['action']) || isset($_GET['act'], $_
             }
         zen_redirect(zen_href_link(FILENAME_DEFAULT, '', 'SSL'));
     }
+}
+
+function adminPostExceededMaxSize(): bool
+{
+    $contentLength = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+    if ($contentLength <= 0) {
+        return false;
+    }
+
+    $postMaxSize = adminIniSizeToBytes((string)ini_get('post_max_size'));
+
+    return $postMaxSize > 0 && $contentLength > $postMaxSize;
+}
+
+function adminIniSizeToBytes(string $size): int
+{
+    $size = trim($size);
+    if ($size === '') {
+        return 0;
+    }
+
+    $unit = strtolower(substr($size, -1));
+    $value = (float)$size;
+
+    switch ($unit) {
+        case 'g':
+            $value *= 1024;
+            // no break
+        case 'm':
+            $value *= 1024;
+            // no break
+        case 'k':
+            $value *= 1024;
+    }
+
+    return (int)$value;
+}
+
+function adminPostTooLargeRedirectTarget(): string
+{
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    if ($referer === '') {
+        return '';
+    }
+
+    $refererHost = parse_url($referer, PHP_URL_HOST);
+    $adminHost = parse_url(HTTP_SERVER, PHP_URL_HOST);
+    if ($refererHost === null || $refererHost === false || $refererHost !== $adminHost) {
+        return '';
+    }
+
+    return $referer;
 }
