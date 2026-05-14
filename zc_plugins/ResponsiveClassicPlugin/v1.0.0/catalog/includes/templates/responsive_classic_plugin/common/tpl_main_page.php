@@ -96,6 +96,10 @@ $body_id = ($this_is_home_page) ? 'indexHome' : str_replace('_', '', $_GET['main
 $zco_notifier->notify('NOTIFY_PAGE_BODY_BEGIN', $current_page);
 ?>
 
+<div style="position: fixed; top: 0.75rem; right: 0.75rem; z-index: 9999; padding: 0.4rem 0.7rem; border-radius: 999px; background: rgba(24, 80, 152, 0.92); color: #fff; font: 600 12px/1 Arial, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);">
+  ResponsiveClassicPlugin Active
+</div>
+
 <?php
  if ( $detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile' ) {
   echo '<div id="page">';
