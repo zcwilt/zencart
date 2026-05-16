@@ -155,9 +155,16 @@ class PluginManagerController extends BaseController
             if ($this->isSelectableTemplate($unique_key, $version)) {
                 $plugin_template_key = $this->getSelectableTemplateKey($unique_key, $version);
                 if ($plugin_template_key !== null) {
-                    $templateResolver = new \Zencart\ResourceLoaders\TemplateResolver();
-                    $template_record = $templateResolver->getTemplateRecord($plugin_template_key);
-                    if ($template_record !== null && !empty($template_record['is_active'])) {
+                    $templateSelect = new \Zencart\Templates\TemplateSelect();
+                    $isAssignedTemplate = false;
+                    foreach ($templateSelect->getAllActiveTemplates() as $selectedTemplate) {
+                        if (($selectedTemplate['template_dir'] ?? null) === $plugin_template_key) {
+                            $isAssignedTemplate = true;
+                            break;
+                        }
+                    }
+
+                    if ($isAssignedTemplate) {
                         $btn_type = 'warning';
                         $this->setBoxContent(
                             sprintf(WARNING_TEMPLATE_IS_ACTIVE, zen_href_link(FILENAME_TEMPLATE_SELECT), BOX_TOOLS_TEMPLATE_SELECT)

@@ -65,7 +65,7 @@ if (SHOW_CATEGORIES_SEPARATOR_LINK === '1') {
 }
 if (SHOW_CATEGORIES_BOX_SPECIALS === 'true') {
     $show_this = $db->Execute("SELECT products_id FROM " . TABLE_SPECIALS . " WHERE status= 1 limit 1");
-    if ($show_this->EOF) {
+    if (!$show_this->EOF) {
         $content .= '<li><a class="category-links" href="' . zen_href_link(FILENAME_SPECIALS) . '">' . CATEGORIES_BOX_HEADING_SPECIALS . '</a></li>' . "\n";
     }
 }
@@ -94,4 +94,3 @@ if (SHOW_CATEGORIES_BOX_PRODUCTS_ALL === 'true') {
     $content .= '<li><a class="category-links" href="' . zen_href_link(FILENAME_PRODUCTS_ALL) . '">' . CATEGORIES_BOX_HEADING_PRODUCTS_ALL . '</a></li>' . "\n";
 }
 $content .= '</ul></div>';
-
