@@ -56,6 +56,8 @@ PHP
         file_put_contents($this->fixtureRoot . '/includes/modules/sideboxes/template_default/base_box.php', "<?php\n");
         file_put_contents($this->fixtureRoot . '/includes/modules/sideboxes/responsive_classic/base_override_box.php', "<?php\n");
         file_put_contents($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/modules/sideboxes/child_theme/child_box.php', "<?php\n");
+        file_put_contents($this->fixtureRoot . '/includes/modules/sideboxes/responsive_classic/shared_box.php', "<?php\n");
+        file_put_contents($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/modules/sideboxes/child_theme/shared_box.php', "<?php\n");
 
         $this->instantiateQfr([
             'template_id' => '1',
@@ -99,6 +101,18 @@ PHP
         $path = $finder->sideboxPath(['layout_box_name' => 'child_box.php', 'plugin_details' => 'ChildTheme/v1.0.0'], 'child_theme', true);
 
         $this->assertSame($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/modules/sideboxes/child_theme/', $path);
+    }
+
+    public function testSideboxPathPrefersChildTemplateOverrideOverInheritedParent(): void
+    {
+        $finder = $this->makeFinder();
+
+        $path = $finder->sideboxPath(['layout_box_name' => 'shared_box.php', 'plugin_details' => 'ChildTheme/v1.0.0'], 'child_theme', true);
+
+        $this->assertSame(
+            $this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/modules/sideboxes/child_theme/',
+            $path
+        );
     }
 
     private function makeFinder(): SideboxFinder
