@@ -78,8 +78,10 @@ class CatalogArraysLanguageLoader extends ArraysLanguageLoader
         // directory, those overwrite any definitions previously loaded.
         //
         foreach ($this->getTemplateInheritanceChainForLookup(true) as $templateKey) {
-            $definesListTemplate = $this->loadCurrentPageExtraFilesFromDir(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . $templateKey);
-            $definesList = array_merge($definesList, $definesListTemplate);
+            foreach ($this->getTemplateLanguageOverrideDirectories(DIR_WS_LANGUAGES, $_SESSION['language'], $templateKey) as $templateDirectory) {
+                $definesListTemplate = $this->loadCurrentPageExtraFilesFromDir($templateDirectory);
+                $definesList = array_merge($definesList, $definesListTemplate);
+            }
         }
 
         // -----

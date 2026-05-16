@@ -43,7 +43,7 @@ class SideboxFinder
             $sideboxes[$file] = '';
         }
 
-        foreach ($this->getTemplateSpecificSideboxDirectories($templateDir) as $templateSpecificDir) {
+        foreach ($this->getTemplateSpecificSideboxDirectories($templateDir, true) as $templateSpecificDir) {
             $files = $this->filesystem->listFilesFromDirectoryAlphaSorted($templateSpecificDir['full_path']);
             foreach ($files as $file) {
                 $sideboxes[$file] = $templateSpecificDir['plugin_details'];
@@ -106,7 +106,7 @@ class SideboxFinder
     /**
      * @since ZC v3.0.0
      */
-    protected function getTemplateSpecificSideboxDirectories(string $templateDir): array
+    protected function getTemplateSpecificSideboxDirectories(string $templateDir, bool $reverse = false): array
     {
         $directories = [];
         $chain = $this->templateResolver->getTemplateInheritanceChain($templateDir);
@@ -114,7 +114,11 @@ class SideboxFinder
             $chain = [$templateDir];
         }
 
-        foreach (array_reverse($chain) as $templateKey) {
+        if ($reverse) {
+            $chain = array_reverse($chain);
+        }
+
+        foreach ($chain as $templateKey) {
             $record = $this->templateResolver->getTemplateRecord($templateKey);
             if ($record === null) {
                 continue;
