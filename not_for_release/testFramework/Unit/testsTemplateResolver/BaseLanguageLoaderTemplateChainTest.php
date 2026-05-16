@@ -25,15 +25,30 @@ class BaseLanguageLoaderTemplateChainTest extends zcTemplateResolverTest
 
         $this->fixtureRoot = sys_get_temp_dir() . '/zencart-language-loader-' . uniqid('', true);
         mkdir($this->fixtureRoot . '/includes/templates/template_default', 0777, true);
-        mkdir($this->fixtureRoot . '/includes/templates/responsive_classic', 0777, true);
+        mkdir($this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/templates/base_theme', 0777, true);
         mkdir($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/templates/child_theme', 0777, true);
         mkdir($this->fixtureRoot . '/includes/languages/english/template_default', 0777, true);
-        mkdir($this->fixtureRoot . '/includes/languages/english/responsive_classic', 0777, true);
+        mkdir($this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/languages/base_theme', 0777, true);
+        mkdir($this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/languages/english/base_theme', 0777, true);
         mkdir($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme', 0777, true);
-        mkdir($this->fixtureRoot . '/includes/languages/responsive_classic', 0777, true);
         $this->writeTemplateInfo($this->fixtureRoot . '/includes/templates/template_default/template_info.php', 'Template Default');
-        $this->writeTemplateInfo($this->fixtureRoot . '/includes/templates/responsive_classic/template_info.php', 'Responsive Classic');
+        $this->writeTemplateInfo($this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/templates/base_theme/template_info.php', 'Base Theme');
         $this->writeTemplateInfo($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/templates/child_theme/template_info.php', 'Child Theme');
+        file_put_contents(
+            $this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/manifest.php',
+            <<<'PHP'
+<?php
+return [
+    'pluginVersion' => 'v1.0.0',
+    'pluginName' => 'Base Theme',
+    'template' => [
+        'key' => 'base_theme',
+        'baseTemplate' => 'template_default',
+        'infoFile' => 'catalog/includes/templates/base_theme/template_info.php',
+    ],
+];
+PHP
+        );
         file_put_contents(
             $this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/manifest.php',
             <<<'PHP'
@@ -43,7 +58,7 @@ return [
     'pluginName' => 'Child Theme',
     'template' => [
         'key' => 'child_theme',
-        'baseTemplate' => 'responsive_classic',
+        'baseTemplate' => 'base_theme',
         'infoFile' => 'catalog/includes/templates/child_theme/template_info.php',
     ],
 ];
@@ -51,10 +66,10 @@ PHP
         );
 
         file_put_contents($this->fixtureRoot . '/includes/languages/english/template_default/lang.example.php', "<?php\nreturn ['A' => 'default'];\n");
-        file_put_contents($this->fixtureRoot . '/includes/languages/english/responsive_classic/lang.example.php', "<?php\nreturn ['A' => 'base'];\n");
+        file_put_contents($this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/languages/english/base_theme/lang.example.php', "<?php\nreturn ['A' => 'plugin base'];\n");
         file_put_contents($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme/lang.example.php', "<?php\nreturn ['A' => 'plugin child'];\n");
         file_put_contents($this->fixtureRoot . '/includes/languages/lang.english.php', "<?php\nreturn ['A' => 'default main'];\n");
-        file_put_contents($this->fixtureRoot . '/includes/languages/responsive_classic/lang.english.php', "<?php\nreturn ['A' => 'base main'];\n");
+        file_put_contents($this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/languages/base_theme/lang.english.php', "<?php\nreturn ['A' => 'plugin base main'];\n");
 
         $this->instantiateQfr([
             'template_id' => '1',
@@ -70,7 +85,7 @@ PHP
         parent::tearDown();
     }
 
-    public function testFindTemplateLanguageOverrideFileFallsBackThroughInheritance(): void
+    public function testChildPluginTemplateResolvesItsOwnLanguageOverrideFile(): void
     {
         $loader = new TestableBaseLanguageLoader($this->fixtureRoot, 'child_theme');
 
@@ -83,7 +98,7 @@ PHP
         $this->assertSame($this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme/lang.example.php', $file);
     }
 
-    public function testTemplateLanguageOverrideFilesLoadFromBaseToChild(): void
+    public function testChildPluginTemplateLoadsParentPluginLanguageOverridesInInheritanceOrder(): void
     {
         $loader = new TestableBaseLanguageLoader($this->fixtureRoot, 'child_theme');
 
@@ -95,12 +110,12 @@ PHP
 
         $this->assertSame([
             $this->fixtureRoot . '/includes/languages/english/template_default/lang.example.php',
-            $this->fixtureRoot . '/includes/languages/english/responsive_classic/lang.example.php',
+            $this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/languages/english/base_theme/lang.example.php',
             $this->fixtureRoot . '/zc_plugins/ChildTheme/v1.0.0/catalog/includes/languages/english/child_theme/lang.example.php',
         ], $files);
     }
 
-    public function testTemplateFirstLanguageFilesLoadFromBaseToChild(): void
+    public function testChildPluginTemplateLoadsParentPluginRootLanguageFiles(): void
     {
         $loader = new TestableBaseLanguageLoader($this->fixtureRoot, 'child_theme');
 
@@ -111,7 +126,7 @@ PHP
 
         $this->assertSame([
             $this->fixtureRoot . '/includes/languages/lang.english.php',
-            $this->fixtureRoot . '/includes/languages/responsive_classic/lang.english.php',
+            $this->fixtureRoot . '/zc_plugins/BaseTheme/v1.0.0/catalog/includes/languages/base_theme/lang.english.php',
         ], $files);
     }
 
@@ -157,7 +172,8 @@ PHP
 class TestableBaseLanguageLoader extends BaseLanguageLoader
 {
     private const INSTALLED_PLUGINS = [
-        ['unique_key' => 'ChildTheme', 'version' => 'v1.0.0'],
+        ['unique_key' => 'BaseTheme', 'version' => 'v1.0.0', 'type' => 'template'],
+        ['unique_key' => 'ChildTheme', 'version' => 'v1.0.0', 'type' => 'template'],
     ];
 
     public function __construct(string $catalogRoot, string $templateDir)
