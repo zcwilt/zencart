@@ -176,7 +176,7 @@ class BaseLanguageLoader
     }
 
     /**
-     * @since ZC v2.2.1
+     * @since ZC v3.0.0
      */
     protected function getTemplateLanguageOverrideDirectories(
         string $rootPath,

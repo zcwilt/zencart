@@ -53,6 +53,37 @@ class TemplateSelectTest extends zcInProcessFeatureTestCaseAdmin
         );
     }
 
+    public function testDetailsPanelRendersMissingTemplateRecordWithoutSettingsWarning(): void
+    {
+        $this->runCustomSeeder('StoreWizardSeeder');
+
+        $this->submitAdminLogin([
+            'admin_name' => 'Admin',
+            'admin_pass' => 'password',
+        ])->assertOk()
+            ->assertSee('Admin Home');
+
+        $db = $this->bootstrapLegacyDbConnection();
+        $db->Execute("DELETE FROM " . TABLE_TEMPLATE_SELECT);
+        $db->Execute(
+            "INSERT INTO " . TABLE_TEMPLATE_SELECT . "
+                (template_dir, template_language)
+             VALUES
+                ('template_default', 0)"
+        );
+        $db->Execute(
+            "INSERT INTO " . TABLE_TEMPLATE_SELECT . "
+                (template_dir, template_language)
+             VALUES
+                ('missing_template_for_test', 999)"
+        );
+        $templateId = (int)$db->insert_ID();
+
+        $this->visitAdminCommand('template_select&tID=' . $templateId)
+            ->assertOk()
+            ->assertSee('MISSING DIRECTORY: missing_template_for_test');
+    }
+
     private function bootstrapLegacyDbConnection(): \queryFactory
     {
         if (!class_exists('queryFactory')) {
