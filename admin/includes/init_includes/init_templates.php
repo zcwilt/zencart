@@ -13,7 +13,7 @@ use Zencart\ResourceLoaders\TemplateResolver;
 use Zencart\Templates\TemplateSelect;
 
 // Set theme related directories
-if (!empty($template_dir)) {
+if (empty($template_dir)) {
     $templateSelect = new TemplateSelect();
     $template_dir = $templateSelect->getActiveTemplateDir();
 }

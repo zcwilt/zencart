@@ -184,12 +184,10 @@ class BaseLanguageLoader
         $templateRecord = $this->templateResolver->getTemplateRecord($templateKey);
 
         // -----
-        // If the specified template is a plugin and it's active, make sure it's at
-        // the top of the template's "roots" directories.
+        // If the specified template is a plugin, include its language root so
+        // template inheritance can traverse parent/child plugin templates.
         //
-        // @TODO: Rework will be needed for the 'child' template implementation.
-        //
-        if ($this->templateResolver->isPluginTemplate($templateKey) && $this->templateResolver->isActiveTemplate($templateKey)) {
+        if ($this->templateResolver->isPluginTemplate($templateKey) && $templateRecord !== null) {
             $roots[] = $this->zcPluginsDir . $templateRecord['plugin_key'] . '/' . $templateRecord['plugin_version'] . '/catalog/includes/languages/';
         }
 

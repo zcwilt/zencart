@@ -13,7 +13,6 @@ class AdminInitTemplatesTest extends zcUnitTestCase
     protected $runTestInSeparateProcess = true;
     protected $preserveGlobalState = false;
 
-    private string $fixtureRoot;
     private string $repoRoot;
 
     public function setUp(): void
@@ -28,51 +27,22 @@ class AdminInitTemplatesTest extends zcUnitTestCase
         require_once $this->repoRoot . 'includes/classes/TemplateDto.php';
         require_once $this->repoRoot . 'includes/classes/TemplateSelect.php';
         require_once $this->repoRoot . 'includes/classes/ResourceLoaders/TemplateResolver.php';
-
-        $this->fixtureRoot = sys_get_temp_dir() . '/zencart-admin-init-templates-' . uniqid('', true);
-        mkdir($this->fixtureRoot . '/includes/templates/template_default', 0777, true);
-        mkdir($this->fixtureRoot . '/includes/templates/admin_template_test', 0777, true);
-        mkdir($this->fixtureRoot . '/includes/classes', 0777, true);
-
-        $this->writeTemplateInfo(
-            $this->fixtureRoot . '/includes/templates/template_default/template_info.php',
-            'Template Default'
-        );
-        $this->writeTemplateInfo(
-            $this->fixtureRoot . '/includes/templates/admin_template_test/template_info.php',
-            'Admin Template Test'
-        );
-
-        file_put_contents(
-            $this->fixtureRoot . '/includes/classes/template_func.php',
-            <<<'PHP'
-<?php
-class template_func
-{
-    public function __construct(public string $directory)
-    {
-    }
-}
-PHP
-        );
-    }
-
-    public function tearDown(): void
-    {
-        $this->removeDirectory($this->fixtureRoot);
-        parent::tearDown();
     }
 
     public function testAdminInitTemplatesLoadsActiveTemplateWhenTemplateDirStartsEmpty(): void
     {
-        define('IS_ADMIN_FLAG', true);
-        define('DIR_FS_CATALOG', $this->fixtureRoot . '/');
-        define('DIR_WS_CLASSES', 'includes/classes/');
-        define('TABLE_TEMPLATE_SELECT', 'template_select');
-        define('CHARSET', 'utf-8');
-        define('HEADER_TITLE_TOP', 'Admin Home');
-        define('TEXT_ADMIN_TAB_PREFIX', 'Admin');
-        define('STORE_NAME', 'Zen Cart');
+        if (!defined('CHARSET')) {
+            define('CHARSET', 'utf-8');
+        }
+        if (!defined('HEADER_TITLE_TOP')) {
+            define('HEADER_TITLE_TOP', 'Admin Home');
+        }
+        if (!defined('TEXT_ADMIN_TAB_PREFIX')) {
+            define('TEXT_ADMIN_TAB_PREFIX', 'Admin');
+        }
+        if (!defined('STORE_NAME')) {
+            define('STORE_NAME', 'Zen Cart');
+        }
 
         $_SESSION['languages_id'] = 0;
         $_GET = [];
@@ -85,7 +55,7 @@ PHP
                 if (stripos($sql, 'FROM ' . TABLE_TEMPLATE_SELECT) !== false) {
                     return $this->makeQueryResult([[
                         'template_id' => 1,
-                        'template_dir' => 'admin_template_test',
+                        'template_dir' => 'responsive_classic',
                         'template_language' => 0,
                         'template_settings' => null,
                     ]]);
@@ -105,26 +75,11 @@ PHP
         include $this->repoRoot . 'admin/includes/init_includes/init_templates.php';
 
         $this->assertSame(
-            'admin_template_test',
+            'responsive_classic',
             $template_dir,
             'Expected admin init_templates to resolve the active template when $template_dir starts empty.'
         );
-        $this->assertSame('includes/templates/admin_template_test/', DIR_WS_TEMPLATE);
-    }
-
-    private function writeTemplateInfo(string $path, string $templateName): void
-    {
-        file_put_contents(
-            $path,
-            <<<PHP
-<?php
-\$template_name = '{$templateName}';
-\$template_version = '1.0.0';
-\$template_author = 'Zen Cart';
-\$template_description = '{$templateName} description';
-\$template_screenshot = 'screenshot.png';
-PHP
-        );
+        $this->assertSame('includes/templates/responsive_classic/', DIR_WS_TEMPLATE);
     }
 
     private function makeQueryResult(array $rows): \queryFactoryResult
@@ -137,28 +92,5 @@ PHP
         $result->EOF = ($rows === []);
 
         return $result;
-    }
-
-    private function removeDirectory(string $directory): void
-    {
-        if (!is_dir($directory)) {
-            return;
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($iterator as $item) {
-            if ($item->isDir()) {
-                rmdir($item->getPathname());
-                continue;
-            }
-
-            unlink($item->getPathname());
-        }
-
-        rmdir($directory);
     }
 }
