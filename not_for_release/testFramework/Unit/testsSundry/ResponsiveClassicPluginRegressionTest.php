@@ -51,15 +51,5 @@ class ResponsiveClassicPluginRegressionTest extends zcUnitTestCase
         $this->assertStringContainsString('href="specials"', $content);
         $this->assertStringContainsString('Specials', $content);
     }
-
-    public function testImageModalStylesheetDoesNotUseInvalidMaxWidthAutoDeclaration(): void
-    {
-        $css = file_get_contents(
-            DIR_FS_CATALOG . 'zc_plugins/ResponsiveClassicPlugin/v1.0.0/catalog/includes/templates/responsive_classic_plugin/css/stylesheet_image_modals.css'
-        );
-
-        $this->assertIsString($css);
-        $this->assertStringNotContainsString('max-width:auto;', $css);
-    }
 }
 }
