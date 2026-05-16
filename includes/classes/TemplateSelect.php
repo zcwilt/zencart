@@ -59,6 +59,17 @@ class TemplateSelect
     }
 
     /**
+     * Returns the currently-selected template for the specified language,
+     * falling back to the default if no language-specific template is set.
+     *
+     * @since ZC v3.0.0
+     */
+    public function getTemplateDirForLanguage(string|int $language_id): string
+    {
+        return $this->activeTemplates[$language_id]['template_dir'] ?? $this->activeTemplates['0']['template_dir'];
+    }
+
+    /**
      * @since ZC v3.0.0
      */
     public function getActiveTemplateSettings(): ?string

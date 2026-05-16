@@ -231,7 +231,7 @@ switch ($action) {
         $contents[] = [
             'text' =>
                 zen_draw_label(TEXT_INFO_TEMPLATE_NAME, 'ln', 'class="control-label"') .
-                zen_draw_pull_down_menu('ln', $template_array, $templateSelect->getActiveTemplateDir(), 'class="form-control" id="ln"')
+                zen_draw_pull_down_menu('ln', $template_array, $templateSelect->getTemplateDirForLanguage($tInfo->template_language), 'class="form-control" id="ln"')
         ];
         $contents[] = [
             'align' => 'text-center',
