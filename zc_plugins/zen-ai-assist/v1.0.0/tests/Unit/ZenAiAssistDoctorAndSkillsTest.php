@@ -27,9 +27,9 @@ class ZenAiAssistDoctorAndSkillsTest extends zcUnitTestCase
             $this->writeFile($pluginRoot . 'manifest.php', "<?php\nreturn ['pluginVersion' => 'v1.0.0', 'pluginName' => 'Example', 'pluginDescription' => 'Example plugin', 'pluginAuthor' => 'Tester', 'pluginId' => 0, 'zcVersions' => []];\n");
             $this->writeFile($pluginRoot . 'filenames.php', "<?php\ndefine('FILENAME_EXAMPLE', 'example');\n");
             $this->writeFile($pluginRoot . 'Installer/ScriptedInstaller.php', "<?php\nclass ScriptedInstaller { public function validateInstall() {} public function executeInstall() { zen_register_admin_page('toolsExample', 'BOX_TOOLS_EXAMPLE', 'FILENAME_EXAMPLE', '', 'tools', 'Y', 20); } public function executeUninstall() {} }\n");
-            $this->writeFile($pluginRoot . 'Installer/languages/english/main.php', "<?php\nreturn [];\n");
+            $this->writeFile($pluginRoot . 'Installer/languages/english/main.php', "<?php\ndefine('ERROR_EXAMPLE_INSTALL', 'Example install error.');\n");
             $this->writeFile($pluginRoot . 'catalog/includes/modules/pages/example/header_php.php', "<?php\n");
-            $this->writeFile($pluginRoot . 'catalog/includes/languages/english/lang.example.php', "<?php\nreturn [];\n");
+            $this->writeFile($pluginRoot . 'catalog/includes/languages/english/lang.example.php', "<?php\nreturn ['HEADING_TITLE' => 'Example', 'TEXT_MAIN' => 'Example'];\n");
             $this->writeFile($pluginRoot . 'catalog/includes/templates/template_default/tpl_example.php', "<?php\n");
             $this->writeFile($pluginRoot . 'admin/example.php', "<?php\n");
             $this->writeFile($pluginRoot . 'admin/includes/languages/english/lang.example.php', "<?php\nreturn ['HEADING_TITLE' => 'Example'];\n");
@@ -458,7 +458,9 @@ JSON
             unlink($pluginRoot . 'catalog/includes/classes/observers/auto_ExampleObserver.php');
             $this->writeFile($pluginRoot . 'catalog/includes/classes/observers/ExampleObserver.php', "<?php\nclass ExampleObserver {}\n");
             $this->writeFile($pluginRoot . 'admin/includes/languages/english/extra_definitions/lang.example_menu.php', '');
+            $this->writeFile($pluginRoot . 'admin/includes/languages/english/lang.example.php', "<?php\nreturn [];\n");
             $this->writeFile($pluginRoot . 'catalog/includes/languages/english/lang.example.php', '');
+            $this->writeFile($pluginRoot . 'Installer/languages/english/main.php', "<?php\nreturn [];\n");
 
             $inspector = new \ZenAiAssistRuntimeInspector($projectRoot, $pluginRoot);
             $structure = $inspector->inspectPluginStructure($pluginRoot);
@@ -469,6 +471,18 @@ JSON
             );
             $this->assertContains(
                 'Admin page `example` has a menu-definition file that does not appear to define an encapsulated admin menu label.',
+                $structure['findings']
+            );
+            $this->assertContains(
+                'Admin page `example` language file does not define any language keys.',
+                $structure['findings']
+            );
+            $this->assertContains(
+                'Admin page `example` language file does not define any typical admin page-language keys.',
+                $structure['findings']
+            );
+            $this->assertContains(
+                'Installer language file `zc_plugins/example/v1.0.0/Installer/languages/english/main.php` does not define any language keys.',
                 $structure['findings']
             );
             $this->assertContains(

@@ -313,12 +313,14 @@ class ZenAiAssistRuntimeInspector
                 $languagePath = $pluginRoot . 'catalog/includes/languages/english/lang.' . $page . '.php';
                 $templateFiles = glob($pluginRoot . 'catalog/includes/templates/*/tpl_' . $page . '*.php') ?: [];
                 $filenameMatches = $this->matchFilenameDefinitions($filenames, $page);
+                $languageAnalysis = is_file($languagePath) ? $this->analyzeLanguageFile($languagePath, 'page', $page) : null;
 
                 $catalogPages[] = [
                     'page' => $page,
                     'header_php' => is_file($headerPath) ? $this->relativePath($headerPath) : null,
                     'main_template_vars' => is_file($mainTemplateVarsPath) ? $this->relativePath($mainTemplateVarsPath) : null,
                     'language_file' => is_file($languagePath) ? $this->relativePath($languagePath) : null,
+                    'language_analysis' => $languageAnalysis,
                     'template_files' => array_map([$this, 'relativePath'], $templateFiles),
                     'filename_constants' => $filenameMatches,
                 ];
@@ -338,6 +340,12 @@ class ZenAiAssistRuntimeInspector
                 if (is_file($languagePath) && !$this->isReadablePhpIncludeFile($languagePath)) {
                     $findings[] = 'Catalog page `' . $page . '` has an unreadable or malformed language file.';
                 }
+                if (($languageAnalysis['has_language_definitions'] ?? true) === false) {
+                    $findings[] = 'Catalog page `' . $page . '` language file does not define any language keys.';
+                }
+                if (($languageAnalysis['has_expected_page_keys'] ?? true) === false) {
+                    $findings[] = 'Catalog page `' . $page . '` language file does not define any typical page-language keys.';
+                }
             }
         }
 
@@ -349,13 +357,17 @@ class ZenAiAssistRuntimeInspector
                 $menuDefinitionPath = $pluginRoot . 'admin/includes/languages/english/extra_definitions/lang.' . $page . '_menu.php';
                 $filenameMatches = $this->matchFilenameDefinitions($filenames, $page);
                 $menuDefinitionKeys = is_file($menuDefinitionPath) ? $this->languageDefinitionKeys($menuDefinitionPath) : [];
+                $languageAnalysis = is_file($languagePath) ? $this->analyzeLanguageFile($languagePath, 'admin-page', $page) : null;
+                $menuDefinitionAnalysis = is_file($menuDefinitionPath) ? $this->analyzeLanguageFile($menuDefinitionPath, 'menu', $page) : null;
                 $installerRegistrations = $this->matchAdminPageRegistrations($adminPageRegistrations, $filenameMatches, $menuDefinitionKeys, $page);
 
                 $adminPages[] = [
                     'page' => $page,
                     'entrypoint' => $this->relativePath($adminPagePath),
                     'language_file' => is_file($languagePath) ? $this->relativePath($languagePath) : null,
+                    'language_analysis' => $languageAnalysis,
                     'menu_definition' => is_file($menuDefinitionPath) ? $this->relativePath($menuDefinitionPath) : null,
+                    'menu_definition_analysis' => $menuDefinitionAnalysis,
                     'filename_constants' => $filenameMatches,
                     'menu_definition_keys' => $menuDefinitionKeys,
                     'installer_registrations' => $installerRegistrations,
@@ -370,11 +382,20 @@ class ZenAiAssistRuntimeInspector
                 if (is_file($languagePath) && !$this->isReadablePhpIncludeFile($languagePath)) {
                     $findings[] = 'Admin page `' . $page . '` has an unreadable or malformed language file.';
                 }
+                if (($languageAnalysis['has_language_definitions'] ?? true) === false) {
+                    $findings[] = 'Admin page `' . $page . '` language file does not define any language keys.';
+                }
+                if (($languageAnalysis['has_expected_page_keys'] ?? true) === false) {
+                    $findings[] = 'Admin page `' . $page . '` language file does not define any typical admin page-language keys.';
+                }
                 if (is_file($menuDefinitionPath) && !$this->menuDefinitionLooksValid($menuDefinitionPath, $page)) {
                     $findings[] = 'Admin page `' . $page . '` has a menu-definition file that does not appear to define an encapsulated admin menu label.';
                 }
                 if (is_file($menuDefinitionPath) && $menuDefinitionKeys === []) {
                     $findings[] = 'Admin page `' . $page . '` has a menu-definition file that does not define any language keys.';
+                }
+                if (($menuDefinitionAnalysis['has_box_keys'] ?? true) === false) {
+                    $findings[] = 'Admin page `' . $page . '` menu-definition file does not define any `BOX_*` language keys.';
                 }
                 if ($installerRegistrations === []) {
                     $findings[] = 'Admin page `' . $page . '` has no matching installer `zen_register_admin_page()` registration.';
@@ -410,6 +431,19 @@ class ZenAiAssistRuntimeInspector
             'admin/includes/extra_configures',
             'admin/includes/extra_datafiles',
         ]);
+        $installerLanguageFiles = $this->listPluginFiles($pluginRoot, ['Installer/languages']);
+        foreach ($installerLanguageFiles as $installerLanguageFile) {
+            $analysis = $this->analyzeLanguageFile($this->projectRoot . $installerLanguageFile, 'installer-language');
+
+            if (($analysis['readable'] ?? true) === false) {
+                $findings[] = 'Installer language file `' . $installerLanguageFile . '` is unreadable or malformed.';
+                continue;
+            }
+
+            if (($analysis['has_language_definitions'] ?? true) === false) {
+                $findings[] = 'Installer language file `' . $installerLanguageFile . '` does not define any language keys.';
+            }
+        }
         $skillTopics = $this->listPluginFiles($pluginRoot, ['resources/skills']);
         foreach ($observerFiles as $observerFile) {
             if (!preg_match('#/(?:catalog|admin)/includes/classes/observers/auto_[^/]+\.php$#', $observerFile)) {
@@ -423,6 +457,7 @@ class ZenAiAssistRuntimeInspector
             'filenames' => $filenames,
             'catalog_pages' => $catalogPages,
             'admin_pages' => $adminPages,
+            'installer_language_files' => $installerLanguageFiles,
             'observers' => $observerFiles,
             'autoloaders' => $autoloaderFiles,
             'extra_files' => $extraFiles,
@@ -880,6 +915,50 @@ class ZenAiAssistRuntimeInspector
         return str_contains($haystack, 'box_')
             || str_contains($haystack, $page)
             || str_contains($haystack, 'return [');
+    }
+
+    private function analyzeLanguageFile(string $path, string $role, string $page = ''): array
+    {
+        $contents = @file_get_contents($path);
+        if (!is_string($contents) || trim($contents) === '' || !str_contains($contents, '<?php')) {
+            return [
+                'readable' => false,
+                'keys' => [],
+                'has_language_definitions' => false,
+                'has_box_keys' => false,
+                'has_expected_page_keys' => false,
+            ];
+        }
+
+        $keys = $this->languageDefinitionKeys($path);
+        $upperKeys = array_map('strtoupper', $keys);
+        $pageNeedle = strtoupper(str_replace(['-', ' '], '_', $page));
+        $expectedKeys = ['HEADING_TITLE', 'NAVBAR_TITLE', 'TEXT_MAIN', 'TEXT_INFORMATION', 'SUBHEADING_TITLE'];
+
+        $hasExpectedPageKeys = false;
+        foreach ($upperKeys as $key) {
+            if (in_array($key, $expectedKeys, true)) {
+                $hasExpectedPageKeys = true;
+                break;
+            }
+
+            if ($pageNeedle !== '' && str_contains($key, $pageNeedle)) {
+                $hasExpectedPageKeys = true;
+                break;
+            }
+        }
+
+        if ($role === 'installer-language') {
+            $hasExpectedPageKeys = true;
+        }
+
+        return [
+            'readable' => true,
+            'keys' => $keys,
+            'has_language_definitions' => $keys !== [],
+            'has_box_keys' => count(array_filter($upperKeys, static fn (string $key): bool => str_starts_with($key, 'BOX_'))) > 0,
+            'has_expected_page_keys' => $hasExpectedPageKeys,
+        ];
     }
 
     private function languageDefinitionKeys(string $path): array
