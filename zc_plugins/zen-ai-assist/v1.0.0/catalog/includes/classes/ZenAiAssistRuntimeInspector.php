@@ -444,12 +444,46 @@ class ZenAiAssistRuntimeInspector
                 $findings[] = 'Installer language file `' . $installerLanguageFile . '` does not define any language keys.';
             }
         }
-        $skillTopics = $this->listPluginFiles($pluginRoot, ['resources/skills']);
+        $observerAnalyses = [];
         foreach ($observerFiles as $observerFile) {
-            if (!preg_match('#/(?:catalog|admin)/includes/classes/observers/auto_[^/]+\.php$#', $observerFile)) {
-                $findings[] = 'Observer file `' . $observerFile . '` does not follow the expected `auto_*.php` naming for encapsulated plugin observers.';
+            $analysis = $this->analyzeObserverFile($this->projectRoot . $observerFile);
+            $observerAnalyses[$observerFile] = $analysis;
+
+            if (!preg_match('#/(?:catalog|admin)/includes/classes/observers/(?:auto[._]|class\.)[^/]+\.php$#i', $observerFile)) {
+                $findings[] = 'Observer file `' . $observerFile . '` does not follow the expected encapsulated plugin observer naming patterns.';
+            }
+            if (($analysis['readable'] ?? true) === false) {
+                $findings[] = 'Observer file `' . $observerFile . '` is unreadable or malformed.';
+                continue;
+            }
+            if (($analysis['extends_base'] ?? true) === false) {
+                $findings[] = 'Observer file `' . $observerFile . '` does not declare a class extending `base`.';
+            }
+            if (($analysis['has_runtime_hook'] ?? true) === false) {
+                $findings[] = 'Observer file `' . $observerFile . '` does not appear to attach to notifications or expose update handlers.';
             }
         }
+
+        $autoloaderAnalyses = [];
+        foreach ($autoloaderFiles as $autoloaderFile) {
+            $analysis = $this->analyzeAutoloaderFile($autoloaderFile);
+            $autoloaderAnalyses[$autoloaderFile] = $analysis;
+
+            if (($analysis['readable'] ?? true) === false) {
+                $findings[] = 'Loader file `' . $autoloaderFile . '` is unreadable or malformed.';
+                continue;
+            }
+            if (($analysis['has_loader_entries'] ?? true) === false) {
+                $findings[] = 'Loader file `' . $autoloaderFile . '` does not define any recognized loader entries.';
+            }
+            foreach ($analysis['missing_references'] ?? [] as $missingReference) {
+                $findings[] = 'Loader file `' . $autoloaderFile . '` references missing file `' . $missingReference . '`.';
+            }
+            foreach ($analysis['issues'] ?? [] as $issue) {
+                $findings[] = 'Loader file `' . $autoloaderFile . '` ' . $issue;
+            }
+        }
+        $skillTopics = $this->listPluginFiles($pluginRoot, ['resources/skills']);
 
         return [
             'plugin_root' => $pluginRoot,
@@ -459,7 +493,9 @@ class ZenAiAssistRuntimeInspector
             'admin_pages' => $adminPages,
             'installer_language_files' => $installerLanguageFiles,
             'observers' => $observerFiles,
+            'observer_analyses' => $observerAnalyses,
             'autoloaders' => $autoloaderFiles,
+            'autoloader_analyses' => $autoloaderAnalyses,
             'extra_files' => $extraFiles,
             'skill_topics' => $skillTopics,
             'findings' => $findings,
@@ -983,6 +1019,90 @@ class ZenAiAssistRuntimeInspector
         sort($keys);
 
         return $keys;
+    }
+
+    private function analyzeObserverFile(string $path): array
+    {
+        $contents = @file_get_contents($path);
+        if (!is_string($contents) || trim($contents) === '' || !str_contains($contents, '<?php')) {
+            return [
+                'readable' => false,
+                'extends_base' => false,
+                'has_runtime_hook' => false,
+            ];
+        }
+
+        return [
+            'readable' => true,
+            'extends_base' => preg_match('/class\s+[A-Za-z0-9_]+\s+extends\s+base\b/i', $contents) === 1,
+            'has_runtime_hook' => preg_match('/->attach\s*\(|function\s+update[A-Za-z0-9_]*\s*\(/i', $contents) === 1,
+        ];
+    }
+
+    private function analyzeAutoloaderFile(string $relativePath): array
+    {
+        $path = $this->projectRoot . $relativePath;
+        $contents = @file_get_contents($path);
+        if (!is_string($contents) || trim($contents) === '' || !str_contains($contents, '<?php')) {
+            return [
+                'readable' => false,
+                'has_loader_entries' => false,
+                'missing_references' => [],
+                'issues' => [],
+            ];
+        }
+
+        $hasLoaderEntries = preg_match('/\$autoLoadConfig\s*\[\s*\d+\s*]\s*\[\s*]\s*=/i', $contents) === 1;
+        $missingReferences = [];
+        $issues = [];
+
+        if (preg_match_all("/'autoType'\s*=>\s*'([^']+)'.+?'loadFile'\s*=>\s*'([^']+)'/si", $contents, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $autoType = strtolower(trim($match[1]));
+                $loadFile = trim($match[2]);
+                $resolvedPath = $this->resolveAutoloaderReference($relativePath, $autoType, $loadFile);
+                if ($resolvedPath !== null && !is_file($resolvedPath)) {
+                    $missingReferences[] = $this->relativePath($resolvedPath);
+                }
+            }
+        }
+
+        if (str_contains($relativePath, '/auto_loaders/')) {
+            if (!str_contains($contents, '$autoLoadConfig')) {
+                $issues[] = 'does not appear to populate `$autoLoadConfig`.';
+            }
+            if (preg_match("/'autoType'\s*=>\s*'classInstantiate'/i", $contents) === 1 && preg_match("/'className'\s*=>\s*'[^']+'/i", $contents) !== 1) {
+                $issues[] = 'defines `classInstantiate` without a `className`.';
+            }
+        }
+
+        if (str_contains($relativePath, '/init_includes/') && !str_contains($contents, 'IS_ADMIN_FLAG')) {
+            $issues[] = 'does not guard direct access with `IS_ADMIN_FLAG`.';
+        }
+
+        return [
+            'readable' => true,
+            'has_loader_entries' => $hasLoaderEntries || str_contains($relativePath, '/init_includes/'),
+            'missing_references' => array_values(array_unique($missingReferences)),
+            'issues' => $issues,
+        ];
+    }
+
+    private function resolveAutoloaderReference(string $relativePath, string $autoType, string $loadFile): ?string
+    {
+        if ($loadFile === '') {
+            return null;
+        }
+
+        $includesRoot = str_contains($relativePath, '/admin/')
+            ? $this->pluginRoot . 'admin/includes/'
+            : $this->pluginRoot . 'catalog/includes/';
+
+        return match ($autoType) {
+            'init_script' => $includesRoot . 'init_includes/' . ltrim($loadFile, '/\\'),
+            'class', 'classinstantiate' => $includesRoot . 'classes/' . ltrim($loadFile, '/\\'),
+            default => null,
+        };
     }
 
     private function adminPageRegistrations(string $pluginRoot): array

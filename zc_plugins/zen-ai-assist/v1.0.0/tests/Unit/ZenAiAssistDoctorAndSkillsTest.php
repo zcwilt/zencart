@@ -34,7 +34,7 @@ class ZenAiAssistDoctorAndSkillsTest extends zcUnitTestCase
             $this->writeFile($pluginRoot . 'admin/example.php', "<?php\n");
             $this->writeFile($pluginRoot . 'admin/includes/languages/english/lang.example.php', "<?php\nreturn ['HEADING_TITLE' => 'Example'];\n");
             $this->writeFile($pluginRoot . 'admin/includes/languages/english/extra_definitions/lang.example_menu.php', "<?php\nreturn ['BOX_TOOLS_EXAMPLE' => 'Example'];\n");
-            $this->writeFile($pluginRoot . 'catalog/includes/classes/observers/auto_ExampleObserver.php', "<?php\nclass auto_ExampleObserver {}\n");
+            $this->writeFile($pluginRoot . 'catalog/includes/classes/observers/auto_ExampleObserver.php', "<?php\nclass auto_ExampleObserver extends base { public function __construct() { \$this->attach(\$this, ['NOTIFY_HEADER_START_INDEX']); } public function update(&\$class, \$eventID, \$paramsArray = []) {} }\n");
             $this->writeFile($pluginRoot . 'resources/skills/plugin-workflow.md', "# Example Plugin Workflow\n\nChecklist\n");
 
             $inspector = new \ZenAiAssistRuntimeInspector($projectRoot, $pluginRoot);
@@ -486,7 +486,42 @@ JSON
                 $structure['findings']
             );
             $this->assertContains(
-                'Observer file `zc_plugins/example/v1.0.0/catalog/includes/classes/observers/ExampleObserver.php` does not follow the expected `auto_*.php` naming for encapsulated plugin observers.',
+                'Observer file `zc_plugins/example/v1.0.0/catalog/includes/classes/observers/ExampleObserver.php` does not follow the expected encapsulated plugin observer naming patterns.',
+                $structure['findings']
+            );
+        } finally {
+            $this->removeDirectory(rtrim($projectRoot, '/\\'));
+        }
+    }
+
+    public function testDoctorFlagsObserverAndLoaderRuntimeIntentProblems(): void
+    {
+        $projectRoot = $this->makeTempDirectory('zen-ai-assist-project');
+        $pluginRoot = $projectRoot . 'zc_plugins/example/v1.0.0/';
+
+        try {
+            $this->writeExamplePlugin($pluginRoot);
+            $this->writeFile($pluginRoot . 'catalog/includes/classes/observers/auto_ExampleObserver.php', "<?php\nclass ExampleObserver {}\n");
+            $this->writeFile($pluginRoot . 'catalog/includes/auto_loaders/config.example.php', "<?php\n\$autoLoadConfig[80][] = ['autoType' => 'init_script', 'loadFile' => 'missing_example.php'];\n");
+            $this->writeFile($pluginRoot . 'catalog/includes/init_includes/init_example.php', "<?php\n\$flag = true;\n");
+
+            $inspector = new \ZenAiAssistRuntimeInspector($projectRoot, $pluginRoot);
+            $structure = $inspector->inspectPluginStructure($pluginRoot);
+
+            $this->assertContains(
+                'Observer file `zc_plugins/example/v1.0.0/catalog/includes/classes/observers/auto_ExampleObserver.php` does not declare a class extending `base`.',
+                $structure['findings']
+            );
+            $this->assertContains(
+                'Observer file `zc_plugins/example/v1.0.0/catalog/includes/classes/observers/auto_ExampleObserver.php` does not appear to attach to notifications or expose update handlers.',
+                $structure['findings']
+            );
+            $this->assertContains(
+                'Loader file `zc_plugins/example/v1.0.0/catalog/includes/auto_loaders/config.example.php` references missing file `zc_plugins/example/v1.0.0/catalog/includes/init_includes/missing_example.php`.',
+                $structure['findings']
+            );
+            $this->assertContains(
+                'Loader file `zc_plugins/example/v1.0.0/catalog/includes/init_includes/init_example.php` does not guard direct access with `IS_ADMIN_FLAG`.',
                 $structure['findings']
             );
         } finally {
@@ -829,7 +864,7 @@ JSON
         $this->writeFile($pluginRoot . 'admin/example.php', "<?php\n");
         $this->writeFile($pluginRoot . 'admin/includes/languages/english/lang.example.php', "<?php\nreturn ['HEADING_TITLE' => 'Example'];\n");
         $this->writeFile($pluginRoot . 'admin/includes/languages/english/extra_definitions/lang.example_menu.php', "<?php\nreturn ['BOX_TOOLS_EXAMPLE' => 'Example'];\n");
-        $this->writeFile($pluginRoot . 'catalog/includes/classes/observers/auto_ExampleObserver.php', "<?php\nclass auto_ExampleObserver {}\n");
+        $this->writeFile($pluginRoot . 'catalog/includes/classes/observers/auto_ExampleObserver.php', "<?php\nclass auto_ExampleObserver extends base { public function __construct() { \$this->attach(\$this, ['NOTIFY_HEADER_START_INDEX']); } public function update(&\$class, \$eventID, \$paramsArray = []) {} }\n");
         $this->writeFile($pluginRoot . 'resources/skills/plugin-workflow.md', "# Example Plugin Workflow\n\nChecklist\n");
     }
 
