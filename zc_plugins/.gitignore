@@ -18,3 +18,5 @@ zenTestPlugin/
 !ScanAdditionalImages/**
 !ResponsiveClassicPlugin/
 !ResponsiveClassicPlugin/**
+!zen-ai-assist/
+!zen-ai-assist/**
