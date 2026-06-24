@@ -700,6 +700,30 @@ JSON
         }
     }
 
+    public function testDoctorFlagsCatalogPageTemplateWiringProblems(): void
+    {
+        $projectRoot = $this->makeTempDirectory('zen-ai-assist-project');
+        $pluginRoot = $projectRoot . 'zc_plugins/example/v1.0.0/';
+
+        try {
+            $this->writeExamplePlugin($pluginRoot);
+            $this->writeFile(
+                $pluginRoot . 'catalog/includes/modules/pages/example/main_template_vars.php',
+                "<?php\n\$tpl_page_body = 'tpl_example_default.php';\n"
+            );
+
+            $inspector = new \ZenAiAssistRuntimeInspector($projectRoot, $pluginRoot);
+            $structure = $inspector->inspectPluginStructure($pluginRoot);
+
+            $this->assertContains(
+                'Catalog page `example` `main_template_vars.php` references missing template `tpl_example_default.php`.',
+                $structure['findings']
+            );
+        } finally {
+            $this->removeDirectory(rtrim($projectRoot, '/\\'));
+        }
+    }
+
     public function testContentRegistryAggregatesCoreInstalledPluginAndBundledContent(): void
     {
         $projectRoot = $this->makeTempDirectory('zen-ai-assist-project');

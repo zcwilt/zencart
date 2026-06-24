@@ -314,6 +314,7 @@ class ZenAiAssistRuntimeInspector
                 $templateFiles = glob($pluginRoot . 'catalog/includes/templates/*/tpl_' . $page . '*.php') ?: [];
                 $filenameMatches = $this->matchFilenameDefinitions($filenames, $page);
                 $languageAnalysis = is_file($languagePath) ? $this->analyzeLanguageFile($languagePath, 'page', $page) : null;
+                $pageWiringAnalysis = $this->analyzeCatalogPageWiring($headerPath, $mainTemplateVarsPath, $templateFiles, $page);
 
                 $catalogPages[] = [
                     'page' => $page,
@@ -321,6 +322,7 @@ class ZenAiAssistRuntimeInspector
                     'main_template_vars' => is_file($mainTemplateVarsPath) ? $this->relativePath($mainTemplateVarsPath) : null,
                     'language_file' => is_file($languagePath) ? $this->relativePath($languagePath) : null,
                     'language_analysis' => $languageAnalysis,
+                    'page_wiring_analysis' => $pageWiringAnalysis,
                     'template_files' => array_map([$this, 'relativePath'], $templateFiles),
                     'filename_constants' => $filenameMatches,
                 ];
@@ -345,6 +347,15 @@ class ZenAiAssistRuntimeInspector
                 }
                 if (($languageAnalysis['has_expected_page_keys'] ?? true) === false) {
                     $findings[] = 'Catalog page `' . $page . '` language file does not define any typical page-language keys.';
+                }
+                if (($pageWiringAnalysis['main_template_vars_readable'] ?? true) === false) {
+                    $findings[] = 'Catalog page `' . $page . '` has an unreadable or malformed `main_template_vars.php` file.';
+                }
+                if (($pageWiringAnalysis['main_template_vars_has_template_handoff'] ?? true) === false) {
+                    $findings[] = 'Catalog page `' . $page . '` `main_template_vars.php` does not appear to hand off to a template.';
+                }
+                foreach ($pageWiringAnalysis['missing_template_references'] ?? [] as $missingTemplateReference) {
+                    $findings[] = 'Catalog page `' . $page . '` `main_template_vars.php` references missing template `' . $missingTemplateReference . '`.';
                 }
             }
         }
@@ -995,6 +1006,53 @@ class ZenAiAssistRuntimeInspector
             'has_box_keys' => count(array_filter($upperKeys, static fn (string $key): bool => str_starts_with($key, 'BOX_'))) > 0,
             'has_expected_page_keys' => $hasExpectedPageKeys,
         ];
+    }
+
+    private function analyzeCatalogPageWiring(string $headerPath, string $mainTemplateVarsPath, array $templateFiles, string $page): array
+    {
+        $analysis = [
+            'header_present' => is_file($headerPath),
+            'main_template_vars_present' => is_file($mainTemplateVarsPath),
+            'main_template_vars_readable' => true,
+            'main_template_vars_has_template_handoff' => true,
+            'template_files_present' => $templateFiles !== [],
+            'missing_template_references' => [],
+        ];
+
+        if (!is_file($mainTemplateVarsPath)) {
+            return $analysis;
+        }
+
+        $contents = @file_get_contents($mainTemplateVarsPath);
+        if (!is_string($contents) || trim($contents) === '' || !str_contains($contents, '<?php')) {
+            $analysis['main_template_vars_readable'] = false;
+            $analysis['main_template_vars_has_template_handoff'] = false;
+            return $analysis;
+        }
+
+        $hasTemplateHandoff = preg_match('/\$tpl_page_body\b|get_template_dir\s*\(|require\s*\(/i', $contents) === 1;
+        $analysis['main_template_vars_has_template_handoff'] = $hasTemplateHandoff;
+
+        $referencedTemplates = [];
+        if (preg_match_all('/tpl_[A-Za-z0-9_]+(?:_default)?\.php/', $contents, $matches)) {
+            $referencedTemplates = array_values(array_unique($matches[0]));
+        }
+
+        if ($referencedTemplates === []) {
+            return $analysis;
+        }
+
+        $availableTemplateBasenames = array_map('basename', $templateFiles);
+        foreach ($referencedTemplates as $referencedTemplate) {
+            if (
+                str_contains($referencedTemplate, $page)
+                && !in_array($referencedTemplate, $availableTemplateBasenames, true)
+            ) {
+                $analysis['missing_template_references'][] = $referencedTemplate;
+            }
+        }
+
+        return $analysis;
     }
 
     private function languageDefinitionKeys(string $path): array

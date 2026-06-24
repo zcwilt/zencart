@@ -323,6 +323,8 @@ class ZenAiAssistDoctorService
                 '/language file does not define any typical (?:admin )?page-language keys\./i',
                 '/menu-definition file does not define any `BOX_\*` language keys\./i',
                 '/installer language file `[^`]+` does not define any language keys\./i',
+                '/`main_template_vars\.php` does not appear to hand off to a template\./i',
+                '/`main_template_vars\.php` references missing template /i',
                 '/is missing `admin\/includes\/languages\/english\/extra_definitions\/lang\.[^`]+_menu\.php`\./i',
                 '/menu-definition file that does not appear to define an encapsulated admin menu label\./i',
                 '/menu-definition file does not define any language keys\./i',
