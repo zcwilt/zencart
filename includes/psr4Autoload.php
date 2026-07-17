@@ -24,6 +24,7 @@ $psr4Autoloader->setClassFile('App\Models\PluginControl', DIR_FS_CATALOG . DIR_W
 $psr4Autoloader->setClassFile('App\Models\PluginControlVersion', DIR_FS_CATALOG . DIR_WS_CLASSES . 'DbRepositories/PluginControlVersion.php');
 
 $psr4Autoloader->addPrefix('Zencart\PluginSupport', DIR_FS_CATALOG . DIR_WS_CLASSES . 'PluginSupport');
+$psr4Autoloader->addPrefix('Zencart\ConfigField', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ConfigField');
 $psr4Autoloader->addPrefix('Zencart\Console', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Console');
 $psr4Autoloader->addPrefix('Zencart\ViewBuilders', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ViewBuilders');
 $psr4Autoloader->addPrefix('Zencart\Exceptions', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Exceptions');

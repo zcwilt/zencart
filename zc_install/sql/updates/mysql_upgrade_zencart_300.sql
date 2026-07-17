@@ -42,6 +42,8 @@ DROP TABLE IF EXISTS paypal_testing;
 ALTER TABLE admin ADD dashboard_layout TEXT NULL;
 ALTER TABLE reviews_description ADD reviews_title VARCHAR(128) NOT NULL DEFAULT '';
 ALTER TABLE products_description DROP COLUMN products_viewed;
+ALTER TABLE configuration ADD renderer TEXT NULL;
+ALTER TABLE product_type_layout ADD renderer TEXT NULL;
 
 
 #PROGRESS_FEEDBACK:!TEXT=Updating configuration settings...

@@ -221,7 +221,7 @@ if (!empty($class) && !isset($mInfo)) {
     foreach ($module->keys() as $next_key) {
         $key_value = $db->Execute(
             "SELECT configuration_title AS `title`, configuration_value AS `value`,
-                        configuration_description AS `description`, use_function, set_function
+                        configuration_description AS `description`, use_function, set_function, renderer
                    FROM " . TABLE_CONFIGURATION . "
                   WHERE configuration_key = '" . zen_db_input($next_key) . "'
                   LIMIT 1");
@@ -375,6 +375,8 @@ if ($set === 'payment') {
         </div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 configurationColumnRight">
 <?php
+$configFieldRowResolver = new \Zencart\ConfigField\ConfigFieldRowResolver($zcConfigFieldRegistry);
+
 $heading = [];
 $contents = [];
 switch ($action) {
@@ -409,7 +411,10 @@ switch ($action) {
                 $displayKey = 'Key: ' . $key . '<br>';
             }
             $keys .= '<b>' . $displayKey . zen_lookup_admin_menu_language_override('configuration_key_title', $key, $value['title']) . '</b><br>' . zen_lookup_admin_menu_language_override('configuration_key_description', $key, $value['description']) . '<br>';
-            if ($value['set_function']) {
+            $inputField = $configFieldRowResolver->renderField($value['renderer'] ?? null, $value['value'], $key);
+            if ($inputField !== null) {
+                $keys .= $inputField;
+            } elseif ($value['set_function']) {
                 eval('$keys .= ' . $value['set_function'] . '"' . zen_output_string($value['value'], ['"' => '&quot;', '`' => 'null;return;exit;']) . '", "' . $key . '");');
             } else {
                 $keys .= zen_draw_input_field('configuration[' . $key . ']', htmlspecialchars($value['value'], ENT_COMPAT, CHARSET, true), 'class="form-control"');
@@ -467,7 +472,10 @@ switch ($action) {
                     $displayKey = 'Key: ' . $key . '<br>';
                 }
                 $keys .= '<b>'. $displayKey . zen_lookup_admin_menu_language_override('configuration_key_title', $key, $value['title']) . '</b><br>';
-                if ($value['use_function']) {
+                $formattedValue = $configFieldRowResolver->formatField($value['renderer'] ?? null, $value['value']);
+                if ($formattedValue !== null) {
+                    $keys .= $formattedValue;
+                } elseif ($value['use_function']) {
                     $use_function = $value['use_function'];
                     if (str_contains($use_function, '->')) {
                         $class_method = explode('->', $use_function);

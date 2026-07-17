@@ -196,8 +196,10 @@ if ($gID === 7) {
 <div class="container-fluid">
     <h1><?= $cfg_group->fields['configuration_group_title'] ?></h1>
 <?php
+$configFieldRowResolver = new \Zencart\ConfigField\ConfigFieldRowResolver($zcConfigFieldRegistry);
+
 $query =
-    "SELECT configuration_id, configuration_title, configuration_description, configuration_value, configuration_key, set_function
+    "SELECT configuration_id, configuration_title, configuration_description, configuration_value, configuration_key, set_function, renderer
        FROM " . TABLE_CONFIGURATION . "
       WHERE configuration_group_id = " . (int)$gID;
 $default_sort = true;
@@ -247,7 +249,11 @@ foreach ($configuration as $item) {
         <div class="col-md-3">
             <?php
             $cfgValue = htmlspecialchars($item['configuration_value'], ENT_COMPAT, CHARSET, true);
-            if (empty($item['set_function'])) {
+            $inputField = $configFieldRowResolver->renderField($item['renderer'] ?? null, $cfgValue, $fieldName);
+
+            if ($inputField !== null) {
+                echo $inputField;
+            } elseif (empty($item['set_function'])) {
                 echo '<input type="text" name="configuration[' . $fieldName . ']" value="' . $cfgValue . '" class="form-control">';
             } else {
                 // use addslashes() instead of $cfgValue directly here.

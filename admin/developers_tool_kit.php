@@ -7,6 +7,8 @@
  */
 require('includes/application_top.php');
 
+$configFieldRowResolver = new \Zencart\ConfigField\ConfigFieldRowResolver($zcConfigFieldRegistry);
+
 $default_context_lines = 0;
 $output = '';
 $outCount = '';
@@ -353,7 +355,7 @@ switch ($action) {
     // The request that returns the configuration keys:
     // Product-Type info is limited to products_type=1 (general)
     $sql = "(SELECT configuration_id, configuration_key, c.configuration_group_id AS configuration_group_id, configuration_group_title,
-                    configuration_title, configuration_description, (CASE WHEN use_function = 'zen_cfg_password_display' THEN '********' ELSE configuration_value END) AS configuration_value, 'conf' AS src
+                    configuration_title, configuration_description, (CASE WHEN use_function = 'zen_cfg_password_display' THEN '********' ELSE configuration_value END) AS configuration_value, renderer, 'conf' AS src
              FROM " . TABLE_CONFIGURATION . " c,
                   " . TABLE_CONFIGURATION_GROUP . " g
              WHERE c.configuration_group_id = g.configuration_group_id
@@ -361,7 +363,7 @@ switch ($action) {
              ORDER BY configuration_title, configuration_group_id)
          UNION
         (SELECT configuration_id, configuration_key, p.product_type_id AS configuration_group_id, type_name AS configuration_group_title,
-                configuration_title, configuration_description, configuration_value, 'type' AS src
+                configuration_title, configuration_description, configuration_value, renderer, 'type' AS src
          FROM " . TABLE_PRODUCT_TYPE_LAYOUT . " p,
               " . TABLE_PRODUCT_TYPES . " t
          WHERE p.product_type_id = t.type_id
@@ -800,9 +802,15 @@ if ($found == false) {
               <td class="dataTableHeadingContentWhois"><?php echo 'Product Type Layout'; ?></td>
             </tr>
           <?php } else { ?>
+            <?php
+            $displayValue = (
+                zcObserverLogEventListener::isSensitiveFieldName($check_configure->fields['configuration_key'])
+                || $configFieldRowResolver->isSensitive($check_configure->fields['renderer'] ?? null)
+            ) ? '********' : $check_configure->fields['configuration_value'];
+            ?>
             <tr>
               <td class="infoBoxHeading"><?php echo TABLE_TITLE_VALUE; ?></td>
-              <td class="dataTableHeadingContentWhois"><?php echo htmlspecialchars($check_configure->fields['configuration_value']); ?></td>
+              <td class="dataTableHeadingContentWhois"><?php echo htmlspecialchars($displayValue); ?></td>
             </tr>
             <tr>
               <td class="infoBoxHeading"><?php echo TABLE_TITLE_GROUP; ?></td>
@@ -961,6 +969,10 @@ if ($found == false) {
                     }
                     $last_group = $keySearchResult['configuration_group_id'];
                     $tdClass = 'dataTableContent' . ($groupChanged ? ' dataTableGroupChange' : '');
+                    $displayValue = (
+                        zcObserverLogEventListener::isSensitiveFieldName($keySearchResult['configuration_key'])
+                        || $configFieldRowResolver->isSensitive($keySearchResult['renderer'] ?? null)
+                    ) ? '********' : $keySearchResult['configuration_value'];
                     ?>
                   <tr class="dataTableRow">
                     <td class="<?php echo $tdClass; ?>"><?php echo $section; ?></td>
@@ -969,7 +981,7 @@ if ($found == false) {
 
                     <td class="<?php echo $tdClass; ?>"><?php echo htmlspecialchars($keySearchResult['configuration_description']); ?> &nbsp;</td>
                     <td class="<?php echo $tdClass; ?>"><?php echo htmlspecialchars($keySearchResult['configuration_key']); ?></td>
-                    <td class="<?php echo $tdClass; ?>"><?php echo htmlspecialchars($keySearchResult['configuration_value']); /* implode("<br>\n", preg_split("/[\s,.]+/", $configuration->fields['configuration_value'])) */ ?></td>
+                    <td class="<?php echo $tdClass; ?>"><?php echo htmlspecialchars($displayValue); /* implode("<br>\n", preg_split("/[\s,.]+/", $configuration->fields['configuration_value'])) */ ?></td>
                     <td class="<?php echo $tdClass; ?> text-center" onclick="document.location.href = '<?php echo $viewlink; ?>'"><a href="<?php echo $editlink; ?>" class="btn btn-primary" role="button"><?php echo IMAGE_EDIT; ?></a></td>
                   </tr>
                   <?php

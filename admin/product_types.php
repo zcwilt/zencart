@@ -178,15 +178,20 @@ if ($action === 'layout' || $action === 'layout_edit') {
               </thead>
               <tbody>
 <?php
+    $configFieldRowResolver = new \Zencart\ConfigField\ConfigFieldRowResolver($zcConfigFieldRegistry);
+
     $configuration = $db->Execute(
-        "SELECT configuration_id, configuration_title, configuration_value, configuration_key, use_function
+        "SELECT configuration_id, configuration_title, configuration_value, configuration_key, use_function, renderer
            FROM " . TABLE_PRODUCT_TYPE_LAYOUT . "
           WHERE product_type_id = " . (int)$_GET['ptID'] . "
        ORDER BY sort_order"
     );
     foreach ($configuration as $item) {
         $item['configuration_title'] = zen_lookup_admin_menu_language_override('product_type_layout_title', $item['configuration_key'], $item['configuration_title']);
-        if (!empty($item['use_function'])) {
+        $formattedValue = $configFieldRowResolver->formatField($item['renderer'] ?? null, $item['configuration_value']);
+        if ($formattedValue !== null) {
+            $cfgValue = $formattedValue;
+        } elseif (!empty($item['use_function'])) {
             $use_function = $item['use_function'];
             if (preg_match('/->/', $use_function)) {
                 $class_method = explode('->', $use_function);
@@ -204,7 +209,7 @@ if ($action === 'layout' || $action === 'layout_edit') {
 
         if (($cID === 0 || $cID === (int)$item['configuration_id']) && !isset($cInfo) && $action !== 'new') {
             $cfg_extra = $db->Execute(
-                "SELECT configuration_key, configuration_description, date_added, last_modified, use_function, set_function
+                "SELECT configuration_key, configuration_description, date_added, last_modified, use_function, set_function, renderer
                    FROM " . TABLE_PRODUCT_TYPE_LAYOUT . "
                   WHERE configuration_id = " . (int)$item['configuration_id']
             );
@@ -255,9 +260,10 @@ if ($action === 'layout' || $action === 'layout_edit') {
     if ($action === 'layout_edit') {
         $heading[] = ['text' => '<h4>' . $cInfo->configuration_title . '</h4>'];
 
-        if ($cInfo->set_function) {
+        $value_field = $configFieldRowResolver->renderField($cInfo->renderer ?? null, $cInfo->configuration_value, 'configuration_value');
+        if ($value_field === null && $cInfo->set_function) {
             eval('$value_field = ' . $cInfo->set_function . '"' . htmlspecialchars($cInfo->configuration_value, ENT_COMPAT, CHARSET, TRUE) . '");');
-        } else {
+        } elseif ($value_field === null) {
             $value_field = zen_draw_input_field('configuration_value', htmlspecialchars($cInfo->configuration_value, ENT_COMPAT, CHARSET, TRUE), 'size="60"');
         }
 

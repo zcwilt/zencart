@@ -59,6 +59,7 @@ trait ScriptedInstallHelpers
             'use_function', // TEXT default NULL
             'set_function', // TEXT default NULL
             'val_function', // TEXT default NULL
+            'renderer', // TEXT default NULL
             //'date_added', // DATETIME
             //'last_modified', // DATETIME default NULL
         ];
@@ -101,6 +102,7 @@ trait ScriptedInstallHelpers
             'use_function', // TEXT default NULL
             'set_function', // TEXT default NULL
             'val_function', // TEXT default NULL
+            'renderer', // TEXT default NULL
             //'date_added', // DATETIME
             //'last_modified', // DATETIME default NULL
         ];
@@ -124,6 +126,23 @@ trait ScriptedInstallHelpers
         zen_record_admin_activity('Updated configuration record: ' . print_r($this->redactSensitiveConfigValue($sql_data_array, $key_name), true), 'warning');
 
         return $rows;
+    }
+
+    /**
+     * Convenience builder for the 'renderer' property value passed to
+     * addConfigurationKey()/updateConfigurationKey(), so plugin authors don't have
+     * to hand-roll the JSON payload. See Zencart\ConfigField\ConfigFieldRegistry for
+     * the set of core renderer/formatter keys, or register your own.
+     * @since ZC v3.0.0
+     */
+    protected function configFieldRenderer(string $renderer, array $params = [], ?string $formatter = null): string
+    {
+        $payload = ['renderer' => $renderer, 'params' => $params];
+        if ($formatter !== null) {
+            $payload['formatter'] = $formatter;
+        }
+
+        return json_encode($payload);
     }
 
     /**
