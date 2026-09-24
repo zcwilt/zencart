@@ -410,7 +410,9 @@ switch ($action) {
             }
             $keys .= '<b>' . $displayKey . zen_lookup_admin_menu_language_override('configuration_key_title', $key, $value['title']) . '</b><br>' . zen_lookup_admin_menu_language_override('configuration_key_description', $key, $value['description']) . '<br>';
             if ($value['set_function']) {
-                eval('$keys .= ' . $value['set_function'] . '"' . zen_output_string($value['value'], ['"' => '&quot;', '`' => 'null;return;exit;']) . '", "' . $key . '");');
+                // single-quoted and addslashes()'d so the stored value can't break out or trigger {$...} interpolation in eval()
+                $safe_value = addslashes(zen_output_string($value['value']));
+                eval('$keys .= ' . $value['set_function'] . '\'' . $safe_value . '\', \'' . $key . '\');');
             } else {
                 $keys .= zen_draw_input_field('configuration[' . $key . ']', htmlspecialchars($value['value'], ENT_COMPAT, CHARSET, true), 'class="form-control"');
             }
