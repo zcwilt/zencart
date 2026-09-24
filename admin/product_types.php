@@ -256,7 +256,9 @@ if ($action === 'layout' || $action === 'layout_edit') {
         $heading[] = ['text' => '<h4>' . $cInfo->configuration_title . '</h4>'];
 
         if ($cInfo->set_function) {
-            eval('$value_field = ' . $cInfo->set_function . '"' . htmlspecialchars($cInfo->configuration_value, ENT_COMPAT, CHARSET, true) . '");');
+            // single-quoted and addslashes()'d so the stored value can't break out or trigger {$...} interpolation in eval()
+            $safe_value = addslashes(htmlspecialchars($cInfo->configuration_value, ENT_COMPAT, CHARSET, true));
+            eval('$value_field = ' . $cInfo->set_function . '\'' . $safe_value . '\');');
         } else {
             $value_field = zen_draw_input_field('configuration_value', htmlspecialchars($cInfo->configuration_value, ENT_COMPAT, CHARSET, true), 'size="60"');
         }
