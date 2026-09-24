@@ -72,6 +72,57 @@ class AdminGiftVoucherHistoryTest extends zcInProcessFeatureTestCaseAdmin
             ->assertSee('Not Redeemed');
     }
 
+    public function testGiftVoucherHistoryAndRedemptionReportEscapeStoredValues(): void
+    {
+        $this->completeInitialAdminSetup();
+
+        $senderId = $this->insertCustomer('<b>Evil</b>', 'Sender', 'evil-sender@example.com');
+        $redeemerId = $this->insertCustomer('<i>Evil</i>', 'Redeemer', 'evil-redeemer@example.com');
+        $couponId = $this->insertGiftVoucherCoupon('XSS-CODE-1', '10.0000');
+
+        TestDb::insert('coupons_description', [
+            'coupon_id' => $couponId,
+            'language_id' => 1,
+            'coupon_name' => 'XSS voucher',
+            'coupon_description' => '',
+        ]);
+
+        TestDb::insert('coupon_email_track', [
+            'coupon_id' => $couponId,
+            'customer_id_sent' => $senderId,
+            'sent_firstname' => '<b>Evil</b>',
+            'sent_lastname' => 'Sender',
+            'emailed_to' => '"><img src=x onerror=alert(1)>',
+            'date_sent' => '2026-03-01 10:00:00',
+        ]);
+
+        TestDb::insert('coupon_redeem_track', [
+            'coupon_id' => $couponId,
+            'customer_id' => $redeemerId,
+            'redeem_date' => '2026-03-02 15:30:00',
+            'redeem_ip' => '<script>alert(2)</script>',
+            'order_id' => 0,
+        ]);
+
+        $gvSent = $this->getAdmin('/admin/index.php?cmd=gv_sent&gid=' . $couponId . '&page=1')
+            ->assertOk()
+            ->assertSee('&lt;b&gt;Evil&lt;/b&gt; Sender')
+            ->assertSee('&lt;img src=x onerror=alert(1)&gt;')
+            ->assertSee('&lt;script&gt;alert(2)&lt;/script&gt;');
+
+        $this->assertStringNotContainsString('<b>Evil</b>', $gvSent->content);
+        $this->assertStringNotContainsString('<img src=x onerror=alert(1)>', $gvSent->content);
+        $this->assertStringNotContainsString('<script>alert(2)</script>', $gvSent->content);
+
+        $report = $this->getAdmin('/admin/index.php?cmd=coupon_admin&action=voucherreport&cid=' . $couponId . '&reports_page=1')
+            ->assertOk()
+            ->assertSee('&lt;i&gt;Evil&lt;/i&gt; Redeemer')
+            ->assertSee('&lt;script&gt;alert(2)&lt;/script&gt;');
+
+        $this->assertStringNotContainsString('<i>Evil</i>', $report->content);
+        $this->assertStringNotContainsString('<script>alert(2)</script>', $report->content);
+    }
+
     protected function insertGiftVoucherCoupon(string $couponCode, string $amount): int
     {
         return (int) TestDb::insert('coupons', [

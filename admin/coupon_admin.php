@@ -441,8 +441,8 @@ switch ($_GET['action']) {
                                                 WHERE customers_id = " . (int)$item['customer_id']);
                       ?>
                       <td class="dataTableContent"><?= $item['customer_id'] ?></td>
-                      <td class="dataTableContent text-center"><?= $customer->fields['customers_firstname'] . ' ' . $customer->fields['customers_lastname'] ?></td>
-                      <td class="dataTableContent text-center"><?= $item['redeem_ip'] ?></td>
+                      <td class="dataTableContent text-center"><?= zen_output_string_protected($customer->fields['customers_firstname'] . ' ' . $customer->fields['customers_lastname']) ?></td>
+                      <td class="dataTableContent text-center"><?= zen_output_string_protected($item['redeem_ip']) ?></td>
                       <td class="dataTableContent text-center"><?= zen_date_short($item['redeem_date']) ?></td>
                       <td class="dataTableContent text-right"><?= $item['order_id'] ?></td>
                       <td class="dataTableContent text-right">
@@ -537,8 +537,8 @@ switch ($_GET['action']) {
                                                 WHERE customers_id = " . (int)$item['customer_id']);
                       ?>
                       <td class="dataTableContent"><?= $item['customer_id'] ?></td>
-                      <td class="dataTableContent text-center"><?= $customer->fields['customers_firstname'] . ' ' . $customer->fields['customers_lastname'] ?></td>
-                      <td class="dataTableContent text-center"><?= $item['redeem_ip'] ?></td>
+                      <td class="dataTableContent text-center"><?= zen_output_string_protected($customer->fields['customers_firstname'] . ' ' . $customer->fields['customers_lastname']) ?></td>
+                      <td class="dataTableContent text-center"><?= zen_output_string_protected($item['redeem_ip']) ?></td>
                       <td class="dataTableContent"><?= $item['coupon_code'] ?></td>
                       <td class="dataTableContent text-center"><?= zen_date_short($item['redeem_date']) ?></td>
                       <td class="dataTableContent text-right"><?= $item['order_id'] ?></td>

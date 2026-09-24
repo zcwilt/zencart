@@ -68,7 +68,7 @@ if ($_GET['action'] == 'send') {
   if (isset($_POST['edit_x']) || isset($_POST['edit_y'])) {
     $error = true;
   }
-  if (!isset($_POST['to_name']) || trim($_POST['to_name']=='')) {
+  if (!isset($_POST['to_name']) || trim($_POST['to_name']) === '') {
     $error = true;
     $messageStack->add('gv_send', ERROR_ENTRY_TO_NAME_CHECK, 'error');
   }
@@ -87,7 +87,7 @@ if ($_GET['action'] == 'send') {
     $messageStack->add('gv_send', ERROR_ENTRY_AMOUNT_CHECK, 'error');
   }
   $gv_amount = $currencies->normalizeValue($gv_amount);
-  if ( $currencies->value($gv_amount, true,zen_config('DEFAULT_CURRENCY')) > $customer_amount || $gv_amount == 0) {
+  if (!is_numeric($gv_amount) || $currencies->value($gv_amount, true,zen_config('DEFAULT_CURRENCY')) > $customer_amount || $gv_amount == 0) {
     //echo $currencies->value($customer_amount, true,DEFAULT_CURRENCY);
     $error = true;
     $messageStack->add('gv_send', ERROR_ENTRY_AMOUNT_CHECK, 'error');
@@ -98,7 +98,8 @@ if ($_GET['action'] == 'process') {
   if (!isset($_POST['back'])) { // customer didn't click the back button
     $id1 = Coupon::generateRandomCouponCode($account->fields['customers_email_address']);
     // sanitize and remove non-numeric characters
-    $_POST['amount'] = preg_replace('/[^0-9.,%]/', '', $_POST['amount']);
+    $_POST['amount'] = preg_replace('/[^0-9.,%]/', '', (string)($_POST['amount'] ?? ''));
+    $_POST['email'] = trim((string)($_POST['email'] ?? ''));
 
     // 'process' can be posted directly, so repeat the 'send' checks before creating or emailing anything
     $error = false;
@@ -106,14 +107,15 @@ if ($_GET['action'] == 'process') {
       $error = true;
       $messageStack->add('gv_send', ERROR_ENTRY_TO_NAME_CHECK, 'error');
     }
-    if (!zen_validate_email(trim($_POST['email'] ?? ''))) {
+    if (!zen_validate_email($_POST['email'])) {
       $error = true;
       $messageStack->add('gv_send', ERROR_ENTRY_EMAIL_ADDRESS_CHECK, 'error');
     }
 
-    $new_amount = $gv_result->fields['amount'] - $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY'));
-    $new_db_amount = $gv_result->fields['amount'] - $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY'));
-    if ($new_amount < 0 || $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY')) <= 0) {
+    // a non-numeric amount would throw a TypeError inside $currencies->value()
+    $send_amount = is_numeric($_POST['amount']) ? $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY')) : 0;
+    $new_amount = $gv_result->fields['amount'] - $send_amount;
+    if ($new_amount < 0 || $send_amount <= 0) {
       $error = true;
       $messageStack->add('gv_send', ERROR_ENTRY_AMOUNT_CHECK, 'error');
     }
@@ -132,7 +134,7 @@ if ($_GET['action'] == 'process') {
                  VALUES ('G', :couponCode, NOW(), :amount)";
 
       $gv_query = $db->bindVars($gv_query, ':couponCode', $id1, 'string');
-      $gv_query = $db->bindVars($gv_query, ':amount', $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY')), 'currency');
+      $gv_query = $db->bindVars($gv_query, ':amount', $send_amount, 'currency');
       $gv = $db->Execute($gv_query);
 
       $insert_id = $db->insert_ID();
