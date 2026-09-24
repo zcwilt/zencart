@@ -55,7 +55,7 @@ foreach ($gv_lists as $gv_list) {
                     <?php } else { ?>
                     <tr class="dataTableRow" onclick="document.location.href = '<?= zen_href_link('gv_sent.php', zen_get_all_get_params(['gid', 'action']) . 'gid=' . $gv_list['coupon_id']); ?>'">
                     <?php } ?>
-                    <td class="dataTableContent"><?= $gv_list['sent_firstname'] . ' ' . $gv_list['sent_lastname']; ?></td>
+                    <td class="dataTableContent"><?= zen_output_string_protected($gv_list['sent_firstname'] . ' ' . $gv_list['sent_lastname']); ?></td>
                     <td class="dataTableContent text-center"><?= $currencies->format($gv_list['coupon_amount']); ?></td>
                     <td class="dataTableContent text-center"><?= $gv_list['coupon_code']; ?></td>
                     <td class="dataTableContent text-right"><?= zen_date_short($gv_list['date_sent']); ?></td>
@@ -98,10 +98,10 @@ if (isset($gInfo)) {
     $contents[] = ['text' => TEXT_INFO_AMOUNT_SENT . ' ' . $currencies->format($gInfo->coupon_amount)];
     $contents[] = ['text' => TEXT_INFO_DATE_SENT . ' ' . zen_date_short($gInfo->date_sent)];
     $contents[] = ['text' => TEXT_INFO_VOUCHER_CODE . ' ' . $gInfo->coupon_code];
-    $contents[] = ['text' => TEXT_INFO_EMAIL_ADDRESS . ' ' . $gInfo->emailed_to];
+    $contents[] = ['text' => TEXT_INFO_EMAIL_ADDRESS . ' ' . zen_output_string_protected($gInfo->emailed_to)];
     if ($redeemed == 'Yes') {
         $contents[] = ['text' => '<br>' . TEXT_INFO_DATE_REDEEMED . ' ' . zen_date_short($redeem->fields['redeem_date'])];
-        $contents[] = ['text' => TEXT_INFO_IP_ADDRESS . ' ' . $redeem->fields['redeem_ip']];
+        $contents[] = ['text' => TEXT_INFO_IP_ADDRESS . ' ' . zen_output_string_protected($redeem->fields['redeem_ip'])];
         $contents[] = ['text' => TEXT_INFO_CUSTOMERS_ID . ' ' . $redeem->fields['customer_id'] . ' ' . ($redeem->fields['customer_id'] != 0 ? zen_get_customer_email_from_id($redeem->fields['customer_id']) : '')];
     } else {
         $contents[] = ['text' => '<br>' . TEXT_INFO_NOT_REDEEMED];

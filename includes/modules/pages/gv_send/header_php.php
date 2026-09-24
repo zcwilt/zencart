@@ -100,11 +100,24 @@ if ($_GET['action'] == 'process') {
     // sanitize and remove non-numeric characters
     $_POST['amount'] = preg_replace('/[^0-9.,%]/', '', $_POST['amount']);
 
+    // 'process' can be posted directly, so repeat the 'send' checks before creating or emailing anything
+    $error = false;
+    if (!isset($_POST['to_name']) || trim($_POST['to_name']) === '') {
+      $error = true;
+      $messageStack->add('gv_send', ERROR_ENTRY_TO_NAME_CHECK, 'error');
+    }
+    if (!zen_validate_email(trim($_POST['email'] ?? ''))) {
+      $error = true;
+      $messageStack->add('gv_send', ERROR_ENTRY_EMAIL_ADDRESS_CHECK, 'error');
+    }
+
     $new_amount = $gv_result->fields['amount'] - $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY'));
     $new_db_amount = $gv_result->fields['amount'] - $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY'));
-    if ($new_amount < 0) {
-      $error= true;
+    if ($new_amount < 0 || $currencies->value($_POST['amount'], true, zen_config('DEFAULT_CURRENCY')) <= 0) {
+      $error = true;
       $messageStack->add('gv_send', ERROR_ENTRY_AMOUNT_CHECK, 'error');
+    }
+    if ($error === true) {
       $_GET['action'] = 'send';
     } else {
       $_GET['action'] = 'complete';
