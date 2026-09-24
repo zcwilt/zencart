@@ -543,6 +543,18 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
             continue;
         }
 
+        /**
+         * Decimal columns are copied as the numeric strings the database returned rather than
+         * cast to float, which would drop digits beyond PHP's float-to-string precision.
+         */
+        $decimals = [];
+        foreach (['options_values_price', 'products_attributes_weight', 'attributes_price_onetime', 'attributes_price_factor',
+                  'attributes_price_factor_offset', 'attributes_price_factor_onetime', 'attributes_price_factor_onetime_offset',
+                  'attributes_price_words', 'attributes_price_letters'] as $field) {
+            $value = trim((string)($copy_from[$field] ?? ''));
+            $decimals[$field] = is_numeric($value) ? $value : '0';
+        }
+
         // New attribute - insert it
         if ($add_attribute === true) {
             $db->Execute("INSERT INTO " . TABLE_PRODUCTS_ATTRIBUTES . "
@@ -556,28 +568,28 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
               VALUES (" . $products_id_to . ",
               '" . (int)$copy_from['options_id'] . "',
               '" . (int)$copy_from['options_values_id'] . "',
-              '" . (float)$copy_from['options_values_price'] . "',
+              '" . $decimals['options_values_price'] . "',
               '" . zen_db_input($copy_from['options_values_price_w']) . "',
               '" . zen_db_input($copy_from['price_prefix']) . "',
               '" . (int)$copy_from['products_options_sort_order'] . "',
               '" . (int)$copy_from['product_attribute_is_free'] . "',
-              '" . (float)$copy_from['products_attributes_weight'] . "',
+              '" . $decimals['products_attributes_weight'] . "',
               '" . zen_db_input($copy_from['products_attributes_weight_prefix']) . "',
               '" . (int)$copy_from['attributes_display_only'] . "',
               '" . (int)$copy_from['attributes_default'] . "',
               '" . (int)$copy_from['attributes_discounted'] . "',
               '" . zen_db_input($copy_from['attributes_image']) . "',
               '" . (int)$copy_from['attributes_price_base_included'] . "',
-              '" . (float)$copy_from['attributes_price_onetime'] . "',
-              '" . (float)$copy_from['attributes_price_factor'] . "',
-              '" . (float)$copy_from['attributes_price_factor_offset'] . "',
-              '" . (float)$copy_from['attributes_price_factor_onetime'] . "',
-              '" . (float)$copy_from['attributes_price_factor_onetime_offset'] . "',
+              '" . $decimals['attributes_price_onetime'] . "',
+              '" . $decimals['attributes_price_factor'] . "',
+              '" . $decimals['attributes_price_factor_offset'] . "',
+              '" . $decimals['attributes_price_factor_onetime'] . "',
+              '" . $decimals['attributes_price_factor_onetime_offset'] . "',
               '" . zen_db_input($copy_from['attributes_qty_prices']) . "',
               '" . zen_db_input($copy_from['attributes_qty_prices_onetime']) . "',
-              '" . (float)$copy_from['attributes_price_words'] . "',
+              '" . $decimals['attributes_price_words'] . "',
               '" . (int)$copy_from['attributes_price_words_free'] . "',
-              '" . (float)$copy_from['attributes_price_letters'] . "',
+              '" . $decimals['attributes_price_letters'] . "',
               '" . (int)$copy_from['attributes_price_letters_free'] . "',
               '" . (int)$copy_from['attributes_required'] . "')"
             );
@@ -612,35 +624,33 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
         // Update attribute - Just attribute settings not ids
         if ($update_attribute === true) {
             $db->Execute("UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . " SET
-                  options_values_price = '" . (float)$copy_from['options_values_price'] . "',
+                  options_values_price = '" . $decimals['options_values_price'] . "',
                   options_values_price_w = '" . zen_db_input($copy_from['options_values_price_w']) . "',
                   price_prefix = '" . zen_db_input($copy_from['price_prefix']) . "',
                   products_options_sort_order = '" . (int)$copy_from['products_options_sort_order'] . "',
                   product_attribute_is_free = '" . (int)$copy_from['product_attribute_is_free'] . "',
-                  products_attributes_weight = '" . (float)$copy_from['products_attributes_weight'] . "',
+                  products_attributes_weight = '" . $decimals['products_attributes_weight'] . "',
                   products_attributes_weight_prefix = '" . zen_db_input($copy_from['products_attributes_weight_prefix']) . "',
                   attributes_display_only = '" . (int)$copy_from['attributes_display_only'] . "',
                   attributes_default = '" . (int)$copy_from['attributes_default'] . "',
                   attributes_discounted = '" . (int)$copy_from['attributes_discounted'] . "',
                   attributes_image = '" . zen_db_input($copy_from['attributes_image']) . "',
                   attributes_price_base_included = '" . (int)$copy_from['attributes_price_base_included'] . "',
-                  attributes_price_onetime = '" . (float)$copy_from['attributes_price_onetime'] . "',
-                  attributes_price_factor = '" . (float)$copy_from['attributes_price_factor'] . "',
-                  attributes_price_factor_offset = '" . (float)$copy_from['attributes_price_factor_offset'] . "',
-                  attributes_price_factor_onetime = '" . (float)$copy_from['attributes_price_factor_onetime'] . "',
-                  attributes_price_factor_onetime_offset = '" . (float)$copy_from['attributes_price_factor_onetime_offset'] . "',
+                  attributes_price_onetime = '" . $decimals['attributes_price_onetime'] . "',
+                  attributes_price_factor = '" . $decimals['attributes_price_factor'] . "',
+                  attributes_price_factor_offset = '" . $decimals['attributes_price_factor_offset'] . "',
+                  attributes_price_factor_onetime = '" . $decimals['attributes_price_factor_onetime'] . "',
+                  attributes_price_factor_onetime_offset = '" . $decimals['attributes_price_factor_onetime_offset'] . "',
                   attributes_qty_prices = '" . zen_db_input($copy_from['attributes_qty_prices']) . "',
                   attributes_qty_prices_onetime = '" . zen_db_input($copy_from['attributes_qty_prices_onetime']) . "',
-                  attributes_price_words = '" . (float)$copy_from['attributes_price_words'] . "',
+                  attributes_price_words = '" . $decimals['attributes_price_words'] . "',
                   attributes_price_words_free = '" . (int)$copy_from['attributes_price_words_free'] . "',
-                  attributes_price_letters = '" . (float)$copy_from['attributes_price_letters'] . "',
+                  attributes_price_letters = '" . $decimals['attributes_price_letters'] . "',
                   attributes_price_letters_free = '" . (int)$copy_from['attributes_price_letters_free'] . "',
                   attributes_required = '" . (int)$copy_from['attributes_required'] . "'
                   WHERE products_id = " . $products_id_to . "
                    AND options_id = " . (int)$copy_from['options_id'] . "
                    AND options_values_id = " . (int)$copy_from['options_values_id']
-// and attributes_image='" . $copy_from['attributes_image'] . "'
-// and attributes_price_base_included=" . $copy_from['attributes_price_base_included']
             );
             $messageStack->add_session(sprintf(TEXT_ATTRIBUTE_COPY_UPDATING, (int)$copy_from['products_attributes_id'], $products_id_to), 'success');
 
@@ -723,7 +733,7 @@ function zen_update_attributes_products_option_values_sort_order($product_id)
     $results = $db->Execute($sql);
     foreach ($results as $result) {
         $db->Execute("UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . "
-                      SET products_options_sort_order = '" . $results->fields['products_options_values_sort_order'] . "'
+                      SET products_options_sort_order = " . (int)$results->fields['products_options_values_sort_order'] . "
                       WHERE products_id = " . (int)$product_id . "
                       AND products_attributes_id = " . (int)$results->fields['products_attributes_id']);
     }
