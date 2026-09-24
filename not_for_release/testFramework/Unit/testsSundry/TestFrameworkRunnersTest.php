@@ -671,9 +671,14 @@ class TestFrameworkRunnersTest extends TestCase
 
         $this->assertSame(0, $exitCode, implode(PHP_EOL, $output));
         $dryLines = array_values(array_filter($output, static fn (string $line): bool => str_starts_with($line, 'DRY   ')));
-        $this->assertContains('DRY   [worker 1] not_for_release/testFramework/FeatureAdmin/AdminEndpoints/AdminAccountPagesTest.php', $dryLines);
-        $this->assertContains('DRY   [worker 2] not_for_release/testFramework/FeatureAdmin/AdminEndpoints/AdminAuthLifecycleTest.php', $dryLines);
         $this->assertGreaterThan(2, count($dryLines));
+        // Assert the cycling pattern rather than specific files, so adding an admin test does not break this.
+        foreach (array_slice($dryLines, 0, 3) as $index => $line) {
+            $this->assertMatchesRegularExpression(
+                '#^DRY   \[worker ' . ($index % 2 + 1) . '\] not_for_release/testFramework/FeatureAdmin/\S+Test\.php$#',
+                $line
+            );
+        }
     }
 
     public function testParallelFeatureAggregateDryRunSkipsStorefrontForAdminOnlyFilter(): void
