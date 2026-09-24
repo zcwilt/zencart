@@ -13,6 +13,13 @@
 
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_START_GV_SEND');
+// array-valued inputs would throw a TypeError in zen_output_string_protected(), trim(), stripslashes() or zen_mail(); treat them as empty
+foreach (['to_name', 'email', 'amount', 'message'] as $gv_field) {
+  if (isset($_POST[$gv_field]) && !is_string($_POST[$gv_field])) {
+    $_POST[$gv_field] = '';
+  }
+}
+
 if (isset($_POST['message'])) $_POST['message'] = zen_output_string_protected($_POST['message']);
 if (isset($_POST['to_name'])) $_POST['to_name'] = zen_output_string_protected($_POST['to_name']);
 
@@ -68,7 +75,7 @@ if ($_GET['action'] == 'send') {
   if (isset($_POST['edit_x']) || isset($_POST['edit_y'])) {
     $error = true;
   }
-  if (!isset($_POST['to_name']) || trim($_POST['to_name']) === '') {
+  if (!isset($_POST['to_name']) || trim($_POST['to_name']) === '' || preg_match('/[\r\n]/', $_POST['to_name'])) {
     $error = true;
     $messageStack->add('gv_send', ERROR_ENTRY_TO_NAME_CHECK, 'error');
   }
@@ -103,7 +110,7 @@ if ($_GET['action'] == 'process') {
 
     // 'process' can be posted directly, so repeat the 'send' checks before creating or emailing anything
     $error = false;
-    if (!isset($_POST['to_name']) || trim($_POST['to_name']) === '') {
+    if (!isset($_POST['to_name']) || trim($_POST['to_name']) === '' || preg_match('/[\r\n]/', $_POST['to_name'])) {
       $error = true;
       $messageStack->add('gv_send', ERROR_ENTRY_TO_NAME_CHECK, 'error');
     }
@@ -119,16 +126,25 @@ if ($_GET['action'] == 'process') {
       $error = true;
       $messageStack->add('gv_send', ERROR_ENTRY_AMOUNT_CHECK, 'error');
     }
+    if ($error === false) {
+      // debit in a single statement so concurrent submissions can't both spend the same balance
+      $gv_query = "UPDATE " . TABLE_COUPON_GV_CUSTOMER . "
+                   SET amount = amount - :amount
+                   WHERE customer_id = :customersID
+                   AND amount >= :amount";
+
+      $gv_query = $db->bindVars($gv_query, ':amount', $send_amount, 'currency');
+      $gv_query = $db->bindVars($gv_query, ':customersID', $_SESSION['customer_id'], 'integer');
+      $db->Execute($gv_query);
+      if ($db->affectedRows() < 1) {
+        $error = true;
+        $messageStack->add('gv_send', ERROR_ENTRY_AMOUNT_CHECK, 'error');
+      }
+    }
     if ($error === true) {
       $_GET['action'] = 'send';
     } else {
       $_GET['action'] = 'complete';
-      $gv_query="UPDATE " . TABLE_COUPON_GV_CUSTOMER . "
-                 SET amount = '" .  $new_amount . "'
-                 WHERE customer_id = :customersID";
-
-      $gv_query = $db->bindVars($gv_query, ':customersID', $_SESSION['customer_id'], 'integer');
-      $db->Execute($gv_query);
 
       $gv_query="INSERT INTO " . TABLE_COUPONS . " (coupon_type, coupon_code, date_created, coupon_amount)
                  VALUES ('G', :couponCode, NOW(), :amount)";

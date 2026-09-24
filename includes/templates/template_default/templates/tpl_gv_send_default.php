@@ -48,7 +48,7 @@ if ($action === 'doneprocess') {
 
     <?php echo zen_draw_form('gv_send_process', zen_href_link(FILENAME_GV_SEND, 'action=process', 'SSL', false)); ?>
         <div id="gvSendDefaultMainMessage" class="content">
-            <?php echo sprintf(MAIN_MESSAGE, $currencies->format($currencies->normalizeValue($_POST['amount']), false), $to_name, $_POST['email']); ?>
+            <?php echo sprintf(MAIN_MESSAGE, $currencies->format($currencies->normalizeValue($_POST['amount']), false), $to_name, zen_output_string_protected($_POST['email'])); ?>
         </div>
 
         <div id="gvSendDefaultMessageSecondary" class="content">
@@ -66,7 +66,7 @@ if ($action === 'doneprocess') {
     echo zen_draw_hidden_field('to_name', stripslashes($to_name)) .
          zen_draw_hidden_field('email', $_POST['email']) .
          zen_draw_hidden_field('amount', $gv_amount) .
-         zen_draw_hidden_field('message', stripslashes($_POST['message']));
+         zen_draw_hidden_field('message', stripslashes($_POST['message'] ?? ''));
 ?>
         <div class="buttonRow forward"><?php echo zen_image_submit(BUTTON_IMAGE_CONFIRM_SEND, BUTTON_CONFIRM_SEND_ALT); ?></div>
         <div class="buttonRow back"><?php echo zen_image_submit(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT, 'name="edit" value="edit"'); ?></div>

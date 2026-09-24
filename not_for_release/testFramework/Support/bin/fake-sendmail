@@ -1,0 +1,3 @@
+#!/bin/sh
+# Stand-in for sendmail during test runs (see Support/application_testing.php): accept the message and discard it.
+cat > /dev/null

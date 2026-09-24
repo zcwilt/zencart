@@ -22,4 +22,11 @@ $config = \Tests\Support\TestConfigResolver::resolveConfigPath($context, $basePa
 if (!defined('ZC_ADMIN_TWO_FACTOR_AUTHENTICATION_SERVICE')) {
     define('ZC_ADMIN_TWO_FACTOR_AUTHENTICATION_SERVICE', '');
 }
+/**
+ * With EMAIL_TRANSPORT set to 'sendmail', mail goes to a script that discards it, so a test can enable
+ * SEND_EMAILS and EMAIL_ARCHIVE and read what would have been sent from the email_archive table.
+ */
+if (!defined('EMAIL_SENDMAIL_PATH')) {
+    define('EMAIL_SENDMAIL_PATH', __DIR__ . '/bin/fake-sendmail');
+}
 require($config);
